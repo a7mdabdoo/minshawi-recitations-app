@@ -453,7 +453,7 @@ class _LandingPlaylistsSection extends StatelessWidget {
     required Color textSecondary,
   }) {
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    final created = playlist.createdAt ?? DateTime.now();
+    final created = playlist.createdAt;
     final dateStr =
         '${created.year}/${created.month.toString().padLeft(2, '0')}/${created.day.toString().padLeft(2, '0')}';
 

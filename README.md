@@ -1,8 +1,9 @@
-# جامع تلاوات المنشاوي
+﻿# جامع تلاوات المنشاوي
 ### Al-Minshawi Quran Recitations App
 
-تطبيق قرآني شامل لتلاوات الشيخ محمد صديق المنشاوي (رحمه الله) مبني باستخدام Flutter.  
-*A comprehensive Quranic recitation application for Sheikh Muhammad Siddiq Al-Minshawi, built with Flutter.*
+تطبيق قرآني شامل ونقي لوجه الله تعالى، يجمع التراث الصوتي لفضيلة الشيخ محمد صديق المنشاوي (رحمه الله) بأعلى معايير الأداء والجمالية، مبني باستخدام Flutter وفق مبادئ Clean Architecture وبدون أي إعلانات.
+
+*A premium, non-profit, offline-first Quranic recitation application dedicated to the vocal legacy of Sheikh Muhammad Siddiq Al-Minshawi, crafted with Flutter and Clean Architecture principles with zero ads.*
 
 ---
 
@@ -23,22 +24,45 @@
 ## نبذة عن المشروع | Overview
 
 ### العربية
-تطبيق "جامع تلاوات المنشاوي" هو تطبيق مفتوح المصدر يهدف إلى توفير وصول سلس وموثوق إلى التراث الصوتي لفضيلة القارئ الشيخ محمد صديق المنشاوي. يضم التطبيق المصحف المرتل كاملاً، والمصحف المجود كاملاً، بالإضافة إلى تسجيلات عام 1387 هـ الخارجية النادرة، مع مراعاة أحدث معايير الأداء وتصميم واجهات المستخدم المتجاوبة.
+تطبيق **"جامع تلاوات المنشاوي"** هو منصة قرآنية صوتية مفتوحة المصدر تهدف إلى توفير تجربة استماع راقية وموثوقة للتراث الصوتي الخالد لفضيلة القارئ الشيخ محمد صديق المنشاوي (رحمه الله). يجمع التطبيق المصحف المرتل كاملاً (١١٤ سورة)، والمصحف المجود كاملاً، بالإضافة إلى التسجيلات الخارجية النادرة لحفلات عام ١٣٨٧ هـ. يتميز التطبيق بمشغل صوتي عصري ومتقدم مستوحى من أفضل منصات الصوتيات، وأدوات متخصصة في حفظ القرآن ومراجعته، مع دعم كامل للتشغيل دون اتصال بالإنترنت وخلو تام من الإعلانات أو أدوات التتبع.
 
 ### English
-Al-Minshawi Quran Recitations is an open-source mobile application designed to deliver seamless, high-fidelity access to the recorded audio legacy of the prominent Egyptian reciter Sheikh Muhammad Siddiq Al-Minshawi. The application includes his complete Murattal recitation, complete Mujawwad recitation, and rare external recordings from 1387 AH (1967-1968), engineered for smooth performance and responsive user experience.
+**Al-Minshawi Quran Recitations** is a modern, open-source audio streaming and offline playback platform engineered to present the timeless recordings of Sheikh Muhammad Siddiq Al-Minshawi. It bundles his complete Murattal recitation (114 Surahs), complete Mujawwad recitation, and rare historic external concert recordings from 1387 AH (1967-1968). The app provides an elegant, Spotify-inspired audio experience with Quranic memorization tools, offline caching, and strict zero-advertising and privacy commitments.
 
 ---
 
-## الخصائص التقنية والوظيفية | Key Features
+## المميزات الرئيسية | Key Features
 
-- **الاستماع والتحميل دون اتصال (Offline Playback & Downloading):** إمكانية تحميل السور في الذاكرة المحلية للجهاز مع إدارة تلقائية للمساحة التخزينية.
-- **خدمة تشغيل الخلفية والتحكم بالنظام (Background Audio Service):** تكامل كامل مع خدمات تشغيل الوسائط في نظام التشغيل وإشعارات شاشة القفل (just_audio و audio_service).
-- **قوائم التشغيل والمفضلة (Custom Playlists & Bookmarks):** إدارة قوائم التشغيل المخصصة، وإضافة المقاطع إلى المفضلة، مع إمكانية التشغيل التتابعي.
-- **أوضاع التكرار وتكرار المقاطع (Repeat Modes & A-B Looping):** دعم تكرار السورة، تكرار القائمة، التشغيل العشوائي، وتحديد مقطع بين نقطتين للتكرار بغرض الحفظ والمراجعة.
-- **مؤقت النوم التدريجي (Smart Sleep Timer):** إيقاف التشغيل تلقائياً بعد فترة زمنية محددة مع خفض تدريجي للصوت أو عند نهاية السورة الحالية.
-- **تحسينات الأداء ومعدل الإطارات (Performance Optimizations):** اعتماد تقنيات RepaintBoundary وتحديثات الحالة الموضعية عبر BLoC لضمان معدل تحديث ثابت وسلس (60/120 FPS).
-- **تصميم متناسق ودعم الوضع الداكن (Dark & Light Theme Support):** واجهة مستخدم إسلامية رصينة تدعم الوضعين الفاتح والداكن ومصممة خصيصاً للغة العربية وقواعد خط المصحف.
+### 1. مشغل صوتي عصري وشريط مصغر تفاعلي (Modern Audio Player & Mini-Player)
+- **واجهة عصرية فاخرة:** تصميم رمادي داكن فاحم (Charcoal Grey & Gold Accent) يتناغم بدقة مع ألوان التطبيق في الوضعين الداكن والفاتح.
+- **إيماءات سحب سلسة (Bidirectional Swipe Gestures):** سحب لأعلى على الشريط المصغر (Mini-Player) لفتح المشغل الكامل بانتقال ناعم، وسحب لأسفل في المشغل الكامل للرجوع الفوري.
+- **تحكم زمني دقيق:** أزرار تقديم وتأخير مخصصة (`+10s` و `-10s`) لتسهيل متابعة الآيات والتدبر.
+- **تشغيل في الخلفية وشاشة القفل:** تكامل متكامل مع نظام التشغيل عبر `just_audio` و `audio_service` مع أزرار التحكم في شريط الإشعارات وشاشة القفل.
+
+### 2. أداة التكرار الذكي وحفظ الآيات (A-B Repeat Looping)
+- إمكانية تحديد نقطة بداية (A) ونقطة نهاية (B) بدقة بالغة بالثواني والأجزاء المئوية.
+- أزرار ضبط دقيق (`+1s` و `-1s`) لكل نقطة للوصول للآية المحددة بدقة.
+- تكرار تلقائي بعدد محدد أو تكرار لا نهائي للمساعدة في تثبيت الحفظ ومراجعة الأحكام.
+
+### 3. مكتبة تلاوات متكاملة (Comprehensive Recitation Library)
+- **المصحف المرتل كاملاً:** ١١٤ سورة نقية برواية حفص عن عاصم.
+- **المصحف المجود:** روائع التلاوات المجودة بجودة صوتية عالية.
+- **النوادر الخارجية لعام ١٣٨٧ هـ:** حفلات وتسجيلات خارجية تاريخية نادرة.
+
+### 4. قوائم التشغيل المخصصة والمفضلة (Custom Playlists & Favorites)
+- إنشاء وإدارة قوائم تشغيل مخصصة للتلاوات المفضلة وحفظها محلياً بأمان عبر Hive.
+- بحث فوري وسريع يدعم تطبيع الحروف والهمزات العربية (`ArabicNormalizer`) لمنع أي فقد في نتائج البحث.
+- تشغيل تتابعي ذكي لجميع عناصر القائمة.
+
+### 5. الاستماع دون اتصال والتحميل السريع (Offline Downloads)
+- تحميل السور والتلاوات للاستماع أثناء السفر أو في غياب شبكة الإنترنت.
+- إدارة ذكية للتحميل تدعم الاستئناف التلقائي والإيقاف المؤقت، مع فحص سلامة الملفات على القرص.
+
+### 6. مؤقت النوم الذكي (Smart Sleep Timer)
+- خيارات زمنية مرنة مع إيقاف تدريجي هادئ للصوت لحماية السمع ومنع انقطاع الصوت المفاجئ.
+
+### 7. دعم السمات والتصميم المتجاوب (Dark & Light Themes)
+- دعم كامل للوضع الداكن (Dark Theme) المريح للعين والوضع الفاتح الأنيق، مع مراعاة كاملة لاتجاه القراءة من اليمين إلى اليسار (RTL).
 
 ---
 
@@ -47,11 +71,12 @@ Al-Minshawi Quran Recitations is an open-source mobile application designed to d
 - **إطار العمل (Framework):** Flutter (v3.29+)
 - **لغة البرمجة (Language):** Dart (v3.7+)
 - **نمط التصميم (Architecture):** Clean Architecture (Presentation, Domain, Data Layers)
-- **إدارة الحالة (State Management):** BLoC / Cubit (flutter_bloc)
-- **قواعد البيانات والتخزين المحلي (Local Storage):** Hive (hive_flutter)
-- **محرك الصوتيات (Audio Engine):** just_audio, audio_service, just_audio_background
-- **إدارة الشبكة والتحميل (Networking):** Dio (dio)
-- **الخطوط والطباعة (Typography):** Amiri & Cairo
+- **إدارة الحالة (State Management):** BLoC / Cubit (`flutter_bloc`) مع تحسينات إعادة البناء `buildWhen` لأعلى أداء (60/120 FPS).
+- **قواعد البيانات والتخزين المحلي (Local Storage):** Hive (`hive_flutter`) لحفظ التفضيلات وقوائم التشغيل ومسارات التنزيل محلياً وسريعاً.
+- **محرك الصوتيات (Audio Engine):** `just_audio`, `audio_service`, `just_audio_background`
+- **التنقل والتوجيه (Navigation):** `go_router`
+- **إدارة الشبكة (Networking):** `dio`
+- **الخطوط والطباعة (Typography):** Amiri (لأسماء السور والنصوص القرآنية) و Cairo (لواجهات المستخدم).
 
 ---
 
@@ -60,57 +85,65 @@ Al-Minshawi Quran Recitations is an open-source mobile application designed to d
 ```
 lib/
 ├── core/
-│   ├── constants/              # App themes, colors, API endpoints, manifests
-│   ├── di/                     # Dependency injection (GetIt service locator)
-│   ├── errors/                 # Failures and custom exceptions
-│   ├── network/                # Dio client configuration
-│   ├── router/                 # Navigation routing
-│   ├── services/               # Audio, storage, and download services
-│   ├── settings/               # User settings and playback persistence
-│   ├── theme/                  # Theme modes and configuration
-│   └── utils/                  # Text normalizers and formatters
+│   ├── constants/              # ألوان التطبيق، الروابط، والثيمات
+│   ├── di/                     # حقن التبعيات (GetIt service locator)
+│   ├── errors/                 # معالجة الأخطاء والاستثناءات
+│   ├── network/                # إعدادات عميل Dio
+│   ├── router/                 # مسارات التنقل والتوجيه عبر GoRouter
+│   ├── services/               # خدمات الصوت والتنزيل
+│   ├── settings/               # إعدادات المستخدم وتفضيلات التشغيل
+│   ├── theme/                  # تكوين الثيمات (Dark & Light Mode)
+│   └── utils/                  # أدوات معالجة النصوص وتنسيق الوقت
 ├── features/
-│   ├── downloads/              # Download manager and storage views
-│   ├── favorites/              # Saved favorites collection
-│   ├── player/                 # MiniPlayer, audio controller, sleep timer
-│   ├── playlists/              # Custom user playlists
-│   └── recitations/            # Collections, surah listing, landing and home pages
-└── main.dart                   # Application entry point
+│   ├── downloads/              # إدارة التنزيلات وعرض السور المحملة
+│   ├── favorites/              # المفضلة والتسجيلات المحفوظة
+│   ├── player/                 # مشغل الصوت الكامل، المشغل المصغر، مؤقت النوم، وتكرار A-B
+│   ├── playlists/              # إدارة قوائم التشغيل المخصصة والبحث
+│   └── recitations/            # فهرس السور والمصاحف والصفحة الرئيسية
+└── main.dart                   # نقطة انطلاق التطبيق
 ```
+
+---
+
+## سياسة الخصوصية | Privacy Policy
+
+التطبيق مجاني 100%، بدون أي إعلانات تجارية أو أدوات تتبع، ولا يجمع أو يشارك أي بيانات شخصية للمستخدمين. للاطلاع على الوثيقة الرسمية لسياسة الخصوصية، يرجى زيارة:
+- [سياسة الخصوصية الكاملة (PRIVACY_POLICY.md)](PRIVACY_POLICY.md)
+- [الرابط العام على GitHub](https://github.com/a7mdabdoo/minshawi-recitations-app/blob/main/PRIVACY_POLICY.md)
 
 ---
 
 ## التثبيت والتشغيل | Installation & Setup
 
 ### المتطلبات الأساسية (Prerequisites)
-- Flutter SDK (الإصدار 3.5.0 أو أحدث)
-- Android Studio أو VS Code مع حزم أدوات Flutter و Dart
-- جهاز Android حقيقي أو محاكي (Android Emulator)
+- Flutter SDK (الإصدار 3.29.0 أو أحدث)
+- Android SDK مع دعم Android 8.0 (API 26) فما فوق
+- بيئة تطوير متكاملة (VS Code أو Android Studio)
 
 ### خطوات التشغيل (Setup Commands)
 
-1. استنساخ المستودع (Clone repository):
+1. **استنساخ المستودع (Clone repository):**
    ```bash
    git clone https://github.com/a7mdabdoo/minshawi-recitations-app.git
    cd minshawi-recitations-app
    ```
 
-2. تثبيت الحزم البرمجية (Install dependencies):
+2. **تثبيت الحزم البرمجية (Install dependencies):**
    ```bash
    flutter pub get
    ```
 
-3. تشغيل الاختبارات (Run tests):
+3. **تشغيل الاختبارات البرمجية (Run tests):**
    ```bash
    flutter test
    ```
 
-4. تشغيل التطبيق في بيئة التطوير (Run app):
+4. **تشغيل التطبيق في بيئة التطوير (Run app):**
    ```bash
    flutter run
    ```
 
-5. بناء حزمة الإنتاج (Build release APK):
+5. **بناء حزمة الإنتاج (Build release APK):**
    ```bash
    flutter build apk --release
    ```
@@ -119,4 +152,4 @@ lib/
 
 ## الترخيص | License
 
-هذا المشروع متاح بموجب ترخيص [MIT License](LICENSE).
+هذا المشروع متاح بموجب ترخيص [MIT License](LICENSE). جميع التلاوات الصوتية هي تراث إسلامي عام لفضيلة الشيخ محمد صديق المنشاوي (رحمه الله).
