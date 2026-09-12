@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../recitations/data/datasources/local_recitation_data_source.dart';
@@ -78,6 +80,32 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
   /// The last known duration (updated via durationStream).
   Duration _duration = Duration.zero;
 
+  /// Cached local file URI for the portrait artwork, bypassing flutter_cache_manager.
+  static Uri? _cachedArtworkUri;
+
+  /// Copies the portrait asset to local storage so audio_service / notification
+  /// can read it directly via the file:// scheme without triggering flutter_cache_manager.
+  static Future<Uri?> _resolveArtworkUri() async {
+    if (_cachedArtworkUri != null) return _cachedArtworkUri;
+    try {
+      final docDir = await getApplicationSupportDirectory();
+      final file = File('${docDir.path}/minshawi_art.jpg');
+      if (!await file.exists()) {
+        final byteData =
+            await rootBundle.load('assets/images/minshawi_portrait.jpg');
+        await file.writeAsBytes(
+          byteData.buffer
+              .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
+          flush: true,
+        );
+      }
+      _cachedArtworkUri = Uri.file(file.path);
+      return _cachedArtworkUri;
+    } catch (_) {
+      return null;
+    }
+  }
+
   AudioPlayerCubit(
     this._localDataSource, {
     this.onPositionSaved,
@@ -85,6 +113,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
   })  : _player = AudioPlayer(),
         super(const AudioPlayerIdle()) {
     _bindStreams();
+    unawaited(_resolveArtworkUri());
   }
 
   void _cancelNetworkTimeout() {
@@ -405,17 +434,21 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
         _ => 'التلاوات النادرة - تسجيلات ١٣٨٧ هـ',
       };
 
+      // Resolve portrait artwork to a file:// URI to avoid network downloading via cache manager
+      final artUri = _cachedArtworkUri ?? await _resolveArtworkUri();
+
       final mediaItem = MediaItem(
         id: recitation.id,
         album: albumName,
         title: 'سورة ${recitation.surahNameAr}',
         artist: AppConstants.sheikhNameAr,
-        artUri: Uri.parse('asset:///assets/images/minshawi_portrait.jpg'),
+        artUri: artUri,
         duration: recitation.durationSeconds > 0
             ? Duration(seconds: recitation.durationSeconds)
             : null,
       );
 
+      // Direct streaming from remote URL or local file without cache manager
       final AudioSource source = validHivePath != null
           ? AudioSource.uri(
               Uri.file(validHivePath),
@@ -424,11 +457,15 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
           : AudioSource.uri(
               Uri.parse(recitation.audioUrl),
               tag: mediaItem,
+              headers: const {
+                'Accept': 'audio/mpeg, audio/*, */*',
+              },
             );
 
       await _player.setAudioSource(
         source,
         initialPosition: initialPosition,
+        preload: true,
       );
       await _player.setLoopMode(_loopMode == LoopMode.one ? LoopMode.one : LoopMode.off);
       await _player.play();
