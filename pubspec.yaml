@@ -1,0 +1,74 @@
+name: al_minshawi_recitations
+description: "تلاوات الشيخ محمد صديق المنشاوي النادرة"
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+
+  # Audio Engine
+  just_audio: ^0.10.4
+  just_audio_background: ^0.0.1-beta.14
+  audio_service: ^0.18.17
+  audio_session: ^0.2.2
+
+  # Networking & Downloads
+  dio: ^5.11.0
+  path_provider: ^2.1.6 
+  url_launcher: ^6.3.1 
+
+  # Local Persistence
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # Routing
+  go_router: ^15.1.2
+
+  # Service Locator
+  get_it: ^8.0.3
+
+  # UI & Fonts
+  google_fonts: ^8.2.1
+  flutter_svg: ^2.0.17
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+
+  # Web platform support
+  web: ^1.1.0
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.13
+  flutter_launcher_icons: ^0.13.1
+
+# ── Launcher Icon Generation ──────────────────────────────────────────────────
+# Run:  dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_logo.png"
+  adaptive_icon_background: "#101B24"
+  adaptive_icon_foreground: "assets/images/app_logo.png"
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/data/
+    - assets/images/
