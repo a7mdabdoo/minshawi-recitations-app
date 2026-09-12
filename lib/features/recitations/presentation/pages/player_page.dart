@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:al_minshawi_recitations/features/player/presentation/pages/audio_player_screen.dart';
 
-/// Player page – Full implementation in Phase 5.
-/// Phase 1 provides a skeleton so routing compiles.
+export 'package:al_minshawi_recitations/features/player/presentation/pages/audio_player_screen.dart';
+
+/// Full-screen audio player page wrapper for routing.
 class PlayerPage extends StatelessWidget {
   final String? initialRecitationId;
 
@@ -9,15 +11,6 @@ class PlayerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('المشغّل'),
-
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Text('تلاوة: ${initialRecitationId ?? 'غير محدد'}'),
-      ),
-    );
+    return AudioPlayerScreen(initialRecitationId: initialRecitationId);
   }
 }

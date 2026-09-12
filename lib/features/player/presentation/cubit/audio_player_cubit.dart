@@ -725,6 +725,42 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     }
   }
 
+  /// Sets Point A explicitly at the given duration or current playback position.
+  void setPointA([Duration? pos]) {
+    _abPointA = pos ?? _player.position;
+    if (_abPointB != null && _abPointB! <= _abPointA!) {
+      _abPointB = null;
+    }
+    final s = state;
+    if (s is AudioPlayerReady) {
+      emit(s.copyWith(
+        abPointA: _abPointA,
+        abPointB: _abPointB,
+        clearAbPoints: _abPointB == null,
+      ));
+    }
+  }
+
+  /// Sets Point B explicitly at the given duration or current position and activates the loop.
+  Future<void> setPointB([Duration? pos]) async {
+    final currentPos = pos ?? _player.position;
+    _abPointA ??= Duration.zero;
+    if (currentPos > _abPointA!) {
+      _abPointB = currentPos;
+    } else {
+      _abPointB = _abPointA;
+      _abPointA = currentPos;
+    }
+    await _player.seek(_abPointA!);
+    final s = state;
+    if (s is AudioPlayerReady) {
+      emit(s.copyWith(
+        abPointA: _abPointA,
+        abPointB: _abPointB,
+      ));
+    }
+  }
+
   @override
   Future<void> close() async {
     _cancelNetworkTimeout();

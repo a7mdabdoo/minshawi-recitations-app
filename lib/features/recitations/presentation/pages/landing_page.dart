@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -18,7 +20,8 @@ import '../../../player/presentation/widgets/mini_player.dart';
 enum _LandingTab { collections, playlists }
 
 class LandingPage extends StatefulWidget {
-  const LandingPage({super.key});
+  final ui.Image? portraitUiImage;
+  const LandingPage({super.key, this.portraitUiImage});
 
   @override
   State<LandingPage> createState() => _LandingPageState();
@@ -101,7 +104,11 @@ class _LandingPageState extends State<LandingPage> {
                       ),
                       child: Column(
                         children: [
-                          _UnifiedHeroBanner(isDark: isDark, gold: gold),
+                          _UnifiedHeroBanner(
+                            isDark: isDark,
+                            gold: gold,
+                            portraitUiImage: widget.portraitUiImage,
+                          ),
 
                           const SizedBox(height: 14),
 
@@ -150,10 +157,12 @@ class _LandingPageState extends State<LandingPage> {
 class _UnifiedHeroBanner extends StatelessWidget {
   final bool isDark;
   final Color gold;
+  final ui.Image? portraitUiImage;
 
   const _UnifiedHeroBanner({
     required this.isDark,
     required this.gold,
+    this.portraitUiImage,
   });
 
   @override
@@ -277,18 +286,24 @@ class _UnifiedHeroBanner extends StatelessWidget {
                 ),
               ),
               child: ClipOval(
-                child: Image.asset(
-                  'assets/images/minshawi_portrait.jpg',
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0, -0.25),
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/images/minshawi_portrait.jpg',
-                      fit: BoxFit.cover,
-                      alignment: const Alignment(0, -0.25),
-                    );
-                  },
-                ),
+                child: portraitUiImage != null
+                    ? RawImage(
+                        image: portraitUiImage,
+                        fit: BoxFit.cover,
+                        alignment: const Alignment(0, -0.25),
+                      )
+                    : Image.asset(
+                        'assets/images/minshawi_portrait.jpg',
+                        fit: BoxFit.cover,
+                        alignment: const Alignment(0, -0.25),
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/minshawi_portrait.jpg',
+                            fit: BoxFit.cover,
+                            alignment: const Alignment(0, -0.25),
+                          );
+                        },
+                      ),
               ),
             ),
           ),

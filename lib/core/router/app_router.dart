@@ -62,10 +62,23 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.player,
         name: 'player',
-        builder: (context, state) {
-          // The recitation ID is passed as an extra parameter.
+        pageBuilder: (context, state) {
           final recitationId = state.extra as String?;
-          return PlayerPage(initialRecitationId: recitationId);
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: PlayerPage(initialRecitationId: recitationId),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.easeOutCubic;
+              final tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          );
         },
       ),
     ],
