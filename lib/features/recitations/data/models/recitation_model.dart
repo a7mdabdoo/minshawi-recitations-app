@@ -21,20 +21,25 @@ class RecitationModel extends Recitation {
 
   factory RecitationModel.fromJson(Map<String, dynamic> json) {
     return RecitationModel(
-      id: json['id'] as String,
-      surahNumber: json['surahNumber'] as int,
-      surahNameAr: json['surahNameAr'] as String,
-      surahNameEn: json['surahNameEn'] as String,
-      verseRange: json['verseRange'] as String,
-      durationSeconds: json['durationSeconds'] as int? ?? 0,
-      fileSizeBytes: json['fileSizeBytes'] as int? ?? 0,
-      audioUrl: json['audioUrl'] as String,
-      recordingYear: json['recordingYear'] as String? ?? '1387 هـ / 1967-1968',
+      id: json['id']?.toString() ?? '',
+      surahNumber: int.tryParse(json['surahNumber']?.toString() ?? '0') ?? 0,
+      surahNameAr: json['surahNameAr']?.toString() ?? '',
+      surahNameEn: json['surahNameEn']?.toString() ?? '',
+      verseRange: json['verseRange']?.toString() ?? '',
+      durationSeconds:
+          int.tryParse(json['durationSeconds']?.toString() ?? '0') ?? 0,
+      fileSizeBytes:
+          int.tryParse(json['fileSizeBytes']?.toString() ?? '0') ?? 0,
+      audioUrl: json['audioUrl']?.toString() ?? '',
+      recordingYear: json['recordingYear']?.toString() ?? '1387 هـ / 1967-1968',
       recordingLocation:
-          json['recordingLocation'] as String? ?? 'تسجيل إذاعي (1387 هـ)',
-      collectionId: json['collectionId'] as String? ?? 'rare_1387',
-      isRare: json['isRare'] as bool? ?? true,
-      quality: json['quality'] as String? ?? '',
+          json['recordingLocation']?.toString() ?? 'تسجيل إذاعي (1387 هـ)',
+      collectionId: json['collectionId']?.toString() ?? 'rare_1387',
+      isRare: json['isRare'] is bool
+          ? json['isRare'] as bool
+          : (json['isRare']?.toString() == 'true'),
+      quality: json['quality']?.toString() ?? '',
+      localFilePath: json['localFilePath']?.toString(),
     );
   }
 

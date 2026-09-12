@@ -71,6 +71,25 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     return AbLoopState.off;
   }
 
+  /// A-B Repeat repetition count (null = infinite ∞)
+  int? _abRepeatCount;
+  int? get abRepeatCount => _abRepeatCount;
+  int _abRemainingRepeats = 0;
+  int get abRemainingRepeats => _abRemainingRepeats;
+
+  /// Sets repeat count for A-B loop (null = infinite ∞).
+  void setAbRepeatCount(int? count) {
+    _abRepeatCount = count;
+    _abRemainingRepeats = count ?? 0;
+    final s = state;
+    if (s is AudioPlayerReady) {
+      emit(s.copyWith(
+        abRepeatCount: _abRepeatCount,
+        clearAbRepeatCount: _abRepeatCount == null,
+      ));
+    }
+  }
+
   /// Guard to prevent concurrent track transition triggers.
   bool _isTransitioning = false;
 
@@ -110,7 +129,19 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     this._localDataSource, {
     this.onPositionSaved,
     this.onTrackPlayed,
-  })  : _player = AudioPlayer(),
+  })  : _player = AudioPlayer(
+          audioLoadConfiguration: const AudioLoadConfiguration(
+            androidLoadControl: AndroidLoadControl(
+              minBufferDuration: Duration(seconds: 15),
+              maxBufferDuration: Duration(seconds: 45),
+              bufferForPlaybackDuration: Duration(seconds: 2),
+              bufferForPlaybackAfterRebufferDuration: Duration(seconds: 4),
+            ),
+            darwinLoadControl: DarwinLoadControl(
+              preferredForwardBufferDuration: Duration(seconds: 30),
+            ),
+          ),
+        ),
         super(const AudioPlayerIdle()) {
     _bindStreams();
     unawaited(_resolveArtworkUri());
@@ -146,7 +177,16 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     // Position: fires ~200 ms while playing.
     _positionSub = _player.positionStream.listen((position) {
       if (_abPointA != null && _abPointB != null && position >= _abPointB!) {
-        _player.seek(_abPointA!);
+        if (_abRepeatCount != null && _abRepeatCount! > 0) {
+          if (_abRemainingRepeats > 1) {
+            _abRemainingRepeats--;
+            _player.seek(_abPointA!);
+          } else {
+            clearAbRepeat();
+          }
+        } else {
+          _player.seek(_abPointA!);
+        }
         return;
       }
 
@@ -665,6 +705,14 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     }
   }
 
+  /// Current audio volume (0.0 to 1.0).
+  double get volume => _player.volume;
+
+  /// Sets audio player volume (0.0 to 1.0).
+  Future<void> setVolume(double val) async {
+    await _player.setVolume(val.clamp(0.0, 1.0));
+  }
+
   /// Cycles playback speed: 1.0x -> 1.25x -> 1.5x -> 0.75x -> 1.0x.
   Future<void> togglePlaybackSpeed() async {
     final nextSpeed = switch (_speed) {
@@ -719,6 +767,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
   void clearAbRepeat() {
     _abPointA = null;
     _abPointB = null;
+    _abRemainingRepeats = _abRepeatCount ?? 0;
     final s = state;
     if (s is AudioPlayerReady) {
       emit(s.copyWith(clearAbPoints: true));
@@ -751,6 +800,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       _abPointB = _abPointA;
       _abPointA = currentPos;
     }
+    _abRemainingRepeats = _abRepeatCount ?? 0;
     await _player.seek(_abPointA!);
     final s = state;
     if (s is AudioPlayerReady) {

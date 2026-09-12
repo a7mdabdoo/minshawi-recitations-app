@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../../features/downloads/presentation/cubit/storage_cubit.dart';
 import '../../features/favorites/presentation/cubit/favorites_cubit.dart';
 import '../../features/playlists/presentation/cubit/playlists_cubit.dart';
 import '../../features/player/presentation/cubit/audio_player_cubit.dart';
@@ -17,7 +16,6 @@ import '../constants/app_constants.dart';
 import '../network/dio_client.dart';
 import '../settings/settings_cubit.dart';
 import '../services/download_service.dart';
-import '../services/storage_service.dart';
 import '../theme/theme_cubit.dart';
 
 /// Global service locator instance.
@@ -63,11 +61,6 @@ Future<void> setupServiceLocator() async {
       sl<Box<dynamic>>(instanceName: AppConstants.favoritesBoxName),
     ),
   );
-  sl.registerSingleton<PlaylistsCubit>(
-    PlaylistsCubit(
-      sl<Box<dynamic>>(instanceName: AppConstants.playlistsBoxName),
-    ),
-  );
   
   sl.registerLazySingleton<DownloadService>(
     () => DownloadService(
@@ -78,19 +71,7 @@ Future<void> setupServiceLocator() async {
     ),
   );
 
-  sl.registerLazySingleton<StorageService>(
-    () => StorageService(
-      localDataSource: LocalRecitationDataSource(
-        sl<Box<dynamic>>(instanceName: AppConstants.downloadedFilesBoxName),
-      ),
-    ),
-  );
 
-  sl.registerLazySingleton<StorageCubit>(
-    () => StorageCubit(
-      storageService: sl<StorageService>(),
-    ),
-  );
 
   // Data sources
   sl.registerLazySingleton<ManifestDataSource>(
@@ -107,6 +88,13 @@ Future<void> setupServiceLocator() async {
     () => RecitationRepositoryImpl(
       manifestDataSource: sl<ManifestDataSource>(),
       localDataSource: sl<LocalRecitationDataSource>(),
+    ),
+  );
+
+  sl.registerSingleton<PlaylistsCubit>(
+    PlaylistsCubit(
+      sl<Box<dynamic>>(instanceName: AppConstants.playlistsBoxName),
+      sl<RecitationRepository>(),
     ),
   );
 

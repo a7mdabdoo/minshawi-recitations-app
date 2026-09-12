@@ -6,24 +6,11 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
-import '../../../recitations/domain/entities/recitation.dart';
 import '../cubit/audio_player_cubit.dart';
 import '../cubit/audio_player_state.dart';
 import '../pages/audio_player_screen.dart';
 
 /// Persistent bottom mini-player bar shown whenever a track is active.
-///
-/// Features:
-///   - Top 2px gold progress line.
-///   - Top subtle drag handle indicator (36x3.5 dp).
-///   - Tap anywhere & swipe-up gesture to smoothly open [AudioPlayerScreen]
-///     via a bottom-to-top slide transition (PageRouteBuilder).
-///   - Row 1 (Track Info & Actions):
-///       * Right: Surah name (bold Arabic) + expand arrow, with Quranic metadata
-///         tag (revelation type & ayah count, e.g. "مدنية • ٢٨٦ آية") below it.
-///       * Left: Favorite (heart) and Close (dismiss) buttons with clear padding.
-///   - Seek Bar Row: Interactive seek slider with elapsed & total duration.
-///   - Row 2 (Playback Controls): Previous, Replay 10s (-10), Play/Pause (prominent gold circle), Forward 10s (+10), Next.
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({super.key});
 
@@ -48,9 +35,6 @@ class MiniPlayer extends StatelessWidget {
   }
 }
 
-// ==========================================================
-// Main content shell with gesture recognition & slide-up animation
-// ==========================================================
 class _MiniPlayerContent extends StatelessWidget {
   final AudioPlayerState state;
   const _MiniPlayerContent({required this.state});
@@ -78,13 +62,13 @@ class _MiniPlayerContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
-    final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
-    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    final textPrimary =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final bg = isDark ? AppColors.darkCardSurface : Colors.white;
+    final gold = isDark ? const Color(0xFFE5B248) : const Color(0xFFD4A017);
+    final borderColor =
+        isDark ? const Color(0xFF2D333B) : const Color(0xFFE2E8F0);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+        isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B);
 
     final cubit = context.read<AudioPlayerCubit>();
 
@@ -115,10 +99,10 @@ class _MiniPlayerContent extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: bg,
-          border: Border(top: BorderSide(color: borderColor, width: 0.5)),
+          border: Border(top: BorderSide(color: borderColor, width: 0.8)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(isDark ? 110 : 25),
+              color: Colors.black.withAlpha(isDark ? 110 : 20),
               blurRadius: 18,
               offset: const Offset(0, -3),
             ),
@@ -127,17 +111,15 @@ class _MiniPlayerContent extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── 1. Top 2px gold progress line ─────────────────
-            _ProgressLine(gold: gold),
+            RepaintBoundary(child: _ProgressLine(gold: gold)),
 
-            // ── 2. Visual Drag Handle Indicator ────────────────
             Center(
               child: Container(
-                margin: const EdgeInsets.only(top: 5, bottom: 2),
+                margin: const EdgeInsets.only(top: 5, bottom: 3),
                 width: 36,
                 height: 3.5,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.black12,
+                  color: isDark ? const Color(0xFF30363D) : Colors.black12,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -147,59 +129,37 @@ class _MiniPlayerContent extends StatelessWidget {
               top: false,
               bottom: true,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 4, 14, 8),
+                padding: const EdgeInsets.fromLTRB(14, 2, 14, 8),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // ── 3. Row 1: Surah Title + Metadata (Right) & Actions (Left) ──
                     Directionality(
                       textDirection: TextDirection.rtl,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // Right side (RTL start): Surah name + Metadata tag
                           Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        recitation?.surahNameAr ?? '',
-                                        style: GoogleFonts.amiri(
-                                          color: textPrimary,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                                Flexible(
+                                  child: Text(
+                                    recitation?.surahNameAr ?? '',
+                                    style: GoogleFonts.amiri(
+                                      color: textPrimary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
-                                    const SizedBox(width: 4),
-                                    Icon(
-                                      Icons.keyboard_arrow_up_rounded,
-                                      size: 18,
-                                      color: gold.withAlpha(220),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 1),
-                                Text(
-                                  _getSurahMetaTag(recitation),
-                                  style: GoogleFonts.cairo(
-                                    color: isDark
-                                        ? Colors.white54
-                                        : textSecondary,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.keyboard_arrow_up_rounded,
+                                  size: 20,
+                                  color: gold,
                                 ),
                               ],
                             ),
@@ -207,12 +167,10 @@ class _MiniPlayerContent extends StatelessWidget {
 
                           const SizedBox(width: 8),
 
-                          // Left side (RTL end): Favorite + Close buttons
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // 1. Favorite button
                               if (recitation != null)
                                 BlocBuilder<FavoritesCubit, FavoritesState>(
                                   builder: (context, favState) {
@@ -225,9 +183,7 @@ class _MiniPlayerContent extends StatelessWidget {
                                       size: 20,
                                       color: isFav
                                           ? const Color(0xFFEF4444)
-                                          : (isDark
-                                              ? Colors.white60
-                                              : textSecondary.withAlpha(160)),
+                                          : textSecondary,
                                       tooltip: isFav
                                           ? 'إزالة من المفضلة'
                                           : 'أضف إلى المفضلة',
@@ -241,13 +197,10 @@ class _MiniPlayerContent extends StatelessWidget {
 
                               const SizedBox(width: 4),
 
-                              // 2. Close / Dismiss button (stops playback & hides bar)
                               _IconTap(
                                 icon: Icons.close_rounded,
                                 size: 20,
-                                color: isDark
-                                    ? Colors.white60
-                                    : textSecondary.withAlpha(180),
+                                color: textSecondary,
                                 tooltip: 'إغلاق المشغل',
                                 padding: const EdgeInsets.all(6),
                                 onTap: () =>
@@ -259,21 +212,21 @@ class _MiniPlayerContent extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
 
-                    // ── 4. Interactive seek-bar + timestamps ────────
-                    _SeekBarRow(
-                      gold: gold,
-                      isDark: isDark,
-                      isLoading: isLoading,
-                      isError: isError,
-                      textSecondary: textSecondary,
-                      cubit: cubit,
+                    RepaintBoundary(
+                      child: _SeekBarRow(
+                        gold: gold,
+                        isDark: isDark,
+                        isLoading: isLoading,
+                        isError: isError,
+                        textSecondary: textSecondary,
+                        cubit: cubit,
+                      ),
                     ),
 
                     const SizedBox(height: 4),
 
-                    // ── 5. Row 2: Playback Controls (Centered & Spaced) ──
                     Directionality(
                       textDirection: TextDirection.ltr,
                       child: Row(
@@ -292,7 +245,6 @@ class _MiniPlayerContent extends StatelessWidget {
                                 : cubit.playPrevious,
                           ),
 
-                          // Left side of Play button: Seek backward 10s (-10)
                           _CtrlBtn(
                             icon: Icons.replay_10_rounded,
                             size: 24,
@@ -305,7 +257,6 @@ class _MiniPlayerContent extends StatelessWidget {
                                 : cubit.skipBackward,
                           ),
 
-                          // Prominent Gold Play/Pause Button
                           _PlayPauseButton(
                             isLoading: isLoading,
                             isBuffering: isBuffering,
@@ -320,7 +271,6 @@ class _MiniPlayerContent extends StatelessWidget {
                                 : cubit.togglePlayPause,
                           ),
 
-                          // Right side of Play button: Seek forward 10s (+10)
                           _CtrlBtn(
                             icon: Icons.forward_10_rounded,
                             size: 24,
@@ -355,165 +305,8 @@ class _MiniPlayerContent extends StatelessWidget {
       ),
     );
   }
-
-  /// Formats Quranic metadata: revelation type and ayah count (e.g. "مدنية • ٢٨٦ آية")
-  String _getSurahMetaTag(Recitation? recitation) {
-    if (recitation == null) return '';
-    final surahNum = recitation.surahNumber;
-    final meta = _surahData[surahNum];
-    if (meta == null) {
-      return 'فضيلة الشيخ محمد صديق المنشاوي';
-    }
-    final type = meta.isMeccan ? 'مكية' : 'مدنية';
-    final countStr = _toArabicDigits(meta.verses);
-    final ayahWord = (meta.verses >= 3 && meta.verses <= 10) ? 'آيات' : 'آية';
-
-    if (recitation.verseRange.isNotEmpty &&
-        recitation.verseRange != '1-${meta.verses}' &&
-        recitation.verseRange != '1 - ${meta.verses}') {
-      return '$type • الآيات: ${recitation.verseRange}';
-    }
-    return '$type • $countStr $ayahWord';
-  }
-
-  static String _toArabicDigits(int number) {
-    const digits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-    return number.toString().split('').map((c) {
-      final idx = int.tryParse(c);
-      return idx != null ? digits[idx] : c;
-    }).join();
-  }
 }
 
-// ==========================================================
-// Surah Metadata definition and lookup table for all 114 Surahs
-// ==========================================================
-class _SurahInfo {
-  final bool isMeccan;
-  final int verses;
-  const _SurahInfo(this.isMeccan, this.verses);
-}
-
-const Map<int, _SurahInfo> _surahData = {
-  1: _SurahInfo(true, 7),
-  2: _SurahInfo(false, 286),
-  3: _SurahInfo(false, 200),
-  4: _SurahInfo(false, 176),
-  5: _SurahInfo(false, 120),
-  6: _SurahInfo(true, 165),
-  7: _SurahInfo(true, 206),
-  8: _SurahInfo(false, 75),
-  9: _SurahInfo(false, 129),
-  10: _SurahInfo(true, 109),
-  11: _SurahInfo(true, 123),
-  12: _SurahInfo(true, 111),
-  13: _SurahInfo(false, 43),
-  14: _SurahInfo(true, 52),
-  15: _SurahInfo(true, 99),
-  16: _SurahInfo(true, 128),
-  17: _SurahInfo(true, 111),
-  18: _SurahInfo(true, 110),
-  19: _SurahInfo(true, 98),
-  20: _SurahInfo(true, 135),
-  21: _SurahInfo(true, 112),
-  22: _SurahInfo(false, 78),
-  23: _SurahInfo(true, 118),
-  24: _SurahInfo(false, 64),
-  25: _SurahInfo(true, 77),
-  26: _SurahInfo(true, 227),
-  27: _SurahInfo(true, 93),
-  28: _SurahInfo(true, 88),
-  29: _SurahInfo(true, 69),
-  30: _SurahInfo(true, 60),
-  31: _SurahInfo(true, 34),
-  32: _SurahInfo(true, 30),
-  33: _SurahInfo(false, 73),
-  34: _SurahInfo(true, 54),
-  35: _SurahInfo(true, 45),
-  36: _SurahInfo(true, 83),
-  37: _SurahInfo(true, 182),
-  38: _SurahInfo(true, 88),
-  39: _SurahInfo(true, 75),
-  40: _SurahInfo(true, 85),
-  41: _SurahInfo(true, 54),
-  42: _SurahInfo(true, 53),
-  43: _SurahInfo(true, 89),
-  44: _SurahInfo(true, 59),
-  45: _SurahInfo(true, 37),
-  46: _SurahInfo(true, 35),
-  47: _SurahInfo(false, 38),
-  48: _SurahInfo(false, 29),
-  49: _SurahInfo(false, 18),
-  50: _SurahInfo(true, 45),
-  51: _SurahInfo(true, 60),
-  52: _SurahInfo(true, 49),
-  53: _SurahInfo(true, 62),
-  54: _SurahInfo(true, 55),
-  55: _SurahInfo(false, 78),
-  56: _SurahInfo(true, 96),
-  57: _SurahInfo(false, 29),
-  58: _SurahInfo(false, 22),
-  59: _SurahInfo(false, 24),
-  60: _SurahInfo(false, 13),
-  61: _SurahInfo(false, 14),
-  62: _SurahInfo(false, 11),
-  63: _SurahInfo(false, 11),
-  64: _SurahInfo(false, 18),
-  65: _SurahInfo(false, 12),
-  66: _SurahInfo(false, 12),
-  67: _SurahInfo(true, 30),
-  68: _SurahInfo(true, 52),
-  69: _SurahInfo(true, 52),
-  70: _SurahInfo(true, 44),
-  71: _SurahInfo(true, 28),
-  72: _SurahInfo(true, 28),
-  73: _SurahInfo(true, 20),
-  74: _SurahInfo(true, 56),
-  75: _SurahInfo(true, 40),
-  76: _SurahInfo(false, 31),
-  77: _SurahInfo(true, 50),
-  78: _SurahInfo(true, 40),
-  79: _SurahInfo(true, 46),
-  80: _SurahInfo(true, 42),
-  81: _SurahInfo(true, 29),
-  82: _SurahInfo(true, 19),
-  83: _SurahInfo(true, 36),
-  84: _SurahInfo(true, 25),
-  85: _SurahInfo(true, 22),
-  86: _SurahInfo(true, 17),
-  87: _SurahInfo(true, 19),
-  88: _SurahInfo(true, 26),
-  89: _SurahInfo(true, 30),
-  90: _SurahInfo(true, 20),
-  91: _SurahInfo(true, 15),
-  92: _SurahInfo(true, 21),
-  93: _SurahInfo(true, 11),
-  94: _SurahInfo(true, 8),
-  95: _SurahInfo(true, 8),
-  96: _SurahInfo(true, 19),
-  97: _SurahInfo(true, 5),
-  98: _SurahInfo(false, 8),
-  99: _SurahInfo(false, 8),
-  100: _SurahInfo(true, 11),
-  101: _SurahInfo(true, 11),
-  102: _SurahInfo(true, 8),
-  103: _SurahInfo(true, 3),
-  104: _SurahInfo(true, 9),
-  105: _SurahInfo(true, 5),
-  106: _SurahInfo(true, 4),
-  107: _SurahInfo(true, 7),
-  108: _SurahInfo(true, 3),
-  109: _SurahInfo(true, 6),
-  110: _SurahInfo(false, 3),
-  111: _SurahInfo(true, 5),
-  112: _SurahInfo(true, 4),
-  113: _SurahInfo(true, 5),
-  114: _SurahInfo(true, 6),
-};
-
-// ==========================================================
-// Passive 2px progress line (rebuilt only on progress change)
-// ==========================================================
 class _ProgressLine extends StatelessWidget {
   final Color gold;
   const _ProgressLine({required this.gold});
@@ -542,9 +335,6 @@ class _ProgressLine extends StatelessWidget {
   }
 }
 
-// ==========================================================
-// Interactive seek-bar with elapsed / total timestamps
-// ==========================================================
 class _SeekBarRow extends StatefulWidget {
   final Color gold;
   final bool isDark;
@@ -590,22 +380,21 @@ class _SeekBarRowState extends State<_SeekBarRow> {
 
         final sliderValue = _dragging ? _dragValue : progress.clamp(0.0, 1.0);
         final canInteract = !widget.isLoading && !widget.isError;
+        final inactiveTrack =
+            widget.isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Slider / indeterminate bar
             SizedBox(
-              height: 20,
+              height: 18,
               child: widget.isLoading || widget.isError
                   ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 7),
                       child: LinearProgressIndicator(
                         value: widget.isLoading ? null : 0,
                         minHeight: 2.5,
-                        backgroundColor: widget.isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
+                        backgroundColor: inactiveTrack,
                         valueColor:
                             AlwaysStoppedAnimation<Color>(widget.gold),
                       ),
@@ -614,15 +403,13 @@ class _SeekBarRowState extends State<_SeekBarRow> {
                       data: SliderTheme.of(context).copyWith(
                         trackHeight: 2.5,
                         thumbShape: const RoundSliderThumbShape(
-                          enabledThumbRadius: 5,
+                          enabledThumbRadius: 4.5,
                           disabledThumbRadius: 0,
                         ),
                         overlayShape:
-                            const RoundSliderOverlayShape(overlayRadius: 12),
+                            const RoundSliderOverlayShape(overlayRadius: 10),
                         activeTrackColor: widget.gold,
-                        inactiveTrackColor: widget.isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
+                        inactiveTrackColor: inactiveTrack,
                         thumbColor: widget.gold,
                         overlayColor: widget.gold.withAlpha(30),
                         trackShape: const RectangularSliderTrackShape(),
@@ -653,7 +440,6 @@ class _SeekBarRowState extends State<_SeekBarRow> {
                     ),
             ),
 
-            // Timestamps
             if (!widget.isLoading && !widget.isError)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -663,7 +449,7 @@ class _SeekBarRowState extends State<_SeekBarRow> {
                     Text(
                       Formatters.formatDurationObj(position),
                       style: GoogleFonts.cairo(
-                        fontSize: 10,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.w500,
                         color: widget.textSecondary,
                       ),
@@ -671,7 +457,7 @@ class _SeekBarRowState extends State<_SeekBarRow> {
                     Text(
                       Formatters.formatDurationObj(duration),
                       style: GoogleFonts.cairo(
-                        fontSize: 10,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.w500,
                         color: widget.textSecondary,
                       ),
@@ -686,9 +472,6 @@ class _SeekBarRowState extends State<_SeekBarRow> {
   }
 }
 
-// ==========================================================
-// Central gold play / pause button
-// ==========================================================
 class _PlayPauseButton extends StatelessWidget {
   final bool isLoading;
   final bool isBuffering;
@@ -710,7 +493,7 @@ class _PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = isDark ? AppColors.darkBackground : Colors.white;
+    const iconColor = Color(0xFF12151A);
     final showSpinner = (isLoading || isBuffering) && !isPlaying;
 
     return Material(
@@ -736,8 +519,8 @@ class _PlayPauseButton extends StatelessWidget {
             ],
           ),
           child: showSpinner
-              ? Padding(
-                  padding: const EdgeInsets.all(11),
+              ? const Padding(
+                  padding: EdgeInsets.all(11),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     color: iconColor,
@@ -762,9 +545,6 @@ class _PlayPauseButton extends StatelessWidget {
   }
 }
 
-// ==========================================================
-// Generic tappable icon (32dp minimum touch area)
-// ==========================================================
 class _IconTap extends StatelessWidget {
   final IconData icon;
   final double size;
@@ -798,9 +578,6 @@ class _IconTap extends StatelessWidget {
   }
 }
 
-// ==========================================================
-// Playback control button (skip / prev / next)
-// ==========================================================
 class _CtrlBtn extends StatelessWidget {
   final IconData icon;
   final double size;

@@ -48,6 +48,7 @@ class AudioPlayerReady extends AudioPlayerState {
   final double speed;
   final Duration? abPointA;
   final Duration? abPointB;
+  final int? abRepeatCount; // null means infinite (∞)
 
   const AudioPlayerReady({
     required this.recitation,
@@ -60,6 +61,7 @@ class AudioPlayerReady extends AudioPlayerState {
     this.speed = 1.0,
     this.abPointA,
     this.abPointB,
+    this.abRepeatCount,
   });
 
   AbLoopState get abLoopState {
@@ -86,7 +88,9 @@ class AudioPlayerReady extends AudioPlayerState {
     double? speed,
     Duration? abPointA,
     Duration? abPointB,
+    int? abRepeatCount,
     bool clearAbPoints = false,
+    bool clearAbRepeatCount = false,
   }) {
     return AudioPlayerReady(
       recitation: recitation ?? this.recitation,
@@ -99,6 +103,9 @@ class AudioPlayerReady extends AudioPlayerState {
       speed: speed ?? this.speed,
       abPointA: clearAbPoints ? null : (abPointA ?? this.abPointA),
       abPointB: clearAbPoints ? null : (abPointB ?? this.abPointB),
+      abRepeatCount: clearAbRepeatCount
+          ? null
+          : (abRepeatCount ?? this.abRepeatCount),
     );
   }
 
@@ -114,6 +121,7 @@ class AudioPlayerReady extends AudioPlayerState {
         speed,
         abPointA,
         abPointB,
+        abRepeatCount,
       ];
 }
 

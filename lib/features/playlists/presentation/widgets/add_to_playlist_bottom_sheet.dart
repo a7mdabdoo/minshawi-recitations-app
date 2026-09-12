@@ -121,6 +121,7 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                   await context.read<PlaylistsCubit>().createPlaylist(
                         name,
                         initialRecitationId: recitation.id,
+                        initialRecitation: recitation,
                       );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -330,7 +331,11 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final playlist = playlists[index];
                         final isInPlaylist =
-                            playlist.recitationIds.contains(recitation.id);
+                            playlist.recitationIds.contains(recitation.id) ||
+                            playlist.recitations.any((r) => r.id == recitation.id);
+                        final trackCount = playlist.recitations.isNotEmpty
+                            ? playlist.recitations.length
+                            : playlist.recitationIds.length;
 
                         return Container(
                           decoration: BoxDecoration(
@@ -362,6 +367,7 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                                   await cubit.addRecitationToPlaylist(
                                     playlist.id,
                                     recitation.id,
+                                    recitation,
                                   );
                                 }
                               },
@@ -384,7 +390,9 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            playlist.title,
+                                            playlist.title.isNotEmpty
+                                                ? playlist.title
+                                                : 'قائمة جديدة',
                                             style: GoogleFonts.cairo(
                                               fontSize: 13.5,
                                               fontWeight: FontWeight.w700,
@@ -394,7 +402,7 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                                             ),
                                           ),
                                           Text(
-                                            '${playlist.recitationIds.length} تلاوة',
+                                            '$trackCount تلاوة',
                                             style: GoogleFonts.cairo(
                                               fontSize: 11,
                                               color: textSecondary,
@@ -418,6 +426,7 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                                             .toggleRecitationInPlaylist(
                                               playlist.id,
                                               recitation.id,
+                                              recitation,
                                             );
                                       },
                                     ),
@@ -428,6 +437,37 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                           ),
                         );
                       },
+                    );
+                  }
+
+                  if (state is PlaylistsError) {
+                    return Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.error_outline_rounded,
+                              color: AppColors.darkError, size: 36),
+                          const SizedBox(height: 8),
+                          Text(
+                            state.message,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              color: textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextButton(
+                            onPressed: () =>
+                                context.read<PlaylistsCubit>().loadPlaylists(),
+                            child: Text(
+                              'إعادة المحاولة',
+                              style: GoogleFonts.cairo(color: gold),
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   }
 

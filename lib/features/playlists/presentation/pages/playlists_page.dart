@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/arabic_normalizer.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
 import '../../../recitations/domain/entities/recitation.dart';
@@ -13,7 +15,7 @@ import '../cubit/playlists_cubit.dart';
 import '../cubit/playlists_state.dart';
 import 'playlist_detail_page.dart';
 
-/// Standalone Playlists screen or embedded view for managing custom collections.
+/// Standalone Playlists screen for viewing, searching, and managing custom collections.
 class PlaylistsPage extends StatelessWidget {
   const PlaylistsPage({super.key});
 
@@ -40,27 +42,55 @@ class PlaylistsPage extends StatelessWidget {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: gold),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/');
+            }
+          },
           tooltip: 'رجوع',
         ),
       ),
-      body: const PlaylistsContentView(),
+      body: const PlaylistsContentView(showSearch: true),
     );
   }
 }
 
-/// The reusable content body displaying custom playlists.
-class PlaylistsContentView extends StatelessWidget {
+/// The reusable content body displaying custom playlists with optional search.
+class PlaylistsContentView extends StatefulWidget {
   final ScrollPhysics? physics;
   final bool shrinkWrap;
   final EdgeInsetsGeometry? padding;
+  final bool showSearch;
 
   const PlaylistsContentView({
     super.key,
     this.physics,
     this.shrinkWrap = false,
     this.padding,
+    this.showSearch = true,
   });
+
+  @override
+  State<PlaylistsContentView> createState() => _PlaylistsContentViewState();
+}
+
+class _PlaylistsContentViewState extends State<PlaylistsContentView> {
+  late final TextEditingController _searchController;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _showCreateDialog(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -225,6 +255,69 @@ class PlaylistsContentView extends StatelessWidget {
     );
   }
 
+  Widget _buildSearchBar(
+    bool isDark,
+    Color gold,
+    Color cardBg,
+    Color textPrimary,
+    Color textSecondary,
+  ) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: _searchQuery.isNotEmpty
+              ? gold.withAlpha(isDark ? 160 : 120)
+              : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+          width: _searchQuery.isNotEmpty ? 1.4 : 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 35 : 10),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        textDirection: TextDirection.rtl,
+        style: GoogleFonts.cairo(color: textPrimary, fontSize: 13.5),
+        onChanged: (val) {
+          setState(() {
+            _searchQuery = val;
+          });
+        },
+        decoration: InputDecoration(
+          hintText: 'البحث في قوائم التشغيل أو السور...',
+          hintStyle: GoogleFonts.cairo(color: textSecondary, fontSize: 13),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: _searchQuery.isNotEmpty ? gold : textSecondary,
+            size: 22,
+          ),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: Icon(Icons.clear_rounded, color: textSecondary, size: 18),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchQuery = '';
+                    });
+                  },
+                  tooltip: 'مسح البحث',
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -242,76 +335,39 @@ class PlaylistsContentView extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
+        if (state is PlaylistsError) {
+          return _PlaylistsErrorView(
+            message: state.message,
+            isDark: isDark,
+            gold: gold,
+            textPrimary: textPrimary,
+            textSecondary: textSecondary,
+            onRetry: () => context.read<PlaylistsCubit>().loadPlaylists(),
+          );
+        }
+
+        if (state is PlaylistsEmpty) {
+          return _EmptyPlaylistsView(
+            isDark: isDark,
+            gold: gold,
+            textPrimary: textPrimary,
+            textSecondary: textSecondary,
+            padding: widget.padding,
+            onCreate: () => _showCreateDialog(context),
+          );
+        }
+
         if (state is PlaylistsLoaded) {
           final playlists = state.playlists;
 
           if (playlists.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: padding ?? const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 76,
-                      height: 76,
-                      decoration: BoxDecoration(
-                        color: gold.withAlpha(isDark ? 30 : 20),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.queue_music_rounded,
-                        size: 38,
-                        color: gold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'لا توجد قوائم تشغيل مخصصة',
-                      style: GoogleFonts.amiri(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'أنشئ قوائم تشغيل لتنظيم تلاواتك المفضلة والاستماع إليها متتالية.',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
-                        fontSize: 13,
-                        color: textSecondary,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: gold,
-                        foregroundColor:
-                            isDark ? AppColors.darkBackground : Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: () => _showCreateDialog(context),
-                      icon: const Icon(Icons.add_rounded, size: 20),
-                      label: Text(
-                        'إنشاء قائمة جديدة',
-                        style: GoogleFonts.cairo(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            return _EmptyPlaylistsView(
+              isDark: isDark,
+              gold: gold,
+              textPrimary: textPrimary,
+              textSecondary: textSecondary,
+              padding: widget.padding,
+              onCreate: () => _showCreateDialog(context),
             );
           }
 
@@ -323,13 +379,88 @@ class PlaylistsContentView extends StatelessWidget {
                       : <Recitation>[];
               final recitationsMap = {for (var r in allRecitations) r.id: r};
 
-              return ListView.separated(
-                physics: physics,
-                shrinkWrap: shrinkWrap,
-                padding: padding ?? const EdgeInsets.fromLTRB(16, 12, 16, 96),
+              final cleanQuery = _searchQuery.trim().toLowerCase();
+              final cleanQueryNorm = ArabicNormalizer.normalize(cleanQuery);
+
+              final filteredPlaylists = playlists.where((playlist) {
+                if (cleanQuery.isEmpty) return true;
+
+                final pName = (playlist.name.isNotEmpty
+                        ? playlist.name
+                        : playlist.title)
+                    .toLowerCase();
+                final pNameNorm = ArabicNormalizer.normalize(pName);
+                final pDesc = playlist.description.toLowerCase();
+                final pDescNorm = ArabicNormalizer.normalize(pDesc);
+
+                final matchesName = pName.contains(cleanQuery) ||
+                    pNameNorm.contains(cleanQueryNorm) ||
+                    pDesc.contains(cleanQuery) ||
+                    pDescNorm.contains(cleanQueryNorm);
+
+                if (matchesName) return true;
+
+                final playlistRecs = playlist.recitations.isNotEmpty
+                    ? playlist.recitations
+                    : playlist.recitationIds
+                        .map((id) => recitationsMap[id])
+                        .whereType<Recitation>()
+                        .toList();
+
+                final matchesRecitation = playlistRecs.any((r) {
+                  final arName = r.surahNameAr.toLowerCase();
+                  final arNorm = ArabicNormalizer.normalize(arName);
+                  final enName = r.surahNameEn.toLowerCase();
+
+                  return arName.contains(cleanQuery) ||
+                      arNorm.contains(cleanQueryNorm) ||
+                      enName.contains(cleanQuery);
+                });
+
+                return matchesRecitation;
+              }).toList();
+
+              if (filteredPlaylists.isEmpty) {
+                final noResultsWidget = _NoSearchResultsView(
+                  query: _searchQuery,
+                  isDark: isDark,
+                  gold: gold,
+                  textPrimary: textPrimary,
+                  textSecondary: textSecondary,
+                  onClear: () {
+                    _searchController.clear();
+                    setState(() => _searchQuery = '');
+                  },
+                );
+
+                return Column(
+                  mainAxisSize:
+                      widget.shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
+                  children: [
+                    if (widget.showSearch)
+                      _buildSearchBar(
+                        isDark,
+                        gold,
+                        cardBg,
+                        textPrimary,
+                        textSecondary,
+                      ),
+                    if (widget.shrinkWrap)
+                      noResultsWidget
+                    else
+                      Expanded(child: noResultsWidget),
+                  ],
+                );
+              }
+
+              final listView = ListView.separated(
+                physics: widget.physics,
+                shrinkWrap: widget.shrinkWrap,
+                padding: widget.padding ??
+                    const EdgeInsets.fromLTRB(16, 8, 16, 96),
                 addAutomaticKeepAlives: false,
                 addRepaintBoundaries: true,
-                itemCount: playlists.length + 1,
+                itemCount: filteredPlaylists.length + 1,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   if (index == 0) {
@@ -369,16 +500,22 @@ class PlaylistsContentView extends StatelessWidget {
                     );
                   }
 
-                  final playlist = playlists[index - 1];
-                  final playlistRecitations = playlist.recitationIds
-                      .map((id) => recitationsMap[id])
-                      .whereType<Recitation>()
-                      .toList();
+                  final playlist = filteredPlaylists[index - 1];
+                  final effectiveRecitations = playlist.recitations.isNotEmpty
+                      ? playlist.recitations
+                      : playlist.recitationIds
+                          .map((id) => recitationsMap[id])
+                          .whereType<Recitation>()
+                          .toList();
+
+                  final recitationsCount = playlist.recitations.isNotEmpty
+                      ? playlist.recitations.length
+                      : playlist.recitationIds.length;
 
                   return RepaintBoundary(
                     child: _PlaylistOverviewCard(
                       playlist: playlist,
-                      recitationsCount: playlist.recitationIds.length,
+                      recitationsCount: recitationsCount,
                       isDark: isDark,
                       gold: gold,
                       cardBg: cardBg,
@@ -394,32 +531,54 @@ class PlaylistsContentView extends StatelessWidget {
                         );
                       },
                       onPlay: () {
-                      if (playlistRecitations.isNotEmpty) {
-                        context.read<AudioPlayerCubit>().play(
-                              playlistRecitations.first,
-                              playlist: playlistRecitations,
-                            );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'قائمة التشغيل فارغة! أضف تلاوات أولاً.',
-                              style: GoogleFonts.cairo(color: Colors.white),
+                        if (effectiveRecitations.isNotEmpty) {
+                          context.read<AudioPlayerCubit>().play(
+                                effectiveRecitations.first,
+                                playlist: effectiveRecitations,
+                              );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'قائمة التشغيل فارغة! أضف تلاوات أولاً.',
+                                style: GoogleFonts.cairo(color: Colors.white),
+                              ),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
                             ),
-                            duration: const Duration(seconds: 2),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                    },
-                    onDelete: () => _showDeleteDialog(
-                      context,
-                      playlist.id,
-                      playlist.title,
+                          );
+                        }
+                      },
+                      onDelete: () => _showDeleteDialog(
+                        context,
+                        playlist.id,
+                        playlist.title,
+                      ),
                     ),
+                  );
+                },
+              );
+
+              if (!widget.showSearch) {
+                return listView;
+              }
+
+              return Column(
+                mainAxisSize:
+                    widget.shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
+                children: [
+                  _buildSearchBar(
+                    isDark,
+                    gold,
+                    cardBg,
+                    textPrimary,
+                    textSecondary,
                   ),
-                );
-              },
+                  if (widget.shrinkWrap)
+                    listView
+                  else
+                    Expanded(child: listView),
+                ],
               );
             },
           );
@@ -459,6 +618,8 @@ class _PlaylistOverviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final dateStr =
+        '${playlist.createdAt.year}/${playlist.createdAt.month.toString().padLeft(2, '0')}/${playlist.createdAt.day.toString().padLeft(2, '0')}';
 
     return Container(
       decoration: BoxDecoration(
@@ -496,22 +657,35 @@ class _PlaylistOverviewCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        playlist.title,
+                        playlist.title.isNotEmpty
+                            ? playlist.title
+                            : 'قائمة جديدة',
                         style: GoogleFonts.cairo(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           color: textPrimary,
                         ),
                       ),
+                      if (playlist.description.isNotEmpty) ...[
+                        const SizedBox(height: 1),
+                        Text(
+                          playlist.description,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.cairo(
+                            fontSize: 11.5,
+                            color: textSecondary.withAlpha(190),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 2),
                       Text(
-                        ' تلاوة  ·  تم الإنشاء: //',
+                        '$recitationsCount تلاوة  ·  تم الإنشاء: $dateStr',
                         style: GoogleFonts.cairo(
                           fontSize: 11,
                           color: textSecondary,
@@ -520,7 +694,6 @@ class _PlaylistOverviewCard extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 IconButton(
                   icon: Icon(
                     Icons.play_circle_fill_rounded,
@@ -533,7 +706,6 @@ class _PlaylistOverviewCard extends StatelessWidget {
                   constraints: const BoxConstraints(),
                 ),
                 const SizedBox(width: 8),
-
                 PopupMenuButton<String>(
                   icon: Icon(
                     Icons.more_vert_rounded,
@@ -583,6 +755,267 @@ class _PlaylistOverviewCard extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyPlaylistsView extends StatelessWidget {
+  final bool isDark;
+  final Color gold;
+  final Color textPrimary;
+  final Color textSecondary;
+  final EdgeInsetsGeometry? padding;
+  final VoidCallback onCreate;
+
+  const _EmptyPlaylistsView({
+    required this.isDark,
+    required this.gold,
+    required this.textPrimary,
+    required this.textSecondary,
+    this.padding,
+    required this.onCreate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: padding ?? const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: gold.withAlpha(isDark ? 30 : 20),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.queue_music_rounded,
+                size: 38,
+                color: gold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'لا توجد قوائم تشغيل مخصصة',
+              style: GoogleFonts.amiri(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'أنشئ قوائم تشغيل لتنظيم تلاواتك المفضلة والاستماع إليها متتالية.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.cairo(
+                fontSize: 13,
+                color: textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: gold,
+                foregroundColor:
+                    isDark ? AppColors.darkBackground : Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 0,
+              ),
+              onPressed: onCreate,
+              icon: const Icon(Icons.add_rounded, size: 20),
+              label: Text(
+                'إنشاء قائمة جديدة',
+                style: GoogleFonts.cairo(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NoSearchResultsView extends StatelessWidget {
+  final String query;
+  final bool isDark;
+  final Color gold;
+  final Color textPrimary;
+  final Color textSecondary;
+  final VoidCallback onClear;
+
+  const _NoSearchResultsView({
+    required this.query,
+    required this.isDark,
+    required this.gold,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: gold.withAlpha(isDark ? 25 : 15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: 36,
+                color: gold,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'لم يتم العثور على نتائج',
+              style: GoogleFonts.amiri(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'لا توجد قائمة تشغيل أو سورة تطابق "$query"',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.cairo(
+                fontSize: 13,
+                color: textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: gold,
+                foregroundColor:
+                    isDark ? AppColors.darkBackground : Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              onPressed: onClear,
+              icon: const Icon(Icons.clear_rounded, size: 18),
+              label: Text(
+                'مسح البحث',
+                style: GoogleFonts.cairo(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlaylistsErrorView extends StatelessWidget {
+  final String message;
+  final bool isDark;
+  final Color gold;
+  final Color textPrimary;
+  final Color textSecondary;
+  final VoidCallback onRetry;
+
+  const _PlaylistsErrorView({
+    required this.message,
+    required this.isDark,
+    required this.gold,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.darkError.withAlpha(isDark ? 30 : 20),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                size: 38,
+                color: AppColors.darkError,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'تعذر تحميل قوائم التشغيل',
+              style: GoogleFonts.amiri(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message.isNotEmpty
+                  ? message
+                  : 'حدث خطأ غير متوقع أثناء تحميل البيانات.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.cairo(
+                fontSize: 13,
+                color: textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: gold,
+                foregroundColor:
+                    isDark ? AppColors.darkBackground : Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: Text(
+                'إعادة المحاولة',
+                style: GoogleFonts.cairo(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

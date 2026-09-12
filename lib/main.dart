@@ -12,7 +12,6 @@ import 'core/di/service_locator.dart';
 import 'core/router/app_router.dart';
 import 'core/settings/settings_cubit.dart';
 import 'core/theme/theme_cubit.dart';
-import 'features/downloads/presentation/cubit/storage_cubit.dart';
 import 'features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'features/playlists/presentation/cubit/playlists_cubit.dart';
 import 'features/player/presentation/cubit/audio_player_cubit.dart';
@@ -85,7 +84,6 @@ class AlMinshawIApp extends StatelessWidget {
         BlocProvider<RecitationListCubit>.value(
             value: sl<RecitationListCubit>()),
         BlocProvider<DownloadCubit>.value(value: sl<DownloadCubit>()),
-        BlocProvider<StorageCubit>.value(value: sl<StorageCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {

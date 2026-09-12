@@ -88,57 +88,64 @@ class _LandingPageState extends State<LandingPage> {
         backgroundColor: bg,
         body: Stack(
           children: [
-            CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: SafeArea(
-                    bottom: false,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        16,
-                        10,
-                        16,
-                        96.0 + MediaQuery.of(context).padding.bottom,
-                      ),
-                      child: Column(
-                        children: [
-                          _UnifiedHeroBanner(
-                            isDark: isDark,
-                            gold: gold,
-                            portraitUiImage: widget.portraitUiImage,
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: SafeArea(
+                        bottom: false,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            16,
+                            10,
+                            16,
+                            96.0 + MediaQuery.of(context).padding.bottom,
                           ),
+                          child: Column(
+                            children: [
+                              _UnifiedHeroBanner(
+                                isDark: isDark,
+                                gold: gold,
+                                portraitUiImage: widget.portraitUiImage,
+                              ),
 
-                          const SizedBox(height: 14),
+                              const SizedBox(height: 14),
 
-                          _LandingSegmentedTabs(
-                            selectedTab: _selectedTab,
-                            isDark: isDark,
-                            onTabSelected: (tab) =>
-                                setState(() => _selectedTab = tab),
+                              _LandingSegmentedTabs(
+                                selectedTab: _selectedTab,
+                                isDark: isDark,
+                                onTabSelected: (tab) =>
+                                    setState(() => _selectedTab = tab),
+                              ),
+
+                              if (_selectedTab == _LandingTab.collections) ...[
+                                _VerticalCategoryCards(isDark: isDark),
+                              ] else ...[
+                                const PlaylistsContentView(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  padding: EdgeInsets.only(top: 2, bottom: 8),
+                                  showSearch: false,
+                                ),
+                              ],
+
+                              const Spacer(),
+                              const SizedBox(height: 16),
+
+                              _FramelessDeveloperFooter(isDark: isDark),
+                            ],
                           ),
-
-                          if (_selectedTab == _LandingTab.collections) ...[
-                            _VerticalCategoryCards(isDark: isDark),
-                          ] else ...[
-                            const PlaylistsContentView(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              padding: EdgeInsets.only(top: 2, bottom: 8),
-                            ),
-                          ],
-
-                          const Spacer(),
-                          const SizedBox(height: 16),
-
-                          _FramelessDeveloperFooter(isDark: isDark),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
 
             const Positioned(
@@ -168,7 +175,7 @@ class _UnifiedHeroBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textSecondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return Container(
       width: double.infinity,
@@ -222,7 +229,6 @@ class _UnifiedHeroBanner extends StatelessWidget {
                   constraints: const BoxConstraints(),
                 ),
               ),
-
               Text(
                 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
                 style: GoogleFonts.amiri(
@@ -231,7 +237,6 @@ class _UnifiedHeroBanner extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -256,9 +261,7 @@ class _UnifiedHeroBanner extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 12),
-
           Container(
             width: 122,
             height: 122,
@@ -288,28 +291,34 @@ class _UnifiedHeroBanner extends StatelessWidget {
               child: ClipOval(
                 child: portraitUiImage != null
                     ? RawImage(
-                        image: portraitUiImage,
-                        fit: BoxFit.cover,
-                        alignment: const Alignment(0, -0.25),
-                      )
-                    : Image.asset(
-                        'assets/images/minshawi_portrait.jpg',
-                        fit: BoxFit.cover,
-                        alignment: const Alignment(0, -0.25),
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/images/minshawi_portrait.jpg',
-                            fit: BoxFit.cover,
-                            alignment: const Alignment(0, -0.25),
-                          );
-                        },
+                  image: portraitUiImage,
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -0.25),
+                )
+                    : Image(
+                  image: const ResizeImage(
+                    AssetImage('assets/images/minshawi_portrait.jpg'),
+                    width: 500,
+                    height: 500,
+                  ),
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -0.25),
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Image(
+                      image: ResizeImage(
+                        AssetImage('assets/images/minshawi_portrait.jpg'),
+                        width: 500,
+                        height: 500,
                       ),
+                      fit: BoxFit.cover,
+                      alignment: Alignment(0, -0.25),
+                    );
+                  },
+                ),
               ),
             ),
           ),
-
           const SizedBox(height: 10),
-
           Text(
             AppConstants.sheikhNameAr,
             textAlign: TextAlign.center,
@@ -321,17 +330,15 @@ class _UnifiedHeroBanner extends StatelessWidget {
               height: 1.2,
               shadows: isDark
                   ? [
-                      Shadow(
-                        color: gold.withValues(alpha: 0.3),
-                        blurRadius: 18,
-                      ),
-                    ]
+                Shadow(
+                  color: gold.withValues(alpha: 0.3),
+                  blurRadius: 18,
+                ),
+              ]
                   : null,
             ),
           ),
-
           const SizedBox(height: 2),
-
           Text(
             'رحمه الله تعالى • التلاوات النادرة والمصحف المرتل',
             textAlign: TextAlign.center,
@@ -387,8 +394,7 @@ class _LandingSegmentedTabs extends StatelessWidget {
                     : 0;
                 return _LandingTabButton(
                   icon: Icons.queue_music_rounded,
-                  label:
-                      count > 0 ? 'قوائم التشغيل ($count)' : 'قوائم التشغيل',
+                  label: count > 0 ? 'قوائم التشغيل ($count)' : 'قوائم التشغيل',
                   isSelected: selectedTab == _LandingTab.playlists,
                   gold: gold,
                   bg: bg,
@@ -444,12 +450,12 @@ class _LandingTabButton extends StatelessWidget {
             ),
             boxShadow: isSelected
                 ? [
-                    BoxShadow(
-                      color: gold.withAlpha(isDark ? 60 : 35),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
+              BoxShadow(
+                color: gold.withAlpha(isDark ? 60 : 35),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ]
                 : null,
           ),
           child: Row(
@@ -461,8 +467,8 @@ class _LandingTabButton extends StatelessWidget {
                 color: isSelected
                     ? (isDark ? AppColors.darkBackground : Colors.white)
                     : (isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary),
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary),
               ),
               const SizedBox(width: 7),
               Flexible(
@@ -474,8 +480,8 @@ class _LandingTabButton extends StatelessWidget {
                     color: isSelected
                         ? (isDark ? AppColors.darkBackground : Colors.white)
                         : (isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.lightTextPrimary),
+                        ? AppColors.darkTextPrimary
+                        : AppColors.lightTextPrimary),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -506,9 +512,7 @@ class _VerticalCategoryCards extends StatelessWidget {
             onTap: () => context.push('/recitations/complete_murattal'),
           ),
         ),
-
         const SizedBox(height: 10),
-
         RepaintBoundary(
           child: _WideCategoryCard(
             title: 'المصحف المجود',
@@ -518,9 +522,7 @@ class _VerticalCategoryCards extends StatelessWidget {
             onTap: () => context.push('/recitations/mojawad'),
           ),
         ),
-
         const SizedBox(height: 10),
-
         RepaintBoundary(
           child: _WideCategoryCard(
             title: 'التلاوات النادرة',
@@ -554,9 +556,9 @@ class _WideCategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     const gold = Color(0xFFD4AF37);
     final textPrimary =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final textSecondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return Container(
       decoration: BoxDecoration(
@@ -591,7 +593,6 @@ class _WideCategoryCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: Stack(
               children: [
-                // Right Golden Accent Bar Indicator (RTL Start)
                 Positioned(
                   top: 0,
                   bottom: 0,
@@ -606,13 +607,10 @@ class _WideCategoryCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Main Content
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 14, 18, 14),
                   child: Row(
                     children: [
-                      // Right Side (Start in RTL): Title & Subtitle
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -644,10 +642,7 @@ class _WideCategoryCard extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       const SizedBox(width: 12),
-
-                      // Left Side (End in RTL): Count Badge + Direction Arrow
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -658,11 +653,11 @@ class _WideCategoryCard extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color:
-                                  gold.withValues(alpha: isDark ? 0.12 : 0.08),
+                              gold.withValues(alpha: isDark ? 0.12 : 0.08),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color:
-                                  gold.withValues(alpha: isDark ? 0.35 : 0.4),
+                                gold.withValues(alpha: isDark ? 0.35 : 0.4),
                                 width: 0.9,
                               ),
                             ),
@@ -743,7 +738,6 @@ class _FramelessDeveloperFooter extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Clean developer credit text
         Text(
           'تطوير: ${AppConstants.devNameAr}',
           textAlign: TextAlign.center,
@@ -754,10 +748,7 @@ class _FramelessDeveloperFooter extends StatelessWidget {
             letterSpacing: 0.1,
           ),
         ),
-
         const SizedBox(height: 5),
-
-        // Frameless subtle social icons in matching muted tones
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

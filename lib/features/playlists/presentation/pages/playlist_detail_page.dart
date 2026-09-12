@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -199,6 +200,77 @@ class PlaylistDetailPage extends StatelessWidget {
 
     return BlocBuilder<PlaylistsCubit, PlaylistsState>(
       builder: (context, playlistState) {
+        if (playlistState is PlaylistsError) {
+          return Scaffold(
+            backgroundColor: bg,
+            appBar: AppBar(
+              backgroundColor: bg,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_rounded, color: gold),
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    context.go('/playlists');
+                  }
+                },
+              ),
+            ),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      color: AppColors.darkError,
+                      size: 40,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'تعذر تحميل قائمة التشغيل',
+                      style: GoogleFonts.amiri(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      playlistState.message,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.cairo(
+                        fontSize: 13,
+                        color: textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: gold,
+                        foregroundColor:
+                            isDark ? AppColors.darkBackground : Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () =>
+                          context.read<PlaylistsCubit>().loadPlaylists(),
+                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                      label: Text(
+                        'إعادة المحاولة',
+                        style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         if (playlistState is! PlaylistsLoaded) {
           return Scaffold(
             backgroundColor: bg,
@@ -215,7 +287,13 @@ class PlaylistDetailPage extends StatelessWidget {
               elevation: 0,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_rounded, color: gold),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    context.go('/playlists');
+                  }
+                },
               ),
             ),
             body: Center(
@@ -233,12 +311,14 @@ class PlaylistDetailPage extends StatelessWidget {
                 ? recitationListState.recitations
                 : <Recitation>[];
 
-            // Resolve recitations in playlist order
+            // Resolve recitations from playlist.recitations or map
             final recitationsMap = {for (var r in allRecitations) r.id: r};
-            final playlistRecitations = playlist.recitationIds
-                .map((id) => recitationsMap[id])
-                .whereType<Recitation>()
-                .toList();
+            final playlistRecitations = playlist.recitations.isNotEmpty
+                ? playlist.recitations
+                : playlist.recitationIds
+                    .map((id) => recitationsMap[id])
+                    .whereType<Recitation>()
+                    .toList();
 
             final totalSeconds = playlistRecitations.fold<int>(
               0,
@@ -262,7 +342,13 @@ class PlaylistDetailPage extends StatelessWidget {
                 ),
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back_rounded, color: gold),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
+                      context.go('/playlists');
+                    }
+                  },
                   tooltip: 'رجوع',
                 ),
                 actions: [
@@ -529,7 +615,7 @@ class _PlaylistRecitationCard extends StatelessWidget {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        '',
+                        '$index',
                         style: GoogleFonts.cairo(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -544,7 +630,7 @@ class _PlaylistRecitationCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'سورة ${recitation.surahNameAr}',
+                            'سورة ${recitation.surahNameAr.isNotEmpty ? recitation.surahNameAr : recitation.surahNameEn}',
                             style: GoogleFonts.amiri(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,

@@ -1,4 +1,4 @@
-﻿import 'package:equatable/equatable.dart';
+import 'package:equatable/equatable.dart';
 import '../../domain/entities/playlist.dart';
 
 abstract class PlaylistsState extends Equatable {
@@ -35,7 +35,9 @@ class PlaylistsLoaded extends PlaylistsState {
 
   bool isRecitationInPlaylist(String playlistId, String recitationId) {
     final p = getPlaylist(playlistId);
-    return p != null && p.recitationIds.contains(recitationId);
+    return p != null &&
+        (p.recitationIds.contains(recitationId) ||
+            p.recitations.any((r) => r.id == recitationId));
   }
 
   PlaylistsLoaded copyWith({
@@ -50,6 +52,12 @@ class PlaylistsLoaded extends PlaylistsState {
 
   @override
   List<Object?> get props => [playlists, message];
+}
+
+/// Explicit empty state for custom playlists.
+/// Inherits from [PlaylistsLoaded] for seamless backward compatibility.
+class PlaylistsEmpty extends PlaylistsLoaded {
+  const PlaylistsEmpty({super.message}) : super(playlists: const []);
 }
 
 class PlaylistsError extends PlaylistsState {

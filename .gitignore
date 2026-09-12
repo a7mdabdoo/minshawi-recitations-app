@@ -13,6 +13,7 @@
 migrate_working_dir/
 .jdk17/
 flutter_*.png
+apkpure_assets/
 
 # IntelliJ related
 *.iml
