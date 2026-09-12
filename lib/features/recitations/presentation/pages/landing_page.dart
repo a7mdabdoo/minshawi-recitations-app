@@ -10,12 +10,16 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/theme_cubit.dart';
+import '../../../playlists/domain/entities/playlist.dart';
 import '../../../playlists/presentation/cubit/playlists_cubit.dart';
 import '../../../playlists/presentation/cubit/playlists_state.dart';
-import '../../../playlists/presentation/pages/playlists_page.dart';
+import '../../../playlists/presentation/pages/playlist_detail_page.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
+import '../../../recitations/domain/entities/recitation.dart';
+import '../../../recitations/presentation/cubit/recitation_list_cubit.dart';
+import '../../../recitations/presentation/cubit/recitation_list_state.dart';
 
 enum _LandingTab { collections, playlists }
 
@@ -126,11 +130,9 @@ class _LandingPageState extends State<LandingPage> {
                               if (_selectedTab == _LandingTab.collections) ...[
                                 _VerticalCategoryCards(isDark: isDark),
                               ] else ...[
-                                const PlaylistsContentView(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  padding: EdgeInsets.only(top: 2, bottom: 8),
-                                  showSearch: false,
+                                _LandingPlaylistsSection(
+                                  isDark: isDark,
+                                  gold: gold,
                                 ),
                               ],
 
@@ -161,6 +163,431 @@ class _LandingPageState extends State<LandingPage> {
   }
 }
 
+// ─────────────────────────────────────────────────────────
+// قسم قوائم التشغيل المخصصة داخل الصفحة الرئيسية (خالي تماماً من أخطاء السكرول)
+// ─────────────────────────────────────────────────────────
+class _LandingPlaylistsSection extends StatelessWidget {
+  final bool isDark;
+  final Color gold;
+
+  const _LandingPlaylistsSection({
+    required this.isDark,
+    required this.gold,
+  });
+
+  void _showCreateDialog(BuildContext context) {
+    final cardBg =
+    isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
+    final textPrimary =
+    isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final textSecondary =
+    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+
+    final controller = TextEditingController();
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          backgroundColor: cardBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: Text(
+            'إنشاء قائمة تشغيل جديدة',
+            style: GoogleFonts.cairo(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: textPrimary,
+            ),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            textDirection: TextDirection.rtl,
+            style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
+            decoration: InputDecoration(
+              hintText: 'اسم القائمة (مثال: تلاوات مختارة)...',
+              hintStyle: GoogleFonts.cairo(color: textSecondary, fontSize: 13),
+              filled: true,
+              fillColor: (isDark ? Colors.white : Colors.black).withAlpha(10),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: gold.withAlpha(isDark ? 80 : 50),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: gold, width: 1.5),
+              ),
+              contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: Text(
+                'إلغاء',
+                style: GoogleFonts.cairo(
+                  color: textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: gold,
+                foregroundColor:
+                isDark ? AppColors.darkBackground : Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 0,
+              ),
+              onPressed: () async {
+                final name = controller.text.trim();
+                if (name.isNotEmpty) {
+                  Navigator.of(dialogCtx).pop();
+                  await context.read<PlaylistsCubit>().createPlaylist(name);
+                }
+              },
+              child: Text(
+                'إنشاء',
+                style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteDialog(
+      BuildContext context,
+      String playlistId,
+      String playlistTitle,
+      ) {
+    final cardBg =
+    isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
+    final textPrimary =
+    isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final textSecondary =
+    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          backgroundColor: cardBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: Text(
+            'حذف قائمة التشغيل؟',
+            style: GoogleFonts.cairo(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: textPrimary,
+            ),
+          ),
+          content: Text(
+            'هل ترغب في حذف قائمة التشغيل "$playlistTitle" نهائياً؟',
+            style: GoogleFonts.cairo(
+              fontSize: 13,
+              color: textSecondary,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: Text(
+                'إلغاء',
+                style: GoogleFonts.cairo(
+                  color: textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.darkError,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 0,
+              ),
+              onPressed: () async {
+                Navigator.of(dialogCtx).pop();
+                await context.read<PlaylistsCubit>().deletePlaylist(playlistId);
+              },
+              child: Text(
+                'حذف',
+                style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cardBg =
+    isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
+    final textPrimary =
+    isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final textSecondary =
+    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+
+    return BlocBuilder<PlaylistsCubit, PlaylistsState>(
+      builder: (context, state) {
+        final playlists = state is PlaylistsLoaded ? state.playlists : <Playlist>[];
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // زر إنشاء قائمة جديدة دائماً في الأعلى
+            InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () => _showCreateDialog(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                decoration: BoxDecoration(
+                  color: gold.withAlpha(isDark ? 25 : 15),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: gold.withAlpha(isDark ? 90 : 60),
+                    width: 1.2,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add_circle_outline_rounded, color: gold, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'إنشاء قائمة تشغيل جديدة',
+                      style: GoogleFonts.cairo(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: gold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            if (playlists.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Icon(Icons.queue_music_rounded,
+                        size: 36, color: gold.withAlpha(160)),
+                    const SizedBox(height: 8),
+                    Text(
+                      'لا توجد قوائم تشغيل مخصصة حالياً',
+                      style: GoogleFonts.cairo(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              BlocBuilder<RecitationListCubit, RecitationListState>(
+                builder: (context, recitationListState) {
+                  final allRecitations = recitationListState is RecitationListLoaded
+                      ? recitationListState.recitations
+                      : <Recitation>[];
+                  final recitationsMap = {for (var r in allRecitations) r.id: r};
+
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (final playlist in playlists) ...[
+                        _buildPlaylistCard(
+                          context: context,
+                          playlist: playlist,
+                          recitationsMap: recitationsMap,
+                          cardBg: cardBg,
+                          textPrimary: textPrimary,
+                          textSecondary: textSecondary,
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ],
+                  );
+                },
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildPlaylistCard({
+    required BuildContext context,
+    required Playlist playlist,
+    required Map<String, Recitation> recitationsMap,
+    required Color cardBg,
+    required Color textPrimary,
+    required Color textSecondary,
+  }) {
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final created = playlist.createdAt ?? DateTime.now();
+    final dateStr =
+        '${created.year}/${created.month.toString().padLeft(2, '0')}/${created.day.toString().padLeft(2, '0')}';
+
+    final effectiveRecitations = <Recitation>[
+      ...playlist.recitations,
+      ...playlist.recitationIds
+          .where((id) => !playlist.recitations.any((r) => r.id == id))
+          .map((id) => recitationsMap[id])
+          .whereType<Recitation>(),
+    ];
+
+    final count = playlist.recitations.isNotEmpty
+        ? playlist.recitations.length
+        : playlist.recitationIds.length;
+
+    final displayName = playlist.title.isNotEmpty
+        ? playlist.title
+        : (playlist.name.isNotEmpty ? playlist.name : 'قائمة تشغيل');
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: border, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 40 : 10),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => PlaylistDetailPage(playlistId: playlist.id),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: gold.withAlpha(isDark ? 35 : 20),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.queue_music_rounded, color: gold, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        displayName,
+                        style: GoogleFonts.cairo(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$count تلاوة  ·  تم الإنشاء: $dateStr',
+                        style: GoogleFonts.cairo(
+                          fontSize: 11,
+                          color: textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.play_circle_fill_rounded,
+                    size: 34,
+                    color: gold,
+                  ),
+                  onPressed: () {
+                    if (effectiveRecitations.isNotEmpty) {
+                      context.read<AudioPlayerCubit>().play(
+                        effectiveRecitations.first,
+                        playlist: effectiveRecitations,
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'قائمة التشغيل فارغة! أضف تلاوات أولاً.',
+                            style: GoogleFonts.cairo(color: Colors.white),
+                          ),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  },
+                  tooltip: 'تشغيل القائمة',
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    size: 20,
+                    color: AppColors.darkError,
+                  ),
+                  onPressed: () => _showDeleteDialog(
+                    context,
+                    playlist.id,
+                    displayName,
+                  ),
+                  tooltip: 'حذف القائمة',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// باقي الويدجتس الخاصة بالصفحة الرئيسية كما هي دون تغيير
+// ─────────────────────────────────────────────────────────
 class _UnifiedHeroBanner extends StatelessWidget {
   final bool isDark;
   final Color gold;
