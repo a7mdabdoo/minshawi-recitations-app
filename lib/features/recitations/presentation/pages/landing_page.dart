@@ -163,9 +163,6 @@ class _LandingPageState extends State<LandingPage> {
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// قسم قوائم التشغيل المخصصة داخل الصفحة الرئيسية (خالي تماماً من أخطاء السكرول)
-// ─────────────────────────────────────────────────────────
 class _LandingPlaylistsSection extends StatelessWidget {
   final bool isDark;
   final Color gold;
