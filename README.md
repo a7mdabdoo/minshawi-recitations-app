@@ -1,9 +1,28 @@
-﻿# جامع تلاوات المنشاوي
+# جامع تلاوات المنشاوي
 ### Al-Minshawi Quran Recitations App
 
-تطبيق قرآني شامل ونقي لوجه الله تعالى، يجمع التراث الصوتي لفضيلة الشيخ محمد صديق المنشاوي (رحمه الله) بأعلى معايير الأداء والجمالية، مبني باستخدام Flutter وفق مبادئ Clean Architecture وبدون أي إعلانات.
+<p align="center">
+  <a href="https://apkpure.com/p/com.minshawi.recitations">
+    <img src="https://img.shields.io/badge/Download%20on-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white" alt="Download on APKPure">
+  </a>
+  <a href="https://github.com/a7mdabdoo/minshawi-recitations-app/releases">
+    <img src="https://img.shields.io/badge/Download-Release%20APK-2563eb?style=for-the-badge&logo=github&logoColor=white" alt="Download APK">
+  </a>
+  <a href="PRIVACY_POLICY.md">
+    <img src="https://img.shields.io/badge/Privacy%20Policy-100%25%20Free%20&%20No%20Ads-D4AF37?style=for-the-badge" alt="Privacy Policy">
+  </a>
+</p>
 
-*A premium, non-profit, offline-first Quranic recitation application dedicated to the vocal legacy of Sheikh Muhammad Siddiq Al-Minshawi, crafted with Flutter and Clean Architecture principles with zero ads.*
+---
+
+## 📥 التحميل والتثبيت | Download & Install
+
+يمكنك الآن تحميل التطبيق وتثبيته مباشرة على هاتفك الأندرويد من خلال الروابط التالية:
+
+| المصدر | رابط التحميل المباشر | الحالة |
+| :--- | :--- | :---: |
+| **متجر APKPure (المتجر الرسمي)** | [![Download on APKPure](https://img.shields.io/badge/تحميل_من-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white)](https://apkpure.com/p/com.minshawi.recitations) | ✅ متاح على المتجر |
+| **تحميل ملف الـ APK المباشر (GitHub Releases)** | [![Download APK](https://img.shields.io/badge/تحميل_ملف-app--release.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest) | ✅ متاح ومباشر |
 
 ---
 
