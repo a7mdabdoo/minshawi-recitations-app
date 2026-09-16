@@ -1,11 +1,18 @@
+﻿<div align="center">
+
 # جامع تلاوات المنشاوي
 ### Al-Minshawi Quran Recitations App
+
+تطبيق قرآني شامل للتراث الصوتي لفضيلة الشيخ محمد صديق المنشاوي (رحمه الله)  
+مبني بـ Flutter وفق معمارية Clean Architecture، مجاني 100% وبدون أي إعلانات.
+
+<br>
 
 <p align="center">
   <a href="https://apkpure.com/p/com.minshawi.recitations">
     <img src="https://img.shields.io/badge/Download%20on-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white" alt="Download on APKPure">
   </a>
-  <a href="https://github.com/a7mdabdoo/minshawi-recitations-app/releases">
+  <a href="https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest">
     <img src="https://img.shields.io/badge/Download-Release%20APK-2563eb?style=for-the-badge&logo=github&logoColor=white" alt="Download APK">
   </a>
   <a href="PRIVACY_POLICY.md">
@@ -13,19 +20,22 @@
   </a>
 </p>
 
+</div>
+
 ---
 
-## 📥 التحميل والتثبيت | Download & Install
+## التحميل والتثبيت
 
-يمكنك الآن تحميل التطبيق وتثبيته مباشرة على هاتفك الأندرويد من خلال الروابط التالية:
+يمكنك الآن تحميل التطبيق وتثبيته مباشرة على هاتفك الأندرويد من الروابط التالية:
 
-| المصدر | رابط التحميل المباشر | الحالة |
-| :--- | :--- | :---: |
-| **متجر APKPure (المتجر الرسمي)** | [![Download on APKPure](https://img.shields.io/badge/Download-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white)](https://apkpure.com/p/com.minshawi.recitations) | ✅ متاح على المتجر |
-| **تحميل ملف الـ APK المباشر (GitHub Releases)** | [![Download APK](https://img.shields.io/badge/Download-app--release.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest) | ✅ متاح ومباشر |
+| المصدر | نوع التثبيت | رابط التحميل المباشر | الحالة |
+| :--- | :--- | :---: | :---: |
+| **متجر APKPure** | المتجر الرسمي المعتمد للتطبيق | [![Download on APKPure](https://img.shields.io/badge/Download-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white)](https://apkpure.com/p/com.minshawi.recitations) | متاح على المتجر |
+| **مستودع GitHub** | تحميل ملف الـ APK المباشر | [![Download APK](https://img.shields.io/badge/Download-app--release.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest) | متاح ومباشر |
+
 ---
 
-## إهداء وصدقة جارية | Dedication
+## إهداء وصدقة جارية
 
 > قال رسول الله ﷺ:  
 > «إِذَا مَاتَ الإنْسَانُ انْقَطَعَ عَنْهُ عَمَلُهُ إِلَّا مِنْ ثَلَاثَةٍ: إِلَّا مِنْ صَدَقَةٍ جَارِيَةٍ، أَوْ عِلْمٍ يُنْتَفَعُ بِهِ، أَوْ وَلَدٍ صَالِحٍ يَدْعُو لَهُ» (رواه مسلم)
@@ -39,66 +49,72 @@
 
 ---
 
-## نبذة عن المشروع | Overview
+## نبذة عن المشروع
 
-### العربية
-تطبيق **"جامع تلاوات المنشاوي"** هو منصة قرآنية صوتية مفتوحة المصدر تهدف إلى توفير تجربة استماع راقية وموثوقة للتراث الصوتي الخالد لفضيلة القارئ الشيخ محمد صديق المنشاوي (رحمه الله). يجمع التطبيق المصحف المرتل كاملاً (١١٤ سورة)، والمصحف المجود كاملاً، بالإضافة إلى التسجيلات الخارجية النادرة لحفلات عام ١٣٨٧ هـ. يتميز التطبيق بمشغل صوتي عصري ومتقدم مستوحى من أفضل منصات الصوتيات، وأدوات متخصصة في حفظ القرآن ومراجعته، مع دعم كامل للتشغيل دون اتصال بالإنترنت وخلو تام من الإعلانات أو أدوات التتبع.
+تطبيق **جامع تلاوات المنشاوي** هو منصة قرآنية صوتية مفتوحة المصدر تهدف إلى توفير تجربة استماع راقية وموثوقة للتراث الصوتي الخالد لفضيلة القارئ الشيخ محمد صديق المنشاوي (رحمه الله).
 
-### English
-**Al-Minshawi Quran Recitations** is a modern, open-source audio streaming and offline playback platform engineered to present the timeless recordings of Sheikh Muhammad Siddiq Al-Minshawi. It bundles his complete Murattal recitation (114 Surahs), complete Mujawwad recitation, and rare historic external concert recordings from 1387 AH (1967-1968). The app provides an elegant, Spotify-inspired audio experience with Quranic memorization tools, offline caching, and strict zero-advertising and privacy commitments.
+يجمع التطبيق المصحف المرتل كاملاً (١١٤ سورة)، والمصحف المجود كاملاً، بالإضافة إلى التسجيلات الخارجية النادرة لحفلات عام ١٣٨٧ هـ. يتميز التطبيق بمشغل صوتي عصري ومتقدم مستوحى من أفضل المنصات الصوتية العالمية، وأدوات متخصصة في حفظ القرآن الكريم ومراجعته، مع دعم كامل للتشغيل دون اتصال بالإنترنت وخلو تام من الإعلانات أو أدوات التتبع.
+
+<br>
+
+### About The Project (English)
+
+**Al-Minshawi Quran Recitations** is a modern, open-source audio streaming and offline playback platform engineered to present the timeless recordings of Sheikh Muhammad Siddiq Al-Minshawi.
+
+The app bundles his complete Murattal recitation (114 Surahs), complete Mujawwad recitation, and rare historic external concert recordings from 1387 AH (1967-1968). It provides an elegant, Spotify-inspired audio experience with Quranic memorization tools, offline caching, and strict zero-advertising and privacy commitments.
 
 ---
 
-## المميزات الرئيسية | Key Features
+## المميزات الرئيسية
 
-### 1. مشغل صوتي عصري وشريط مصغر تفاعلي (Modern Audio Player & Mini-Player)
-- **واجهة عصرية فاخرة:** تصميم رمادي داكن فاحم (Charcoal Grey & Gold Accent) يتناغم بدقة مع ألوان التطبيق في الوضعين الداكن والفاتح.
-- **إيماءات سحب سلسة (Bidirectional Swipe Gestures):** سحب لأعلى على الشريط المصغر (Mini-Player) لفتح المشغل الكامل بانتقال ناعم، وسحب لأسفل في المشغل الكامل للرجوع الفوري.
-- **تحكم زمني دقيق:** أزرار تقديم وتأخير مخصصة (`+10s` و `-10s`) لتسهيل متابعة الآيات والتدبر.
+### ١. مشغل صوتي متطور وشريط تحكم مصغر
+- **واجهة عصرية فاخرة:** تصميم رمادي داكن فاحم بلمسات ذهبية يتناغم بدقة مع ألوان التطبيق في الوضعين الداكن والفاتح.
+- **إيماءات سحب سلسة:** سحب لأعلى على الشريط المصغر لفتح المشغل الكامل بانتقال ناعم، وسحب لأسفل في المشغل الكامل للرجوع الفوري.
+- **تحكم زمني دقيق:** أزرار تقديم وتأخير مخصصة (+10 ثوانٍ و -10 ثوانٍ) لتسهيل متابعة الآيات والتدبر.
 - **تشغيل في الخلفية وشاشة القفل:** تكامل متكامل مع نظام التشغيل عبر `just_audio` و `audio_service` مع أزرار التحكم في شريط الإشعارات وشاشة القفل.
 
-### 2. أداة التكرار الذكي وحفظ الآيات (A-B Repeat Looping)
-- إمكانية تحديد نقطة بداية (A) ونقطة نهاية (B) بدقة بالغة بالثواني والأجزاء المئوية.
-- أزرار ضبط دقيق (`+1s` و `-1s`) لكل نقطة للوصول للآية المحددة بدقة.
-- تكرار تلقائي بعدد محدد أو تكرار لا نهائي للمساعدة في تثبيت الحفظ ومراجعة الأحكام.
+### ٢. أداة التكرار الذكي لحفظ الآيات (A-B Repeat)
+- إمكانية تحديد نقطة بداية (A) ونقطة نهاية (B) بدقة بالغة بالثواني.
+- أزرار ضبط دقيق (+1 ثانية و -1 ثانية) لكل نقطة للوصول لبداية الآية ونهايتها بالضبط.
+- تكرار تلقائي بعدد محدد أو تكرار لانهائي للمساعدة في تثبيت الحفظ ومراجعة الأحكام.
 
-### 3. مكتبة تلاوات متكاملة (Comprehensive Recitation Library)
+### ٣. مكتبة تلاوات متكاملة
 - **المصحف المرتل كاملاً:** ١١٤ سورة نقية برواية حفص عن عاصم.
-- **المصحف المجود:** روائع التلاوات المجودة بجودة صوتية عالية.
+- **المصحف المجود:** روائع التلاوة المجودة بجودة صوتية نقية.
 - **النوادر الخارجية لعام ١٣٨٧ هـ:** حفلات وتسجيلات خارجية تاريخية نادرة.
 
-### 4. قوائم التشغيل المخصصة والمفضلة (Custom Playlists & Favorites)
+### ٤. قوائم التشغيل المخصصة والمفضلة
 - إنشاء وإدارة قوائم تشغيل مخصصة للتلاوات المفضلة وحفظها محلياً بأمان عبر Hive.
-- بحث فوري وسريع يدعم تطبيع الحروف والهمزات العربية (`ArabicNormalizer`) لمنع أي فقد في نتائج البحث.
-- تشغيل تتابعي ذكي لجميع عناصر القائمة.
+- بحث فوري وسريع يدعم تطبيع الحروف والهمزات العربية لمنع أي فقد في نتائج البحث.
+- تشغيل تتابعي ذكي لجميع عناصر القائمة مباشرة من الواجهة الرئيسية.
 
-### 5. الاستماع دون اتصال والتحميل السريع (Offline Downloads)
+### ٥. الاستماع والتحميل أوفلاين بدون إنترنت
 - تحميل السور والتلاوات للاستماع أثناء السفر أو في غياب شبكة الإنترنت.
 - إدارة ذكية للتحميل تدعم الاستئناف التلقائي والإيقاف المؤقت، مع فحص سلامة الملفات على القرص.
 
-### 6. مؤقت النوم الذكي (Smart Sleep Timer)
+### ٦. مؤقت النوم الذكي (Sleep Timer)
 - خيارات زمنية مرنة مع إيقاف تدريجي هادئ للصوت لحماية السمع ومنع انقطاع الصوت المفاجئ.
 
-### 7. دعم السمات والتصميم المتجاوب (Dark & Light Themes)
-- دعم كامل للوضع الداكن (Dark Theme) المريح للعين والوضع الفاتح الأنيق، مع مراعاة كاملة لاتجاه القراءة من اليمين إلى اليسار (RTL).
+### ٧. دعم السمات والتصميم المتجاوب
+- دعم كامل للوضع الداكن المريح للعين والوضع الفاتح الأنيق، مع مراعاة كاملة لاتجاه القراءة من اليمين إلى اليسار.
 
 ---
 
-## البنية البرمجية والتقنيات المستخدمة | Tech Stack & Architecture
+## التقنيات والبنية البرمجية
 
-- **إطار العمل (Framework):** Flutter (v3.29+)
-- **لغة البرمجة (Language):** Dart (v3.7+)
-- **نمط التصميم (Architecture):** Clean Architecture (Presentation, Domain, Data Layers)
-- **إدارة الحالة (State Management):** BLoC / Cubit (`flutter_bloc`) مع تحسينات إعادة البناء `buildWhen` لأعلى أداء (60/120 FPS).
-- **قواعد البيانات والتخزين المحلي (Local Storage):** Hive (`hive_flutter`) لحفظ التفضيلات وقوائم التشغيل ومسارات التنزيل محلياً وسريعاً.
-- **محرك الصوتيات (Audio Engine):** `just_audio`, `audio_service`, `just_audio_background`
-- **التنقل والتوجيه (Navigation):** `go_router`
-- **إدارة الشبكة (Networking):** `dio`
-- **الخطوط والطباعة (Typography):** Amiri (لأسماء السور والنصوص القرآنية) و Cairo (لواجهات المستخدم).
+- **إطار العمل:** Flutter (v3.29+)
+- **لغة البرمجة:** Dart (v3.7+)
+- **النمط المعماري:** Clean Architecture (Data, Domain, Presentation)
+- **إدارة الحالة:** BLoC / Cubit مع تحسينات إعادة البناء `buildWhen` لأعلى أداء وسلاسة (60/120 FPS).
+- **قواعد البيانات والتخزين المحلي:** Hive NoSQL لحفظ التفضيلات وقوائم التشغيل ومسارات التنزيل محلياً وسريعاً.
+- **محرك الصوتيات:** `just_audio`, `audio_service`, `just_audio_background`
+- **التنقل والتوجيه:** `go_router`
+- **إدارة الشبكة:** `dio`
+- **الخطوط والطباعة:** Amiri للنصوص القرآنية، و Cairo لواجهات المستخدم.
 
 ---
 
-## هيكل المجلدات | Directory Structure
+## هيكل المجلدات البرمجية
 
 ```
 lib/
@@ -123,51 +139,51 @@ lib/
 
 ---
 
-## سياسة الخصوصية | Privacy Policy
+## سياسة الخصوصية
 
-التطبيق مجاني 100%، بدون أي إعلانات تجارية أو أدوات تتبع، ولا يجمع أو يشارك أي بيانات شخصية للمستخدمين. للاطلاع على الوثيقة الرسمية لسياسة الخصوصية، يرجى زيارة:
-- [سياسة الخصوصية الكاملة (PRIVACY_POLICY.md)](PRIVACY_POLICY.md)
-- [الرابط العام على GitHub](https://github.com/a7mdabdoo/minshawi-recitations-app/blob/main/PRIVACY_POLICY.md)
+التطبيق مجاني 100%، بدون أي إعلانات تجارية أو أدوات تتبع، ولا يجمع أو يشارك أي بيانات شخصية للمستخدمين. للاطلاع على الوثيقة الرسمية لسياسة الخصوصية:
+- [وثيقة سياسة الخصوصية الكاملة في المستودع (PRIVACY_POLICY.md)](PRIVACY_POLICY.md)
+- [الرابط العام المباشر على GitHub](https://github.com/a7mdabdoo/minshawi-recitations-app/blob/main/PRIVACY_POLICY.md)
 
 ---
 
-## التثبيت والتشغيل | Installation & Setup
+## التثبيت والتشغيل للمطورين
 
-### المتطلبات الأساسية (Prerequisites)
+### المتطلبات الأساسية
 - Flutter SDK (الإصدار 3.29.0 أو أحدث)
 - Android SDK مع دعم Android 8.0 (API 26) فما فوق
 - بيئة تطوير متكاملة (VS Code أو Android Studio)
 
-### خطوات التشغيل (Setup Commands)
+### خطوات التشغيل
 
-1. **استنساخ المستودع (Clone repository):**
+1. **استنساخ المستودع:**
    ```bash
    git clone https://github.com/a7mdabdoo/minshawi-recitations-app.git
    cd minshawi-recitations-app
    ```
 
-2. **تثبيت الحزم البرمجية (Install dependencies):**
+2. **تثبيت الحزم البرمجية:**
    ```bash
    flutter pub get
    ```
 
-3. **تشغيل الاختبارات البرمجية (Run tests):**
+3. **تشغيل الاختبارات البرمجية:**
    ```bash
    flutter test
    ```
 
-4. **تشغيل التطبيق في بيئة التطوير (Run app):**
+4. **تشغيل التطبيق في بيئة التطوير:**
    ```bash
    flutter run
    ```
 
-5. **بناء حزمة الإنتاج (Build release APK):**
+5. **بناء حزمة الإنتاج (APK):**
    ```bash
    flutter build apk --release
    ```
 
 ---
 
-## الترخيص | License
+## الترخيص
 
 هذا المشروع متاح بموجب ترخيص [MIT License](LICENSE). جميع التلاوات الصوتية هي تراث إسلامي عام لفضيلة الشيخ محمد صديق المنشاوي (رحمه الله).
