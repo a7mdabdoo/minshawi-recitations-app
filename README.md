@@ -22,8 +22,7 @@
 | المصدر | رابط التحميل المباشر | الحالة |
 | :--- | :--- | :---: |
 | **متجر APKPure (المتجر الرسمي)** | [![Download on APKPure](https://img.shields.io/badge/Download-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white)](https://apkpure.com/p/com.minshawi.recitations) | ✅ متاح على المتجر |
-| **تحميل ملف الـ APK المباشر (GitHub Releases)** | [![Download APK](https://img.shields.io/badge/تحميل_ملف-app--release.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest) | ✅ متاح ومباشر |
-
+| **تحميل ملف الـ APK المباشر (GitHub Releases)** | [![Download APK](https://img.shields.io/badge/Download-app--release.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest) | ✅ متاح ومباشر |
 ---
 
 ## إهداء وصدقة جارية | Dedication
