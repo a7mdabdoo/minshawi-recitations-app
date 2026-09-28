@@ -106,6 +106,8 @@ class _DownloadsPageState extends State<DownloadsPage> {
 
               return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+                // ignore: deprecated_member_use
+                cacheExtent: 500,
                 addAutomaticKeepAlives: false,
                 addRepaintBoundaries: true,
                 itemCount: offlineRecitations.length,
@@ -319,20 +321,53 @@ class _DownloadedRecitationCard extends StatelessWidget {
                         recitation.surahNameAr.startsWith('سورة')
                             ? recitation.surahNameAr
                             : 'سورة ${recitation.surahNameAr}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.amiri(
                           fontSize: 16.5,
                           fontWeight: FontWeight.w700,
                           color: textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${Formatters.formatDuration(recitation.durationSeconds)} • ${sizeMb > 0 ? sizeMb.toStringAsFixed(1) : (recitation.fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} ميجابايت',
-                        style: GoogleFonts.cairo(
-                          fontSize: 11.5,
-                          color: textSecondary,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: gold.withAlpha(isDark ? 30 : 20),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: gold.withAlpha(isDark ? 70 : 45),
+                                width: 0.6,
+                              ),
+                            ),
+                            child: Text(
+                              recitation.sourceLabel,
+                              style: GoogleFonts.cairo(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: gold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              '• ${Formatters.formatDuration(recitation.durationSeconds)}${recitation.trailingVerseOrLocation.isNotEmpty ? ' • ${recitation.trailingVerseOrLocation}' : ''} • ${sizeMb > 0 ? sizeMb.toStringAsFixed(1) : (recitation.fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} م.ب',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.cairo(
+                                fontSize: 11,
+                                color: textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

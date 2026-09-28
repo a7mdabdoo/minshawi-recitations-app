@@ -79,6 +79,7 @@ class Playlist extends Equatable {
           'recordingYear': r.recordingYear,
           'recordingLocation': r.recordingLocation,
           'collectionId': r.collectionId,
+          'recitationType': r.recitationType.name,
           'isRare': r.isRare,
           'quality': r.quality,
           if (r.localFilePath != null) 'localFilePath': r.localFilePath,

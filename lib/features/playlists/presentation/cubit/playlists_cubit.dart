@@ -43,16 +43,7 @@ class PlaylistsCubit extends Cubit<PlaylistsState> {
 
   Future<void> _enrichPlaylistsWithFullRecitations(List<Playlist> list) async {
     final repo = _repository;
-    if (repo == null) return;
-
-    bool hasMissing = false;
-    for (final p in list) {
-      if (p.recitations.length < p.recitationIds.length) {
-        hasMissing = true;
-        break;
-      }
-    }
-    if (!hasMissing) return;
+    if (repo == null || list.isEmpty) return;
 
     try {
       final allRecitations = await repo.getRecitations();
@@ -61,18 +52,47 @@ class PlaylistsCubit extends Cubit<PlaylistsState> {
       final enriched = <Playlist>[];
 
       for (final p in list) {
-        if (p.recitations.length < p.recitationIds.length) {
-          final existingIds = p.recitations.map((r) => r.id).toSet();
-          final updatedRecs = List<Recitation>.from(p.recitations);
+        final updatedRecs = <Recitation>[];
+        bool playlistChanged = false;
+
+        if (p.recitationIds.isNotEmpty) {
+          final oldRecMap = {for (final r in p.recitations) r.id: r};
           for (final id in p.recitationIds) {
-            if (!existingIds.contains(id) && recMap.containsKey(id)) {
-              updatedRecs.add(recMap[id]!);
-              anyUpdated = true;
+            final canonical = recMap[id];
+            final existing = oldRecMap[id];
+            if (canonical != null) {
+              updatedRecs.add(canonical);
+              if (existing == null ||
+                  existing.verseRange != canonical.verseRange ||
+                  existing.collectionId != canonical.collectionId ||
+                  existing.surahNameAr != canonical.surahNameAr) {
+                playlistChanged = true;
+              }
+            } else if (existing != null) {
+              updatedRecs.add(existing);
             }
           }
+        } else {
+          for (final existing in p.recitations) {
+            final canonical = recMap[existing.id];
+            if (canonical != null) {
+              updatedRecs.add(canonical);
+              if (existing.verseRange != canonical.verseRange ||
+                  existing.collectionId != canonical.collectionId ||
+                  existing.surahNameAr != canonical.surahNameAr) {
+                playlistChanged = true;
+              }
+            } else {
+              updatedRecs.add(existing);
+            }
+          }
+        }
+
+        if (playlistChanged) {
           final updatedPlaylist = p.copyWith(recitations: updatedRecs);
           enriched.add(updatedPlaylist);
           await _box.put(updatedPlaylist.id, updatedPlaylist.toMap());
+          anyUpdated = true;
         } else {
           enriched.add(p);
         }

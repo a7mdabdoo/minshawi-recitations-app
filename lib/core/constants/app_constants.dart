@@ -11,6 +11,7 @@ abstract class AppConstants {
 
   // Assets
   static const String manifestAssetPath = 'assets/data/recitations_manifest.json';
+  static const String nahawandAssetPath = 'assets/data/nahawand_candidates.json';
   static const String defaultArtworkAsset = 'assets/images/artwork.png';
 
   // Hive Boxes

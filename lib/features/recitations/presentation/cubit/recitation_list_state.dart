@@ -42,6 +42,8 @@ class RecitationListLoaded extends RecitationListState {
 
     return recitations.where((r) {
       return ArabicNormalizer.matches(r.surahNameAr, q) ||
+          ArabicNormalizer.matches(r.verseRange, q) ||
+          ArabicNormalizer.matches(r.recordingLocation, q) ||
           r.surahNameEn.toLowerCase().contains(normQuery) ||
           r.surahNumber.toString() == normQuery ||
           r.surahNumber.toString().contains(normQuery);

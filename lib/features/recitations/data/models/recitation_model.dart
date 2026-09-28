@@ -20,8 +20,23 @@ class RecitationModel extends Recitation {
   });
 
   factory RecitationModel.fromJson(Map<String, dynamic> json) {
+    final id = json['id']?.toString() ?? '';
+    final rawType = json['recitationType']?.toString().trim().toLowerCase();
+    String resolvedCollectionId = json['collectionId']?.toString().trim() ?? '';
+    if (resolvedCollectionId.isEmpty) {
+      if (rawType == 'murattal' || id.startsWith('murattal_')) {
+        resolvedCollectionId = 'complete_murattal';
+      } else if (rawType == 'mujawwad' || id.startsWith('mojawad_')) {
+        resolvedCollectionId = 'mojawad';
+      } else if (rawType == 'nahawand' || id.startsWith('nahawand_')) {
+        resolvedCollectionId = 'nahawand';
+      } else {
+        resolvedCollectionId = 'rare_1387';
+      }
+    }
+
     return RecitationModel(
-      id: json['id']?.toString() ?? '',
+      id: id,
       surahNumber: int.tryParse(json['surahNumber']?.toString() ?? '0') ?? 0,
       surahNameAr: json['surahNameAr']?.toString() ?? '',
       surahNameEn: json['surahNameEn']?.toString() ?? '',
@@ -34,7 +49,7 @@ class RecitationModel extends Recitation {
       recordingYear: json['recordingYear']?.toString() ?? '1387 هـ / 1967-1968',
       recordingLocation:
           json['recordingLocation']?.toString() ?? 'تسجيل إذاعي (1387 هـ)',
-      collectionId: json['collectionId']?.toString() ?? 'rare_1387',
+      collectionId: resolvedCollectionId,
       isRare: json['isRare'] is bool
           ? json['isRare'] as bool
           : (json['isRare']?.toString() == 'true'),
@@ -55,8 +70,10 @@ class RecitationModel extends Recitation {
         'recordingYear': recordingYear,
         'recordingLocation': recordingLocation,
         'collectionId': collectionId,
+        'recitationType': recitationType.name,
         'isRare': isRare,
         'quality': quality,
+        if (localFilePath != null) 'localFilePath': localFilePath,
       };
 
   /// Produces a new [RecitationModel] with [localFilePath] injected.

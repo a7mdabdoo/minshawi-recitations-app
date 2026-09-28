@@ -14,6 +14,7 @@ import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dar
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
+import '../../data/models/nahawand_recitation_model.dart';
 import '../../domain/entities/recitation.dart';
 import '../cubit/download_cubit.dart';
 import '../cubit/download_state.dart';
@@ -33,7 +34,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-enum _ListTab { all, favorites }
+enum _ListTab { golden, all, favorites }
 
 class _HomeView extends StatefulWidget {
   final String collectionId;
@@ -44,11 +45,12 @@ class _HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<_HomeView> with WidgetsBindingObserver {
-  _ListTab _selectedTab = _ListTab.all;
+  late _ListTab _selectedTab;
 
   @override
   void initState() {
     super.initState();
+    _selectedTab = _ListTab.all;
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -189,6 +191,8 @@ class _HomeViewState extends State<_HomeView> with WidgetsBindingObserver {
         bottomNavigationBar: const MiniPlayer(),
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
+          // ignore: deprecated_member_use
+          cacheExtent: 500,
           slivers: [
             _AppBar(
               isDark: isDark,
@@ -197,6 +201,7 @@ class _HomeViewState extends State<_HomeView> with WidgetsBindingObserver {
             _FilterTabs(
               selectedTab: _selectedTab,
               isDark: isDark,
+              collectionId: widget.collectionId,
               onTabSelected: (tab) => setState(() => _selectedTab = tab),
             ),
             _SearchBar(isDark: isDark),
@@ -222,11 +227,13 @@ class _AppBar extends StatelessWidget {
     final title = switch (collectionId) {
       'mojawad' => 'المصحف المجود',
       'complete_murattal' => 'المصحف المرتل كاملاً',
+      'nahawand' => 'روائع النهاوند',
       _ => 'تسجيلات 1387 هـ النادرة',
     };
     final subtitle = switch (collectionId) {
       'mojawad' => 'الشيخ محمد صديق المنشاوي (١١٤ سورة)',
       'complete_murattal' => 'الشيخ محمد صديق المنشاوي (١١٤ سورة)',
+      'nahawand' => 'روائع النهاوند - أشهر المحافل التاريخية',
       _ => 'الشيخ محمد صديق المنشاوي (٢٦ سورة)',
     };
 
@@ -347,11 +354,13 @@ class _AppBarBackground extends StatelessWidget {
 class _FilterTabs extends StatelessWidget {
   final _ListTab selectedTab;
   final bool isDark;
+  final String collectionId;
   final ValueChanged<_ListTab> onTabSelected;
 
   const _FilterTabs({
     required this.selectedTab,
     required this.isDark,
+    required this.collectionId,
     required this.onTabSelected,
   });
 
@@ -363,37 +372,91 @@ class _FilterTabs extends StatelessWidget {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-        child: Row(
-          children: [
-            Expanded(
-              child: _TabButton(
-                icon: Icons.list_alt_rounded,
-                label: 'التلاوات',
-                isSelected: selectedTab == _ListTab.all,
-                gold: gold,
-                bg: bg,
-                isDark: isDark,
-                onTap: () => onTabSelected(_ListTab.all),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: BlocBuilder<FavoritesCubit, FavoritesState>(
-                builder: (context, favState) {
-                  final count = favState.favoriteIds.length;
-                  return _TabButton(
-                    icon: Icons.favorite_rounded,
-                    label: count > 0 ? 'المفضلة ($count)' : 'المفضلة',
-                    isSelected: selectedTab == _ListTab.favorites,
-                    gold: gold,
-                    bg: bg,
-                    isDark: isDark,
-                    onTap: () => onTabSelected(_ListTab.favorites),
+        child: BlocBuilder<RecitationListCubit, RecitationListState>(
+          builder: (context, listState) {
+            final currentItems = listState is RecitationListLoaded
+                ? listState.recitations
+                : const <Recitation>[];
+
+            return BlocBuilder<FavoritesCubit, FavoritesState>(
+              builder: (context, favState) {
+                final count = currentItems
+                    .where((item) => favState.isFavorite(item.id))
+                    .length;
+
+                if (collectionId == 'nahawand') {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: _TabButton(
+                          icon: Icons.list_alt_rounded,
+                          label: 'جميع التسجيلات',
+                          isSelected: selectedTab == _ListTab.all,
+                          gold: gold,
+                          bg: bg,
+                          isDark: isDark,
+                          onTap: () => onTabSelected(_ListTab.all),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _TabButton(
+                          icon: Icons.star_rounded,
+                          label: 'المختارات الذهبية',
+                          isSelected: selectedTab == _ListTab.golden,
+                          gold: gold,
+                          bg: bg,
+                          isDark: isDark,
+                          onTap: () => onTabSelected(_ListTab.golden),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 96,
+                        child: _TabButton(
+                          icon: Icons.favorite_rounded,
+                          label: 'المفضلة ($count)',
+                          isSelected: selectedTab == _ListTab.favorites,
+                          gold: gold,
+                          bg: bg,
+                          isDark: isDark,
+                          onTap: () => onTabSelected(_ListTab.favorites),
+                        ),
+                      ),
+                    ],
                   );
-                },
-              ),
-            ),
-          ],
+                }
+
+                return Row(
+                  children: [
+                    Expanded(
+                      child: _TabButton(
+                        icon: Icons.list_alt_rounded,
+                        label: 'التلاوات',
+                        isSelected: selectedTab == _ListTab.all,
+                        gold: gold,
+                        bg: bg,
+                        isDark: isDark,
+                        onTap: () => onTabSelected(_ListTab.all),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _TabButton(
+                        icon: Icons.favorite_rounded,
+                        label: 'المفضلة ($count)',
+                        isSelected: selectedTab == _ListTab.favorites,
+                        gold: gold,
+                        bg: bg,
+                        isDark: isDark,
+                        onTap: () => onTabSelected(_ListTab.favorites),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
         ),
       ),
     );
@@ -808,6 +871,11 @@ class _Body extends StatelessWidget {
         if (state is RecitationListLoaded) {
           var items = state.filtered;
 
+          // Filter by Golden Selection tab (21 items) when selected
+          if (selectedTab == _ListTab.golden) {
+            items = items.where((r) => r.isRare).toList();
+          }
+
           // Filter by favorites tab if selected
           if (selectedTab == _ListTab.favorites) {
             final favoritesState = context.watch<FavoritesCubit>().state;
@@ -1032,7 +1100,11 @@ class _RecitationList extends StatelessWidget {
         addRepaintBoundaries: true,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (context, index) => RepaintBoundary(
-          child: _RecitationCard(recitation: items[index], isDark: isDark),
+          child: _RecitationCard(
+            recitation: items[index],
+            isDark: isDark,
+            displayIndex: index + 1,
+          ),
         ),
       ),
     );
@@ -1042,7 +1114,12 @@ class _RecitationList extends StatelessWidget {
 class _RecitationCard extends StatelessWidget {
   final Recitation recitation;
   final bool isDark;
-  const _RecitationCard({required this.recitation, required this.isDark});
+  final int? displayIndex;
+  const _RecitationCard({
+    required this.recitation,
+    required this.isDark,
+    this.displayIndex,
+  });
 
   void _showDeleteDialog(BuildContext context, DownloadCubit cubit) {
     showDialog(
@@ -1101,6 +1178,7 @@ class _RecitationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = recitation;
+    final nahawand = r is NahawandRecitationModel ? r : null;
 
     // Watch only the current recitation field to highlight the active card.
     final isActive = context.select<AudioPlayerCubit, bool>((cubit) {
@@ -1153,7 +1231,9 @@ class _RecitationCard extends StatelessWidget {
             child: Row(
               children: [
                 _SurahBadge(
-                  number: r.surahNumber,
+                  number: nahawand != null
+                      ? (displayIndex ?? nahawand.nahawandId)
+                      : r.surahNumber,
                   isActive: isActive,
                   isDark: isDark,
                 ),
@@ -1193,7 +1273,9 @@ class _RecitationCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${r.surahNameEn}  ·  الآيات: ${r.verseRange}',
+                        nahawand != null
+                            ? '${r.sourceLabel} • ${nahawand.durationFormatted} • ${r.trailingVerseOrLocation}'
+                            : '${r.sourceLabel} • ${r.surahNameEn} • ${r.trailingVerseOrLocation}',
                         style: GoogleFonts.cairo(
                           fontSize: 11.5,
                           color: isDark
@@ -1207,11 +1289,14 @@ class _RecitationCard extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (r.durationSeconds > 0) ...[
+                          if (nahawand != null || r.durationSeconds > 0) ...[
                             Flexible(
                               child: _MetaChip(
                                 icon: Icons.access_time_rounded,
-                                label: Formatters.formatDuration(r.durationSeconds),
+                                label: nahawand != null
+                                    ? '${nahawand.durationFormatted} دقيقة'
+                                    : Formatters.formatDuration(
+                                        r.durationSeconds),
                                 isDark: isDark,
                               ),
                             ),
@@ -1220,9 +1305,11 @@ class _RecitationCard extends StatelessWidget {
                           Flexible(
                             child: _MetaChip(
                               icon: Icons.history_rounded,
-                              label: r.recordingYear.contains('/')
-                                  ? r.recordingYear.split('/')[0].trim()
-                                  : r.recordingYear,
+                              label: nahawand != null
+                                  ? nahawand.placeOrYear
+                                  : (r.recordingYear.contains('/')
+                                      ? r.recordingYear.split('/')[0].trim()
+                                      : r.recordingYear),
                               isDark: isDark,
                             ),
                           ),

@@ -11,6 +11,7 @@ import '../../features/recitations/data/datasources/manifest_data_source.dart';
 import '../../features/recitations/data/repositories/recitation_repository_impl.dart';
 import '../../features/recitations/domain/repositories/recitation_repository.dart';
 import '../../features/recitations/presentation/cubit/download_cubit.dart';
+import '../../features/recitations/presentation/cubit/nahawand_cubit.dart';
 import '../../features/recitations/presentation/cubit/recitation_list_cubit.dart';
 import '../constants/app_constants.dart';
 import '../network/dio_client.dart';
@@ -102,11 +103,20 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<RecitationListCubit>(
     () => RecitationListCubit(sl<RecitationRepository>()),
   );
+
+  // NahawandCubit — Singleton for Maqam Nahawand section.
+  sl.registerLazySingleton<NahawandCubit>(
+    () => NahawandCubit(
+      manifestDataSource: sl<ManifestDataSource>(),
+      localDataSource: sl<LocalRecitationDataSource>(),
+    ),
+  );
   
   sl.registerLazySingleton<DownloadCubit>(
     () => DownloadCubit(
       downloadService: sl<DownloadService>(),
       recitationListCubit: sl<RecitationListCubit>(),
+      nahawandCubit: sl<NahawandCubit>(),
     ),
   );
 

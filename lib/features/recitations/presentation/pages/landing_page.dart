@@ -17,6 +17,7 @@ import '../../../playlists/presentation/pages/playlist_detail_page.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
+import '../../../../core/services/update_service.dart';
 import '../../../recitations/domain/entities/recitation.dart';
 import '../../../recitations/presentation/cubit/recitation_list_cubit.dart';
 import '../../../recitations/presentation/cubit/recitation_list_state.dart';
@@ -33,6 +34,16 @@ class LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<LandingPage> {
   _LandingTab _selectedTab = _LandingTab.collections;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        UpdateService.checkForUpdate(context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -954,6 +965,16 @@ class _VerticalCategoryCards extends StatelessWidget {
             countBadge: '٢٦ سورة',
             isDark: isDark,
             onTap: () => context.push('/recitations/rare_1387'),
+          ),
+        ),
+        const SizedBox(height: 10),
+        RepaintBoundary(
+          child: _WideCategoryCard(
+            title: 'روائع النهاوند',
+            subtitle: 'أشهر المحافل التاريخية الخالدة بمقام النهاوند',
+            countBadge: '٣٠٣ تسجيل',
+            isDark: isDark,
+            onTap: () => context.push('/recitations/nahawand'),
           ),
         ),
       ],

@@ -65,9 +65,10 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
-# ── Path Provider & URL Launcher ──────────────────────────────────────────────
+# ── Path Provider, URL Launcher & Package Info Plus ──────────────────────────
 -keep class io.flutter.plugins.pathprovider.** { *; }
 -keep class io.flutter.plugins.urllauncher.** { *; }
+-keep class dev.fluttercommunity.plus.packageinfo.** { *; }
 
 # ── General: keep attributes needed for stack-trace de-obfuscation ────────────
 -keepattributes SourceFile,LineNumberTable

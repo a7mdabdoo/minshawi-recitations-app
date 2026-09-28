@@ -311,10 +311,12 @@ class PlaylistDetailPage extends StatelessWidget {
                 ? recitationListState.recitations
                 : <Recitation>[];
 
-            // Resolve recitations from playlist.recitations or map
+            // Resolve recitations from playlist.recitations or map, preferring canonical metadata
             final recitationsMap = {for (var r in allRecitations) r.id: r};
             final playlistRecitations = playlist.recitations.isNotEmpty
                 ? playlist.recitations
+                    .map((r) => recitationsMap[r.id] ?? r)
+                    .toList()
                 : playlist.recitationIds
                     .map((id) => recitationsMap[id])
                     .whereType<Recitation>()
@@ -380,6 +382,8 @@ class PlaylistDetailPage extends StatelessWidget {
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+                      // ignore: deprecated_member_use
+                      cacheExtent: 500,
                       addAutomaticKeepAlives: false,
                       addRepaintBoundaries: true,
                       itemCount: playlistRecitations.length + 1,
@@ -630,20 +634,57 @@ class _PlaylistRecitationCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'سورة ${recitation.surahNameAr.isNotEmpty ? recitation.surahNameAr : recitation.surahNameEn}',
+                            recitation.surahNameAr.startsWith('سورة')
+                                ? recitation.surahNameAr
+                                : 'سورة ${recitation.surahNameAr.isNotEmpty ? recitation.surahNameAr : recitation.surahNameEn}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.amiri(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${Formatters.formatDuration(recitation.durationSeconds)} · الآيات: ${recitation.verseRange}',
-                            style: GoogleFonts.cairo(
-                              fontSize: 11,
-                              color: textSecondary,
-                            ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 1.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: gold.withAlpha(isDark ? 30 : 20),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: gold.withAlpha(isDark ? 70 : 45),
+                                    width: 0.6,
+                                  ),
+                                ),
+                                child: Text(
+                                  recitation.sourceLabel,
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: gold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  recitation.trailingVerseOrLocation.isNotEmpty
+                                      ? '• ${Formatters.formatDuration(recitation.durationSeconds)} • ${recitation.trailingVerseOrLocation}'
+                                      : '• ${Formatters.formatDuration(recitation.durationSeconds)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 11,
+                                    color: textSecondary,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

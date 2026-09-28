@@ -17,6 +17,7 @@ import 'features/playlists/presentation/cubit/playlists_cubit.dart';
 import 'features/player/presentation/cubit/audio_player_cubit.dart';
 import 'features/player/presentation/cubit/sleep_timer_cubit.dart';
 import 'features/recitations/presentation/cubit/download_cubit.dart';
+import 'features/recitations/presentation/cubit/nahawand_cubit.dart';
 import 'features/recitations/presentation/cubit/recitation_list_cubit.dart';
 
 Future<void> main() async {
@@ -83,6 +84,7 @@ class AlMinshawIApp extends StatelessWidget {
         BlocProvider<SleepTimerCubit>.value(value: sl<SleepTimerCubit>()),
         BlocProvider<RecitationListCubit>.value(
             value: sl<RecitationListCubit>()),
+        BlocProvider<NahawandCubit>.value(value: sl<NahawandCubit>()),
         BlocProvider<DownloadCubit>.value(value: sl<DownloadCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(

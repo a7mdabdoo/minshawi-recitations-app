@@ -14,6 +14,8 @@ import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dar
 import '../../../recitations/domain/entities/recitation.dart';
 import '../../../recitations/presentation/cubit/download_cubit.dart';
 import '../../../recitations/presentation/cubit/download_state.dart';
+import '../../../recitations/presentation/cubit/nahawand_cubit.dart';
+import '../../../recitations/presentation/cubit/nahawand_state.dart';
 import '../../../recitations/presentation/cubit/recitation_list_cubit.dart';
 import '../../../recitations/presentation/cubit/recitation_list_state.dart';
 import '../cubit/audio_player_cubit.dart';
@@ -59,6 +61,18 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     final playerCubit = context.read<AudioPlayerCubit>();
     if (playerCubit.currentRecitation?.id == targetId) return;
 
+    if (targetId.startsWith('nahawand_')) {
+      final nahawandState = context.read<NahawandCubit>().state;
+      if (nahawandState is NahawandLoaded) {
+        final match =
+            nahawandState.allRecitations.where((r) => r.id == targetId);
+        if (match.isNotEmpty) {
+          playerCubit.play(match.first);
+          return;
+        }
+      }
+    }
+
     final listState = context.read<RecitationListCubit>().state;
     if (listState is RecitationListLoaded) {
       final match = listState.recitations.where((r) => r.id == targetId);
@@ -70,6 +84,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   String _getCollectionSubtitle(String? collectionId) {
     switch (collectionId) {
+      case 'nahawand':
+        return 'روائع مقام النهاوند - المحافل التاريخية';
       case 'rare_1387':
         return 'التلاوات النادرة الخارجية - لعام ١٣٨٧ هـ';
       case 'mojawad':
