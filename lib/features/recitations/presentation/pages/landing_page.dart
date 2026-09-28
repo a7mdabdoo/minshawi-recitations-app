@@ -972,7 +972,7 @@ class _VerticalCategoryCards extends StatelessWidget {
           child: _WideCategoryCard(
             title: 'روائع النهاوند',
             subtitle: 'أشهر المحافل التاريخية الخالدة بمقام النهاوند',
-            countBadge: '٣٠٣ تسجيل',
+            countBadge: '٣٠٣ تسجيلات',
             isDark: isDark,
             onTap: () => context.push('/recitations/nahawand'),
           ),
