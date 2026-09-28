@@ -1,7 +1,7 @@
-﻿<div align="center">
+<div align="center">
 
 # جامع تلاوات المنشاوي
-### Al-Minshawi Quran Recitations App
+### Al-Minshawi Quran Recitations App (v1.1.0)
 
 تطبيق قرآني شامل للتراث الصوتي لفضيلة الشيخ محمد صديق المنشاوي (رحمه الله)  
 مبني بـ Flutter وفق معمارية Clean Architecture، مجاني 100% وبدون أي إعلانات.
@@ -13,7 +13,7 @@
     <img src="https://img.shields.io/badge/Download%20on-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white" alt="Download on APKPure">
   </a>
   <a href="https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest">
-    <img src="https://img.shields.io/badge/Download-Release%20APK-2563eb?style=for-the-badge&logo=github&logoColor=white" alt="Download APK">
+    <img src="https://img.shields.io/badge/Download-Release%20APK%20v1.1.0-2563eb?style=for-the-badge&logo=github&logoColor=white" alt="Download APK">
   </a>
   <a href="PRIVACY_POLICY.md">
     <img src="https://img.shields.io/badge/Privacy%20Policy-100%25%20Free%20&%20No%20Ads-D4AF37?style=for-the-badge" alt="Privacy Policy">
@@ -24,20 +24,20 @@
 
 ---
 
-## التحميل والتثبيت
+## التحميل والتثبيت (الإصدار الحالي: v1.1.0)
 
 يمكنك الآن تحميل التطبيق وتثبيته مباشرة على هاتفك الأندرويد من الروابط التالية:
 
 | المصدر | نوع التثبيت | رابط التحميل المباشر | الحالة |
 | :--- | :--- | :---: | :---: |
 | **متجر APKPure** | المتجر الرسمي المعتمد للتطبيق | [![Download on APKPure](https://img.shields.io/badge/Download-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white)](https://apkpure.com/p/com.minshawi.recitations) | متاح على المتجر |
-| **مستودع GitHub** | تحميل ملف الـ APK المباشر | [![Download APK](https://img.shields.io/badge/Download-app--release.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest) | متاح ومباشر |
+| **مستودع GitHub** | تحميل ملف الـ APK المباشر (v1.1.0) | [![Download APK](https://img.shields.io/badge/Download-app--arm64--v8a--release.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest) | متاح ومباشر |
 
 ---
 
 ## إهداء وصدقة جارية
 
-> قال رسول الله ﷺ:  
+> قال رسول الله صلى الله عليه وسلم:  
 > «إِذَا مَاتَ الإنْسَانُ انْقَطَعَ عَنْهُ عَمَلُهُ إِلَّا مِنْ ثَلَاثَةٍ: إِلَّا مِنْ صَدَقَةٍ جَارِيَةٍ، أَوْ عِلْمٍ يُنْتَفَعُ بِهِ، أَوْ وَلَدٍ صَالِحٍ يَدْعُو لَهُ» (رواه مسلم)
 
 هذا العمل صَدَقَةٌ جَارِيَةٌ:
@@ -53,50 +53,53 @@
 
 تطبيق **جامع تلاوات المنشاوي** هو منصة قرآنية صوتية مفتوحة المصدر تهدف إلى توفير تجربة استماع راقية وموثوقة للتراث الصوتي الخالد لفضيلة القارئ الشيخ محمد صديق المنشاوي (رحمه الله).
 
-يجمع التطبيق المصحف المرتل كاملاً (١١٤ سورة)، والمصحف المجود كاملاً، بالإضافة إلى التسجيلات الخارجية النادرة لحفلات عام ١٣٨٧ هـ. يتميز التطبيق بمشغل صوتي عصري ومتقدم مستوحى من أفضل المنصات الصوتية العالمية، وأدوات متخصصة في حفظ القرآن الكريم ومراجعته، مع دعم كامل للتشغيل دون اتصال بالإنترنت وخلو تام من الإعلانات أو أدوات التتبع.
+يجمع التطبيق أربعة أقسام رئيسية: المصحف المرتل كاملاً (١١٤ سورة)، والمصحف المجود كاملاً (١١٤ سورة)، والتسجيلات الخارجية النادرة لحفلات عام ١٣٨٧ هـ (٢٦ سورة)، بالإضافة إلى قسم روائع النهاوند الذي يضم ٣٠٣ تسجيلات من أشهر المحافل التاريخية الخالدة مع تبويب خاص للمختارات الذهبية (٢١ محفلاً). يتميز التطبيق بمشغل صوتي عصري ومتقدم، وأدوات متخصصة في حفظ القرآن الكريم ومراجعته، وفحص تلقائي للتحديثات، مع دعم كامل للتشغيل دون اتصال بالإنترنت وخلو تام من الإعلانات أو أدوات التتبع.
 
 <br>
 
 ### About The Project (English)
 
-**Al-Minshawi Quran Recitations** is a modern, open-source audio streaming and offline playback platform engineered to present the timeless recordings of Sheikh Muhammad Siddiq Al-Minshawi.
+**Al-Minshawi Quran Recitations (v1.1.0)** is a modern, open-source audio streaming and offline playback platform engineered to present the timeless recordings of Sheikh Muhammad Siddiq Al-Minshawi.
 
-The app bundles his complete Murattal recitation (114 Surahs), complete Mujawwad recitation, and rare historic external concert recordings from 1387 AH (1967-1968). It provides an elegant, Spotify-inspired audio experience with Quranic memorization tools, offline caching, and strict zero-advertising and privacy commitments.
+The app bundles four comprehensive collections: his complete Murattal recitation (114 Surahs), complete Mujawwad recitation (114 Surahs), rare historic external concert recordings from 1387 AH (26 Surahs), and the Nahawand Masterpieces collection (303 historic recordings alongside a curated 21-track Golden Selection). It provides an elegant audio experience with Quranic memorization tools, offline caching, automatic in-app update checking, and strict zero-advertising and privacy commitments.
 
 ---
 
 ## المميزات الرئيسية
 
-### ١. مشغل صوتي متطور وشريط تحكم مصغر
-- **واجهة عصرية فاخرة:** تصميم رمادي داكن فاحم بلمسات ذهبية يتناغم بدقة مع ألوان التطبيق في الوضعين الداكن والفاتح.
+### ١. مكتبة تلاوات شاملة (٤ أقسام رئيسية)
+- **المصحف المرتل كاملاً:** ١١٤ سورة نقية برواية حفص عن عاصم.
+- **المصحف المجود كاملاً:** ١١٤ سورة من روائع التلاوة المجودة بجودة صوتية عالية.
+- **التلاوات النادرة لعام ١٣٨٧ هـ:** ٢٦ سورة من الحفلات والتسجيلات الخارجية النادرة.
+- **روائع النهاوند (جديد في v1.1.0):** يضم ٣٠٣ تسجيلات من المحافل التاريخية الخالدة بمقام النهاوند، مع تبويب مستقل للمختارات الذهبية (٢١ محفلاً مختاراً) وعرض تفصيلي لاسم السورة ومكان وتاريخ التسجيل.
+
+### ٢. مشغل صوتي متطور وشريط تحكم مصغر
+- **واجهة عصرية متناسقة:** تصميم داكن بلمسات ذهبية يتناغم بدقة مع ألوان التطبيق في الوضعين الداكن والفاتح.
 - **إيماءات سحب سلسة:** سحب لأعلى على الشريط المصغر لفتح المشغل الكامل بانتقال ناعم، وسحب لأسفل في المشغل الكامل للرجوع الفوري.
 - **تحكم زمني دقيق:** أزرار تقديم وتأخير مخصصة (+10 ثوانٍ و -10 ثوانٍ) لتسهيل متابعة الآيات والتدبر.
-- **تشغيل في الخلفية وشاشة القفل:** تكامل متكامل مع نظام التشغيل عبر `just_audio` و `audio_service` مع أزرار التحكم في شريط الإشعارات وشاشة القفل.
+- **تشغيل في الخلفية وشاشة القفل:** تكامل كامل مع نظام التشغيل عبر `just_audio` و `audio_service` مع أزرار التحكم في شريط الإشعارات وشاشة القفل.
 
-### ٢. أداة التكرار الذكي لحفظ الآيات (A-B Repeat)
+### ٣. أداة التكرار الذكي لحفظ الآيات (A-B Repeat)
 - إمكانية تحديد نقطة بداية (A) ونقطة نهاية (B) بدقة بالغة بالثواني.
 - أزرار ضبط دقيق (+1 ثانية و -1 ثانية) لكل نقطة للوصول لبداية الآية ونهايتها بالضبط.
 - تكرار تلقائي بعدد محدد أو تكرار لانهائي للمساعدة في تثبيت الحفظ ومراجعة الأحكام.
 
-### ٣. مكتبة تلاوات متكاملة
-- **المصحف المرتل كاملاً:** ١١٤ سورة نقية برواية حفص عن عاصم.
-- **المصحف المجود:** روائع التلاوة المجودة بجودة صوتية نقية.
-- **النوادر الخارجية لعام ١٣٨٧ هـ:** حفلات وتسجيلات خارجية تاريخية نادرة.
-
-### ٤. قوائم التشغيل المخصصة والمفضلة
-- إنشاء وإدارة قوائم تشغيل مخصصة للتلاوات المفضلة وحفظها محلياً بأمان عبر Hive.
+### ٤. قوائم التشغيل المخصصة والمفضلة المعزولة
+- إنشاء وإدارة قوائم تشغيل مخصصة للتلاوات المفضلة وحفظها محلياً عبر Hive.
+- إظهار شارة مصدر التلاوة (المصحف المرتل، المصحف المجود، التلاوات النادرة، روائع النهاوند) داخل قوائم التشغيل والتنزيلات للتمييز الفوري بين التسجيلات.
+- عزل عداد وقائمة المفضلة لكل قسم بشكل مستقل لسهولة الوصول إلى مفضلة كل مصحف على حدة.
 - بحث فوري وسريع يدعم تطبيع الحروف والهمزات العربية لمنع أي فقد في نتائج البحث.
-- تشغيل تتابعي ذكي لجميع عناصر القائمة مباشرة من الواجهة الرئيسية.
 
-### ٥. الاستماع والتحميل أوفلاين بدون إنترنت
+### ٥. الاستماع والتحميل بدون إنترنت (Offline Playback)
 - تحميل السور والتلاوات للاستماع أثناء السفر أو في غياب شبكة الإنترنت.
 - إدارة ذكية للتحميل تدعم الاستئناف التلقائي والإيقاف المؤقت، مع فحص سلامة الملفات على القرص.
 
 ### ٦. مؤقت النوم الذكي (Sleep Timer)
 - خيارات زمنية مرنة مع إيقاف تدريجي هادئ للصوت لحماية السمع ومنع انقطاع الصوت المفاجئ.
 
-### ٧. دعم السمات والتصميم المتجاوب
-- دعم كامل للوضع الداكن المريح للعين والوضع الفاتح الأنيق، مع مراعاة كاملة لاتجاه القراءة من اليمين إلى اليسار.
+### ٧. فحص التحديثات التلقائي (In-App Update Checker)
+- خدمة خفيفة ومستقلة تتحقق تلقائياً عند بدء التشغيل من توفر إصدار أحدث عبر ملف `version.json` في المستودع الرسمي.
+- عرض نافذة تنبيه متناسقة مع هوية التطبيق تتضمن رقم الإصدار الجديد وملاحظات التحديث وزر الانتقال المباشر للتحميل، مع التجاهل الصامت التام في حال عدم توفر اتصال بالإنترنت.
 
 ---
 
@@ -105,11 +108,11 @@ The app bundles his complete Murattal recitation (114 Surahs), complete Mujawwad
 - **إطار العمل:** Flutter (v3.29+)
 - **لغة البرمجة:** Dart (v3.7+)
 - **النمط المعماري:** Clean Architecture (Data, Domain, Presentation)
-- **إدارة الحالة:** BLoC / Cubit مع تحسينات إعادة البناء `buildWhen` لأعلى أداء وسلاسة (60/120 FPS).
-- **قواعد البيانات والتخزين المحلي:** Hive NoSQL لحفظ التفضيلات وقوائم التشغيل ومسارات التنزيل محلياً وسريعاً.
+- **إدارة الحالة:** BLoC / Cubit مع تحسينات إعادة البناء `buildWhen` لأعلى أداء وسلاسة.
+- **قواعد البيانات والتخزين المحلي:** Hive NoSQL لحفظ التفضيلات وقوائم التشغيل ومسارات التنزيل محلياً.
 - **محرك الصوتيات:** `just_audio`, `audio_service`, `just_audio_background`
 - **التنقل والتوجيه:** `go_router`
-- **إدارة الشبكة:** `dio`
+- **إدارة الشبكة والتحديثات:** `dio`, `http`, `package_info_plus`, `url_launcher`
 - **الخطوط والطباعة:** Amiri للنصوص القرآنية، و Cairo لواجهات المستخدم.
 
 ---
@@ -124,7 +127,7 @@ lib/
 │   ├── errors/                 # معالجة الأخطاء والاستثناءات
 │   ├── network/                # إعدادات عميل Dio
 │   ├── router/                 # مسارات التنقل والتوجيه عبر GoRouter
-│   ├── services/               # خدمات الصوت والتنزيل
+│   ├── services/               # خدمات الصوت، التنزيل، وفحص التحديثات التلقائي
 │   ├── settings/               # إعدادات المستخدم وتفضيلات التشغيل
 │   ├── theme/                  # تكوين الثيمات (Dark & Light Mode)
 │   └── utils/                  # أدوات معالجة النصوص وتنسيق الوقت
@@ -133,7 +136,7 @@ lib/
 │   ├── favorites/              # المفضلة والتسجيلات المحفوظة
 │   ├── player/                 # مشغل الصوت الكامل، المشغل المصغر، مؤقت النوم، وتكرار A-B
 │   ├── playlists/              # إدارة قوائم التشغيل المخصصة والبحث
-│   └── recitations/            # فهرس السور والمصاحف والصفحة الرئيسية
+│   └── recitations/            # فهرس السور والمصاحف وروائع النهاوند والصفحة الرئيسية
 └── main.dart                   # نقطة انطلاق التطبيق
 ```
 
@@ -177,9 +180,9 @@ lib/
    flutter run
    ```
 
-5. **بناء حزمة الإنتاج (APK):**
+5. **بناء حزمة الإنتاج المخففة (Release APK):**
    ```bash
-   flutter build apk --release
+   flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/app/outputs/symbols
    ```
 
 ---
