@@ -210,7 +210,7 @@ class UpdateDialog extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'يتوفر تحديث جديد 🚀',
+                            'يتوفر تحديث جديد',
                             style: GoogleFonts.cairo(
                               fontSize: 16.5,
                               fontWeight: FontWeight.w700,
