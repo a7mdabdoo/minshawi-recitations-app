@@ -226,7 +226,7 @@ class _AppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = switch (collectionId) {
       'mojawad' => 'المصحف المجود',
-      'complete_murattal' => 'المصحف المرتل كاملاً',
+      'complete_murattal' => 'المصحف المرتل',
       'nahawand' => 'روائع النهاوند',
       _ => 'تسجيلات 1387 هـ النادرة',
     };

@@ -470,7 +470,8 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
 
       final albumName = switch (recitation.collectionId) {
         'mojawad' => 'المصحف المجود',
-        'complete_murattal' => 'المصحف المرتل كاملاً',
+        'complete_murattal' => 'المصحف المرتل',
+        'nahawand' => 'روائع النهاوند',
         _ => 'التلاوات النادرة - تسجيلات ١٣٨٧ هـ',
       };
 

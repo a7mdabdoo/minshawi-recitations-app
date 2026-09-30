@@ -940,7 +940,7 @@ class _VerticalCategoryCards extends StatelessWidget {
       children: [
         RepaintBoundary(
           child: _WideCategoryCard(
-            title: 'المصحف المرتل كاملاً',
+            title: 'المصحف المرتل',
             subtitle: 'الختمة الكاملة برواية حفص عن عاصم',
             countBadge: '١١٤ سورة',
             isDark: isDark,
