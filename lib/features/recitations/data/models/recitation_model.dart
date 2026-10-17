@@ -1,6 +1,5 @@
 import '../../domain/entities/recitation.dart';
 
-/// Data-layer model that adds JSON serialisation to the [Recitation] entity.
 class RecitationModel extends Recitation {
   const RecitationModel({
     required super.id,
@@ -76,7 +75,6 @@ class RecitationModel extends Recitation {
         if (localFilePath != null) 'localFilePath': localFilePath,
       };
 
-  /// Produces a new [RecitationModel] with [localFilePath] injected.
   RecitationModel withLocalPath(String? path) {
     return RecitationModel(
       id: id,

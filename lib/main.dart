@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +13,7 @@ import 'core/di/service_locator.dart';
 import 'core/router/app_router.dart';
 import 'core/settings/settings_cubit.dart';
 import 'core/theme/theme_cubit.dart';
+import 'features/downloads/presentation/cubit/downloaded_recitations_cubit.dart';
 import 'features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'features/playlists/presentation/cubit/playlists_cubit.dart';
 import 'features/player/presentation/cubit/audio_player_cubit.dart';
@@ -20,53 +22,80 @@ import 'features/recitations/presentation/cubit/download_cubit.dart';
 import 'features/recitations/presentation/cubit/nahawand_cubit.dart';
 import 'features/recitations/presentation/cubit/recitation_list_cubit.dart';
 
-Future<void> main() async {
-  await runZonedGuarded(
-    _bootstrap,
+void main() async {
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      FlutterError.onError = (details) {
+        debugPrint(
+            '[FLUTTER ERROR] ${details.exceptionAsString()}\n${details.stack}');
+      };
+
+      if (!kIsWeb) {
+        try {
+          await JustAudioBackground.init(
+            androidNotificationChannelId:
+                'com.example.quran_recitation_app.channel.audio',
+            androidNotificationChannelName: 'جامع تلاوات المنشاوي',
+            androidNotificationOngoing: true,
+            androidStopForegroundOnPause: true,
+            androidNotificationIcon: 'mipmap/ic_launcher',
+          ).timeout(const Duration(seconds: 3));
+        } catch (e, st) {
+          debugPrint('[INIT WARNING] JustAudioBackground.init: $e\n$st');
+        }
+
+        try {
+          final session =
+              await AudioSession.instance.timeout(const Duration(seconds: 2));
+          await session
+              .configure(const AudioSessionConfiguration.music())
+              .timeout(const Duration(seconds: 2));
+        } catch (e, st) {
+          debugPrint('[INIT WARNING] AudioSession.configure: $e\n$st');
+        }
+
+        try {
+          await SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+            DeviceOrientation.portraitDown,
+          ]).timeout(const Duration(seconds: 2));
+
+          SystemChrome.setSystemUIOverlayStyle(
+            const SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              systemNavigationBarColor: Colors.transparent,
+              systemNavigationBarDividerColor: Colors.transparent,
+            ),
+          );
+
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        } catch (e, st) {
+          debugPrint('[INIT WARNING] SystemChrome: $e\n$st');
+        }
+      }
+
+      try {
+        await Hive.initFlutter().timeout(const Duration(seconds: 3));
+      } catch (e, st) {
+        debugPrint('[INIT WARNING] Hive.initFlutter: $e\n$st');
+      }
+
+      try {
+        await setupServiceLocator().timeout(const Duration(seconds: 4));
+      } catch (e, st) {
+        debugPrint('[INIT WARNING] setupServiceLocator: $e\n$st');
+      } finally {
+        ensureFallbackServiceLocator();
+      }
+
+      runApp(const AlMinshawIApp());
+    },
     (error, stack) {
-      // Top-level error handler – log in production; rethrow in debug.
-      debugPrint('[FATAL] $error\n$stack');
+      debugPrint('[FATAL UNCAUGHT] $error\n$stack');
     },
   );
-}
-
-Future<void> _bootstrap() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize background audio service for lockscreen and notification media controls
-  await JustAudioBackground.init(
-    androidNotificationChannelId:
-        'com.example.quran_recitation_app.channel.audio',
-    androidNotificationChannelName: 'جامع تلاوات المنشاوي',
-    androidNotificationOngoing: true,
-    androidStopForegroundOnPause: true,
-    androidNotificationIcon: 'mipmap/ic_launcher',
-  );
-
-  // Configure AudioSession to music mode to prevent OS from degrading audio quality
-  final session = await AudioSession.instance;
-  await session.configure(const AudioSessionConfiguration.music());
-
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-    ),
-  );
-
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
-  await Hive.initFlutter();
-
-  await setupServiceLocator();
-
-  runApp(const AlMinshawIApp());
 }
 
 class AlMinshawIApp extends StatelessWidget {
@@ -86,20 +115,18 @@ class AlMinshawIApp extends StatelessWidget {
             value: sl<RecitationListCubit>()),
         BlocProvider<NahawandCubit>.value(value: sl<NahawandCubit>()),
         BlocProvider<DownloadCubit>.value(value: sl<DownloadCubit>()),
+        BlocProvider<DownloadedRecitationsCubit>.value(
+            value: sl<DownloadedRecitationsCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return MaterialApp.router(
             title: 'جامع تلاوات المنشاوي',
             debugShowCheckedModeBanner: false,
-
             theme: AppTheme.lightTheme,
-
             darkTheme: AppTheme.darkTheme,
             themeMode: themeMode,
-
             routerConfig: AppRouter.router,
-
             locale: const Locale('ar', 'EG'),
             supportedLocales: const [
               Locale('ar', 'EG'),
@@ -110,7 +137,6 @@ class AlMinshawIApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-
             builder: (context, child) {
               return Directionality(
                 textDirection: TextDirection.rtl,

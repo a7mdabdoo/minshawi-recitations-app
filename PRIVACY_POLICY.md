@@ -1,4 +1,4 @@
-﻿# سياسة الخصوصية / Privacy Policy
+# سياسة الخصوصية / Privacy Policy
 
 **تطبيق: جامع تلاوات المنشاوي (Minshawi Recitations)**  
 **تاريخ السريان:** سبتمبر ٢٠٢٦ / September 2026
@@ -27,7 +27,7 @@
 
 #### ٤. التواصل
 إذا كانت لديك أي استفسارات حول سياسة الخصوصية أو التطبيق، يسعدنا تواصلك عبر mail
-ahmed@mohamed-abdo.com
+ahmed@mohamed-abdo.me
 
 ---
 

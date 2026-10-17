@@ -1,4 +1,3 @@
-// Barrel export for all core modules.
 export 'constants/constants.dart';
 export 'di/service_locator.dart';
 export 'errors/errors.dart';

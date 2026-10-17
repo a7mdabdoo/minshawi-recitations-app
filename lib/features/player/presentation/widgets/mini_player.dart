@@ -10,7 +10,6 @@ import '../cubit/audio_player_cubit.dart';
 import '../cubit/audio_player_state.dart';
 import '../pages/audio_player_screen.dart';
 
-/// Persistent bottom mini-player bar shown whenever a track is active.
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({super.key});
 
@@ -18,9 +17,15 @@ class MiniPlayer extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
       buildWhen: (prev, curr) {
-        if ((prev is AudioPlayerIdle) != (curr is AudioPlayerIdle)) return true;
-        if (prev.runtimeType != curr.runtimeType) return true;
-        if (prev.currentRecitation?.id != curr.currentRecitation?.id) return true;
+        if ((prev is AudioPlayerIdle) != (curr is AudioPlayerIdle)) {
+          return true;
+        }
+        if (prev.runtimeType != curr.runtimeType) {
+          return true;
+        }
+        if (prev.currentRecitation?.id != curr.currentRecitation?.id) {
+          return true;
+        }
         if (prev is AudioPlayerReady && curr is AudioPlayerReady) {
           return prev.isPlaying != curr.isPlaying ||
               prev.isBuffering != curr.isBuffering;
@@ -28,7 +33,9 @@ class MiniPlayer extends StatelessWidget {
         return false;
       },
       builder: (context, state) {
-        if (state is AudioPlayerIdle) return const SizedBox.shrink();
+        if (state is AudioPlayerIdle) {
+          return const SizedBox.shrink();
+        }
         return RepaintBoundary(child: _MiniPlayerContent(state: state));
       },
     );
@@ -90,7 +97,6 @@ class _MiniPlayerContent extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () => _openFullPlayer(context, recitation?.id),
       onVerticalDragEnd: (details) {
-        // Swipe-up gesture: trigger navigation if upward velocity exceeds 200
         if (details.primaryVelocity != null &&
             details.primaryVelocity! < -200) {
           _openFullPlayer(context, recitation?.id);
@@ -112,7 +118,6 @@ class _MiniPlayerContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             RepaintBoundary(child: _ProgressLine(gold: gold)),
-
             Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 5, bottom: 3),
@@ -124,7 +129,6 @@ class _MiniPlayerContent extends StatelessWidget {
                 ),
               ),
             ),
-
             SafeArea(
               top: false,
               bottom: true,
@@ -164,9 +168,7 @@ class _MiniPlayerContent extends StatelessWidget {
                               ],
                             ),
                           ),
-
                           const SizedBox(width: 8),
-
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -194,9 +196,7 @@ class _MiniPlayerContent extends StatelessWidget {
                                     );
                                   },
                                 ),
-
                               const SizedBox(width: 4),
-
                               _IconTap(
                                 icon: Icons.close_rounded,
                                 size: 20,
@@ -211,9 +211,7 @@ class _MiniPlayerContent extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
                     RepaintBoundary(
                       child: _SeekBarRow(
                         gold: gold,
@@ -224,9 +222,7 @@ class _MiniPlayerContent extends StatelessWidget {
                         cubit: cubit,
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
                     Directionality(
                       textDirection: TextDirection.ltr,
                       child: Row(
@@ -244,7 +240,6 @@ class _MiniPlayerContent extends StatelessWidget {
                                 ? null
                                 : cubit.playPrevious,
                           ),
-
                           _CtrlBtn(
                             icon: Icons.replay_10_rounded,
                             size: 24,
@@ -256,7 +251,6 @@ class _MiniPlayerContent extends StatelessWidget {
                                 ? null
                                 : cubit.skipBackward,
                           ),
-
                           _PlayPauseButton(
                             isLoading: isLoading,
                             isBuffering: isBuffering,
@@ -270,7 +264,6 @@ class _MiniPlayerContent extends StatelessWidget {
                                     : null)
                                 : cubit.togglePlayPause,
                           ),
-
                           _CtrlBtn(
                             icon: Icons.forward_10_rounded,
                             size: 24,
@@ -278,11 +271,9 @@ class _MiniPlayerContent extends StatelessWidget {
                                 ? textSecondary.withAlpha(70)
                                 : textSecondary,
                             tooltip: 'تقديم ١٠ ثوانٍ (+10)',
-                            onPressed: isLoading || isError
-                                ? null
-                                : cubit.skipForward,
+                            onPressed:
+                                isLoading || isError ? null : cubit.skipForward,
                           ),
-
                           _CtrlBtn(
                             icon: Icons.skip_next_rounded,
                             size: 26,
@@ -395,8 +386,7 @@ class _SeekBarRowState extends State<_SeekBarRow> {
                         value: widget.isLoading ? null : 0,
                         minHeight: 2.5,
                         backgroundColor: inactiveTrack,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(widget.gold),
+                        valueColor: AlwaysStoppedAnimation<Color>(widget.gold),
                       ),
                     )
                   : SliderTheme(
@@ -439,7 +429,6 @@ class _SeekBarRowState extends State<_SeekBarRow> {
                       ),
                     ),
             ),
-
             if (!widget.isLoading && !widget.isError)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),

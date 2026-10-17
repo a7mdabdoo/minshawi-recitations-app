@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/services/battery_optimization_service.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
@@ -24,7 +25,6 @@ import '../cubit/sleep_timer_cubit.dart';
 import '../cubit/sleep_timer_state.dart';
 import '../widgets/sleep_timer_bottom_sheet.dart';
 
-/// Full-screen audio player for Quran recitations.
 class AudioPlayerScreen extends StatefulWidget {
   final String? initialRecitationId;
   final ui.Image? portraitUiImage;
@@ -52,6 +52,11 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     if (_volume > 0) {
       _lastNonZeroVolume = _volume;
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        BatteryOptimizationService.checkAndPromptBatteryOptimization(context);
+      }
+    });
   }
 
   void _checkInitialTrack() {
@@ -167,7 +172,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onVerticalDragEnd: (details) {
-          // Swipe-down gesture to dismiss/pop screen
           if (details.primaryVelocity != null &&
               details.primaryVelocity! > 200) {
             Navigator.of(context).maybePop();
@@ -239,7 +243,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                                   textPrimary,
                                   textSecondary,
                                 ),
-
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 24),
@@ -249,33 +252,26 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                                         CrossAxisAlignment.stretch,
                                     children: [
                                       SizedBox(height: isTall ? 6 : 2),
-
                                       _buildPortrait(
                                         portraitSize,
                                         gold,
                                         isDark,
                                       ),
-
                                       SizedBox(height: isTall ? 20 : 12),
-
                                       _buildTrackInfo(
                                         context,
                                         recitation,
                                         textPrimary,
                                         textSecondary,
                                       ),
-
                                       SizedBox(height: isTall ? 16 : 10),
-
                                       _PlayerSeekBarSection(
                                         gold: gold,
                                         textSecondary: textSecondary,
                                         inactiveTrackColor: inactiveTrackColor,
                                         cubit: cubit,
                                       ),
-
                                       SizedBox(height: isTall ? 12 : 8),
-
                                       _buildPrimaryControls(
                                         state,
                                         cubit,
@@ -284,9 +280,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                                         textSecondary,
                                         isDark,
                                       ),
-
                                       SizedBox(height: isTall ? 16 : 10),
-
                                       _buildSecondaryToolsBar(
                                         context,
                                         recitation,
@@ -298,9 +292,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                                         cardBorder,
                                         isDark,
                                       ),
-
                                       SizedBox(height: isTall ? 10 : 6),
-
                                       _buildVolumeSlider(
                                         context,
                                         cubit,
@@ -311,7 +303,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                                     ],
                                   ),
                                 ),
-
                                 _buildBottomReturnButton(
                                   context,
                                   textSecondary,
@@ -332,7 +323,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       ),
     );
   }
-
 
   Widget _buildTopBar(
     BuildContext context,
@@ -379,7 +369,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       ),
     );
   }
-
 
   Widget _buildPortrait(double size, Color gold, bool isDark) {
     final imageFile = File('assets/images/minshawi_portrait.jpg');
@@ -452,7 +441,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     );
   }
 
-
   Widget _buildTrackInfo(
     BuildContext context,
     Recitation? recitation,
@@ -505,9 +493,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               ],
             ),
           ),
-
           const SizedBox(width: 12),
-
           if (recitation != null)
             BlocBuilder<FavoritesCubit, FavoritesState>(
               builder: (context, favState) {
@@ -531,7 +517,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       ),
     );
   }
-
 
   Widget _buildPrimaryControls(
     AudioPlayerState state,
@@ -563,7 +548,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             tooltip: 'السورة السابقة',
             onPressed: (isLoading || isError) ? null : cubit.playPrevious,
           ),
-
           IconButton(
             icon: Icon(
               Icons.replay_10_rounded,
@@ -575,7 +559,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             tooltip: 'تأخير ١٠ ثوانٍ',
             onPressed: (isLoading || isError) ? null : cubit.skipBackward,
           ),
-
           _buildPlayPauseFab(
             cubit: cubit,
             state: state,
@@ -586,7 +569,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             gold: gold,
             isDark: isDark,
           ),
-
           IconButton(
             icon: Icon(
               Icons.forward_10_rounded,
@@ -598,7 +580,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             tooltip: 'تقديم ١٠ ثوانٍ',
             onPressed: (isLoading || isError) ? null : cubit.skipForward,
           ),
-
           IconButton(
             icon: Icon(
               Icons.skip_next_rounded,
@@ -678,7 +659,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     );
   }
 
-
   Widget _buildSecondaryToolsBar(
     BuildContext context,
     Recitation? recitation,
@@ -693,6 +673,9 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     final currentSpeed = state is AudioPlayerReady ? state.speed : cubit.speed;
     final currentLoopMode =
         state is AudioPlayerReady ? state.loopMode : cubit.loopMode;
+    final isShuffleEnabled = state is AudioPlayerReady
+        ? state.isShuffleEnabled
+        : cubit.isShuffleEnabled;
     final ready = state is AudioPlayerReady ? state : null;
     final abState = ready?.abLoopState ?? cubit.abLoopState;
     final isAbActive = abState != AbLoopState.off;
@@ -726,7 +709,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               ),
             ),
           ),
-
           BlocBuilder<SleepTimerCubit, SleepTimerState>(
             builder: (context, timerState) {
               final isActive = timerState.isActive;
@@ -777,9 +759,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               );
             },
           ),
-
           _buildRepeatButton(currentLoopMode, cubit, gold, textSecondary),
-
+          _buildShuffleButton(isShuffleEnabled, cubit, gold, textSecondary),
           Tooltip(
             message: 'تكرار مقطع للحفظ (A-B)',
             child: InkWell(
@@ -793,8 +774,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 isDark,
               ),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -817,7 +797,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               ),
             ),
           ),
-
           if (recitation != null)
             _buildDownloadButton(
               context,
@@ -865,6 +844,31 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     );
   }
 
+  Widget _buildShuffleButton(
+    bool isShuffleEnabled,
+    AudioPlayerCubit cubit,
+    Color gold,
+    Color textSecondary,
+  ) {
+    return Tooltip(
+      message: isShuffleEnabled
+          ? 'التشغيل العشوائي: مفعّل'
+          : 'التشغيل العشوائي: معطّل',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: cubit.toggleShuffle,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            Icons.shuffle_rounded,
+            size: 22,
+            color: isShuffleEnabled ? gold : textSecondary,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDownloadButton(
     BuildContext context,
     Recitation recitation,
@@ -876,8 +880,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       builder: (context, listState) {
         final isDownloaded = recitation.isDownloaded ||
             (listState is RecitationListLoaded &&
-                listState.recitations.any(
-                    (r) => r.id == recitation.id && r.isDownloaded));
+                listState.recitations
+                    .any((r) => r.id == recitation.id && r.isDownloaded));
 
         return BlocBuilder<DownloadCubit, DownloadState>(
           builder: (context, dlState) {
@@ -915,9 +919,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 message: 'استئناف التنزيل',
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  onTap: () => context
-                      .read<DownloadCubit>()
-                      .resumeDownload(recitation),
+                  onTap: () =>
+                      context.read<DownloadCubit>().resumeDownload(recitation),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: Icon(
@@ -986,7 +989,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     );
   }
 
-
   Widget _buildVolumeSlider(
     BuildContext context,
     AudioPlayerCubit cubit,
@@ -1010,8 +1012,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             onPressed: () {
               setState(() {
                 if (isMuted) {
-                  _volume =
-                      _lastNonZeroVolume > 0 ? _lastNonZeroVolume : 0.8;
+                  _volume = _lastNonZeroVolume > 0 ? _lastNonZeroVolume : 0.8;
                 } else {
                   _lastNonZeroVolume = _volume;
                   _volume = 0.0;
@@ -1068,7 +1069,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     );
   }
 
-
   Widget _buildBottomReturnButton(
     BuildContext context,
     Color textSecondary,
@@ -1080,8 +1080,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         child: TextButton.icon(
           style: TextButton.styleFrom(
             foregroundColor: textSecondary,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
               side: BorderSide(
@@ -1108,7 +1107,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       ),
     );
   }
-
 
   void _showAbRepeatBottomSheet(
     BuildContext context,
@@ -1143,12 +1141,10 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             final position = ready?.position ?? Duration.zero;
             final duration = ready?.duration ?? Duration.zero;
 
-            final aLabel = pointA != null
-                ? Formatters.formatDurationObj(pointA)
-                : '--:--';
-            final bLabel = pointB != null
-                ? Formatters.formatDurationObj(pointB)
-                : '--:--';
+            final aLabel =
+                pointA != null ? Formatters.formatDurationObj(pointA) : '--:--';
+            final bLabel =
+                pointB != null ? Formatters.formatDurationObj(pointB) : '--:--';
             final currentPosLabel = Formatters.formatDurationObj(position);
 
             return SafeArea(
@@ -1185,9 +1181,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 10),
-
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 10),
@@ -1239,9 +1233,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 14),
-
                     _buildPointControlRow(
                       label: 'البداية A',
                       pointTime: pointA,
@@ -1281,9 +1273,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                       textSecondary: textSecondary,
                       isDark: isDark,
                     ),
-
                     const SizedBox(height: 10),
-
                     _buildPointControlRow(
                       label: 'النهاية B',
                       pointTime: pointB,
@@ -1326,9 +1316,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                       textSecondary: textSecondary,
                       isDark: isDark,
                     ),
-
                     const SizedBox(height: 14),
-
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1379,7 +1367,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                         ),
                       ],
                     ),
-
                     if (isPointASet || isActive) ...[
                       const SizedBox(height: 14),
                       InkWell(
@@ -1423,7 +1410,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                         ),
                       ),
                     ],
-
                     const SizedBox(height: 6),
                   ],
                 ),
@@ -1497,9 +1483,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               ),
             ),
           ),
-
           const Spacer(),
-
           Text(
             timeStr,
             style: GoogleFonts.cairo(
@@ -1508,9 +1492,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               color: isSet ? gold : textSecondary,
             ),
           ),
-
           const SizedBox(width: 10),
-
           _NudgeButton(
             label: '-1ث',
             enabled: pointTime != null,
@@ -1573,7 +1555,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       ),
     );
   }
-
 
   void _showSpeedDialog(
     BuildContext context,
@@ -1675,7 +1656,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       },
     );
   }
-
 
   Widget _buildEmptyState(
     BuildContext context,
@@ -1823,7 +1803,6 @@ class _PlayerSeekBarSectionState extends State<_PlayerSeekBarSection> {
                         color: widget.textSecondary,
                       ).copyWith(fontFamilyFallback: const ['Arial', 'Cairo']),
                     ),
-
                     Text(
                       Formatters.formatDurationObj(duration),
                       style: GoogleFonts.cairo(

@@ -5,18 +5,14 @@ import '../../../../core/errors/exceptions.dart';
 import '../models/nahawand_recitation_model.dart';
 import '../models/recitation_model.dart';
 
-/// Reads and parses the bundled [AppConstants.manifestAssetPath] and
-/// [AppConstants.nahawandAssetPath] JSON assets.
 class ManifestDataSource {
   const ManifestDataSource();
 
   static const int _schemaVersion = 5;
   static int? _loadedSchemaVersion;
 
-  /// In-memory cache of all parsed models across collections.
   static List<RecitationModel>? _cachedAllModels;
 
-  /// In-memory cache of parsed Nahawand models.
   static List<NahawandRecitationModel>? _cachedNahawandModels;
 
   void _ensureCacheVersion() {
@@ -27,7 +23,6 @@ class ManifestDataSource {
     }
   }
 
-  /// Loads and parses `assets/data/nahawand_candidates.json`.
   Future<List<NahawandRecitationModel>> loadNahawandCandidates() async {
     _ensureCacheVersion();
     if (_cachedNahawandModels != null) {
@@ -58,10 +53,6 @@ class ManifestDataSource {
     }
   }
 
-  /// Returns the raw list of [RecitationModel] parsed from the asset bundle.
-  /// If [collectionId] is provided, only models belonging to that collection are returned.
-  ///
-  /// Subsequent calls return from the in-memory cache instantly without I/O.
   Future<List<RecitationModel>> loadManifest({String? collectionId}) async {
     _ensureCacheVersion();
     if (_cachedAllModels == null) {
@@ -81,7 +72,6 @@ class ManifestDataSource {
 
         final List<RecitationModel> allModels = [];
 
-        // Support multi-collection structure
         if (decoded.containsKey('collections')) {
           final collections = decoded['collections'] as List<dynamic>;
           for (final col in collections) {
@@ -103,14 +93,10 @@ class ManifestDataSource {
           );
         }
 
-        // Also include Nahawand candidates so Playlists, Downloads, and Player
-        // can resolve any `nahawand_*` recitation ID seamlessly.
         try {
           final nahawandList = await loadNahawandCandidates();
           allModels.addAll(nahawandList);
-        } catch (_) {
-          // Non-fatal if Nahawand asset is unavailable during tests
-        }
+        } catch (_) {}
 
         _cachedAllModels = List.unmodifiable(allModels);
       } on FormatException catch (e) {

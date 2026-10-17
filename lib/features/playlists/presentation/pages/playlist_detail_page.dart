@@ -14,8 +14,6 @@ import '../../../recitations/presentation/cubit/recitation_list_state.dart';
 import '../cubit/playlists_cubit.dart';
 import '../cubit/playlists_state.dart';
 
-/// Dedicated details screen for a custom playlist showing all contained recitations,
-/// total duration, sequential playback, reordering/removal, and renaming.
 class PlaylistDetailPage extends StatelessWidget {
   final String playlistId;
 
@@ -24,7 +22,8 @@ class PlaylistDetailPage extends StatelessWidget {
     required this.playlistId,
   });
 
-  void _showRenameDialog(BuildContext context, String currentTitle) {
+  Future<void> _showRenameDialog(
+      BuildContext context, String currentTitle) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
     final cardBg =
@@ -36,83 +35,90 @@ class PlaylistDetailPage extends StatelessWidget {
 
     final controller = TextEditingController(text: currentTitle);
 
-    showDialog<void>(
-      context: context,
-      builder: (dialogCtx) {
-        return AlertDialog(
-          backgroundColor: cardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: Text(
-            'تعديل اسم قائمة التشغيل',
-            style: GoogleFonts.cairo(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: textPrimary,
+    try {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogCtx) {
+          return AlertDialog(
+            backgroundColor: cardBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
             ),
-          ),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            textDirection: TextDirection.rtl,
-            style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
-            decoration: InputDecoration(
-              hintText: 'اسم القائمة...',
-              hintStyle: GoogleFonts.cairo(color: textSecondary, fontSize: 13),
-              filled: true,
-              fillColor: (isDark ? Colors.white : Colors.black).withAlpha(10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: gold.withAlpha(isDark ? 80 : 50),
+            title: Text(
+              'تعديل اسم قائمة التشغيل',
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: textPrimary,
+              ),
+            ),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              textDirection: TextDirection.rtl,
+              style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: 'اسم القائمة...',
+                hintStyle:
+                    GoogleFonts.cairo(color: textSecondary, fontSize: 13),
+                filled: true,
+                fillColor: (isDark ? Colors.white : Colors.black).withAlpha(10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: gold.withAlpha(isDark ? 80 : 50),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: gold, width: 1.5),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(),
+                child: Text(
+                  'إلغاء',
+                  style: GoogleFonts.cairo(
+                    color: textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: gold, width: 1.5),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogCtx).pop(),
-              child: Text(
-                'إلغاء',
-                style: GoogleFonts.cairo(
-                  color: textSecondary,
-                  fontWeight: FontWeight.w600,
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: gold,
+                  foregroundColor:
+                      isDark ? AppColors.darkBackground : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  final name = controller.text.trim();
+                  if (name.isNotEmpty) {
+                    Navigator.of(dialogCtx).pop();
+                    context
+                        .read<PlaylistsCubit>()
+                        .renamePlaylist(playlistId, name);
+                  }
+                },
+                child: Text(
+                  'حفظ',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
                 ),
               ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: gold,
-                foregroundColor:
-                    isDark ? AppColors.darkBackground : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 0,
-              ),
-              onPressed: () {
-                final name = controller.text.trim();
-                if (name.isNotEmpty) {
-                  Navigator.of(dialogCtx).pop();
-                  context.read<PlaylistsCubit>().renamePlaylist(playlistId, name);
-                }
-              },
-              child: Text(
-                'حفظ',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+            ],
+          );
+        },
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _showDeleteDialog(BuildContext context, String playlistTitle) {
@@ -311,7 +317,6 @@ class PlaylistDetailPage extends StatelessWidget {
                 ? recitationListState.recitations
                 : <Recitation>[];
 
-            // Resolve recitations from playlist.recitations or map, preferring canonical metadata
             final recitationsMap = {for (var r in allRecitations) r.id: r};
             final playlistRecitations = playlist.recitations.isNotEmpty
                 ? playlist.recitations
@@ -382,8 +387,6 @@ class PlaylistDetailPage extends StatelessWidget {
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-                      // ignore: deprecated_member_use
-                      cacheExtent: 500,
                       addAutomaticKeepAlives: false,
                       addRepaintBoundaries: true,
                       itemCount: playlistRecitations.length + 1,
@@ -414,7 +417,8 @@ class PlaylistDetailPage extends StatelessWidget {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withAlpha(isDark ? 50 : 15),
+                                    color: Colors.black
+                                        .withAlpha(isDark ? 50 : 15),
                                     blurRadius: 10,
                                     offset: const Offset(0, 3),
                                   ),
@@ -438,7 +442,8 @@ class PlaylistDetailPage extends StatelessWidget {
                                   const SizedBox(width: 14),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           '${playlistRecitations.length} تلاوات',
@@ -504,35 +509,34 @@ class PlaylistDetailPage extends StatelessWidget {
 
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                          child: RepaintBoundary(
-                            child: _PlaylistRecitationCard(
-                              recitation: recitation,
-                              index: trackIndex + 1,
-                              playlistRecitations: playlistRecitations,
-                              isDark: isDark,
-                              gold: gold,
-                              cardBg: cardBg,
-                              textPrimary: textPrimary,
-                              textSecondary: textSecondary,
-                              onRemove: () {
-                                context
-                                    .read<PlaylistsCubit>()
-                                    .removeRecitationFromPlaylist(
-                                      playlistId,
-                                      recitation.id,
-                                    );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'تمت إزالة سورة ${recitation.surahNameAr} من القائمة',
-                                      style: GoogleFonts.cairo(color: Colors.white),
-                                    ),
-                                    duration: const Duration(seconds: 2),
-                                    behavior: SnackBarBehavior.floating,
+                          child: _PlaylistRecitationCard(
+                            recitation: recitation,
+                            index: trackIndex + 1,
+                            playlistRecitations: playlistRecitations,
+                            isDark: isDark,
+                            gold: gold,
+                            cardBg: cardBg,
+                            textPrimary: textPrimary,
+                            textSecondary: textSecondary,
+                            onRemove: () {
+                              context
+                                  .read<PlaylistsCubit>()
+                                  .removeRecitationFromPlaylist(
+                                    playlistId,
+                                    recitation.id,
+                                  );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'تمت إزالة سورة ${recitation.surahNameAr} من القائمة',
+                                    style:
+                                        GoogleFonts.cairo(color: Colors.white),
                                   ),
-                                );
-                              },
-                            ),
+                                  duration: const Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
@@ -574,8 +578,10 @@ class _PlaylistRecitationCard extends StatelessWidget {
       buildWhen: (prev, curr) {
         final prevCurrent = prev.currentRecitation?.id == recitation.id;
         final currCurrent = curr.currentRecitation?.id == recitation.id;
-        final prevPlaying = prevCurrent && prev is AudioPlayerReady && prev.isPlaying;
-        final currPlaying = currCurrent && curr is AudioPlayerReady && curr.isPlaying;
+        final prevPlaying =
+            prevCurrent && prev is AudioPlayerReady && prev.isPlaying;
+        final currPlaying =
+            currCurrent && curr is AudioPlayerReady && curr.isPlaying;
         return prevCurrent != currCurrent || prevPlaying != currPlaying;
       },
       builder: (context, playerState) {
@@ -628,7 +634,6 @@ class _PlaylistRecitationCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -689,7 +694,6 @@ class _PlaylistRecitationCard extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     IconButton(
                       icon: Icon(
                         isPlaying
@@ -714,7 +718,6 @@ class _PlaylistRecitationCard extends StatelessWidget {
                       constraints: const BoxConstraints(),
                     ),
                     const SizedBox(width: 8),
-
                     IconButton(
                       icon: Icon(
                         Icons.remove_circle_outline_rounded,

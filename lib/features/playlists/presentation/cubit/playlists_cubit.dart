@@ -10,7 +10,8 @@ class PlaylistsCubit extends Cubit<PlaylistsState> {
   final Box<dynamic> _box;
   final RecitationRepository? _repository;
 
-  PlaylistsCubit(this._box, [this._repository]) : super(const PlaylistsInitial()) {
+  PlaylistsCubit(this._box, [this._repository])
+      : super(const PlaylistsInitial()) {
     loadPlaylists();
   }
 
@@ -23,7 +24,7 @@ class PlaylistsCubit extends Cubit<PlaylistsState> {
           list.add(Playlist.fromMap(val));
         }
       }
-      // Sort newest first
+
       list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       if (list.isEmpty) {
@@ -32,7 +33,6 @@ class PlaylistsCubit extends Cubit<PlaylistsState> {
         emit(PlaylistsLoaded(playlists: list));
       }
 
-      // If repository is injected and some recitations are missing full models, enrich in background
       if (_repository != null) {
         _enrichPlaylistsWithFullRecitations(list);
       }
@@ -101,9 +101,7 @@ class PlaylistsCubit extends Cubit<PlaylistsState> {
       if (anyUpdated && !isClosed) {
         emit(PlaylistsLoaded(playlists: enriched));
       }
-    } catch (_) {
-      // Ignore background enrichment errors
-    }
+    } catch (_) {}
   }
 
   Future<Playlist> createPlaylist(
@@ -113,7 +111,8 @@ class PlaylistsCubit extends Cubit<PlaylistsState> {
     String? description,
   }) async {
     final trimmed = title.trim();
-    final id = 'playlist_${DateTime.now().microsecondsSinceEpoch}_${_box.length}';
+    final id =
+        'playlist_${DateTime.now().microsecondsSinceEpoch}_${_box.length}';
 
     Recitation? rec = initialRecitation;
     final recId = rec?.id ?? initialRecitationId;
@@ -126,7 +125,8 @@ class PlaylistsCubit extends Cubit<PlaylistsState> {
       } catch (_) {}
     }
 
-    final List<String> ids = (recId != null && recId.isNotEmpty) ? [recId] : const [];
+    final List<String> ids =
+        (recId != null && recId.isNotEmpty) ? [recId] : const [];
     final List<Recitation> recs = rec != null ? [rec] : const [];
 
     final playlist = Playlist(

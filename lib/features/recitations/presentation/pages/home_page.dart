@@ -191,8 +191,6 @@ class _HomeViewState extends State<_HomeView> with WidgetsBindingObserver {
         bottomNavigationBar: const MiniPlayer(),
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
-          // ignore: deprecated_member_use
-          cacheExtent: 500,
           slivers: [
             _AppBar(
               isDark: isDark,
@@ -271,7 +269,8 @@ class _AppBar extends StatelessWidget {
             Icons.folder_special_outlined,
             color: isDark ? AppColors.goldPrimary : AppColors.goldDark,
           ),
-          onPressed: () => context.push(AppRoutes.downloads),
+          onPressed: () =>
+              context.push('${AppRoutes.downloads}?collectionId=$collectionId'),
           tooltip: 'التلاوات المحمّلة',
         ),
         IconButton(
@@ -373,12 +372,18 @@ class _FilterTabs extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
         child: BlocBuilder<RecitationListCubit, RecitationListState>(
+          buildWhen: (prev, curr) =>
+              (prev is RecitationListLoaded ? prev.recitations.length : 0) !=
+              (curr is RecitationListLoaded ? curr.recitations.length : 0),
           builder: (context, listState) {
             final currentItems = listState is RecitationListLoaded
                 ? listState.recitations
                 : const <Recitation>[];
 
             return BlocBuilder<FavoritesCubit, FavoritesState>(
+              buildWhen: (prev, curr) =>
+                  prev.favoriteIds.length != curr.favoriteIds.length ||
+                  prev.favoriteIds != curr.favoriteIds,
               builder: (context, favState) {
                 final count = currentItems
                     .where((item) => favState.isFavorite(item.id))
@@ -581,9 +586,8 @@ class _SearchBarState extends State<_SearchBar> {
           controller: _controller,
           textDirection: TextDirection.rtl,
           style: GoogleFonts.cairo(
-            color: isDark
-                ? AppColors.darkTextPrimary
-                : AppColors.lightTextPrimary,
+            color:
+                isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
           ),
           decoration: InputDecoration(
             hintText: 'ابحث عن سورة بالاسم أو الرقم...',
@@ -615,9 +619,8 @@ class _SearchBarState extends State<_SearchBar> {
                   )
                 : null,
             filled: true,
-            fillColor: isDark
-                ? AppColors.darkCardSurface
-                : AppColors.lightCardSurface,
+            fillColor:
+                isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(
@@ -669,22 +672,28 @@ class _ResumePlaybackBannerState extends State<_ResumePlaybackBanner> {
       buildWhen: (previous, current) =>
           (previous is AudioPlayerIdle) != (current is AudioPlayerIdle),
       builder: (context, playerState) {
-        // Hide banner if audio player is already active / loaded
         if (playerState is! AudioPlayerIdle) {
           return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
         return BlocBuilder<SettingsCubit, SettingsState>(
+          buildWhen: (prev, curr) =>
+              prev.lastPlayedRecitationId != curr.lastPlayedRecitationId ||
+              prev.lastPlayedPositionSeconds != curr.lastPlayedPositionSeconds,
           builder: (context, settingsState) {
             final lastId = settingsState.lastPlayedRecitationId;
             final lastSeconds = settingsState.lastPlayedPositionSeconds ?? 0;
 
-            // Only show if there is a saved track with at least 5 seconds of playback
             if (lastId == null || lastSeconds < 5) {
               return const SliverToBoxAdapter(child: SizedBox.shrink());
             }
 
             return BlocBuilder<RecitationListCubit, RecitationListState>(
+              buildWhen: (prev, curr) =>
+                  prev.runtimeType != curr.runtimeType ||
+                  (prev is RecitationListLoaded &&
+                      curr is RecitationListLoaded &&
+                      prev.recitations.length != curr.recitations.length),
               builder: (context, listState) {
                 if (listState is! RecitationListLoaded) {
                   return const SliverToBoxAdapter(child: SizedBox.shrink());
@@ -707,9 +716,8 @@ class _ResumePlaybackBannerState extends State<_ResumePlaybackBanner> {
                 final isDark = widget.isDark;
                 final gold =
                     isDark ? AppColors.goldPrimary : AppColors.goldDark;
-                final bg = isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF1F5F9);
+                final bg =
+                    isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
                 final textPrimary = isDark
                     ? AppColors.darkTextPrimary
                     : AppColors.lightTextPrimary;
@@ -756,7 +764,6 @@ class _ResumePlaybackBannerState extends State<_ResumePlaybackBanner> {
                             ),
                           ),
                           const SizedBox(width: 12),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -781,7 +788,6 @@ class _ResumePlaybackBannerState extends State<_ResumePlaybackBanner> {
                               ],
                             ),
                           ),
-
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: gold,
@@ -820,7 +826,6 @@ class _ResumePlaybackBannerState extends State<_ResumePlaybackBanner> {
                             },
                           ),
                           const SizedBox(width: 6),
-
                           IconButton(
                             icon: Icon(
                               Icons.close_rounded,
@@ -871,17 +876,14 @@ class _Body extends StatelessWidget {
         if (state is RecitationListLoaded) {
           var items = state.filtered;
 
-          // Filter by Golden Selection tab (21 items) when selected
           if (selectedTab == _ListTab.golden) {
             items = items.where((r) => r.isRare).toList();
           }
 
-          // Filter by favorites tab if selected
           if (selectedTab == _ListTab.favorites) {
             final favoritesState = context.watch<FavoritesCubit>().state;
-            items = items
-                .where((r) => favoritesState.isFavorite(r.id))
-                .toList();
+            items =
+                items.where((r) => favoritesState.isFavorite(r.id)).toList();
 
             if (items.isEmpty) {
               return SliverFillRemaining(
@@ -977,8 +979,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             ElevatedButton.icon(
-              onPressed: () =>
-                  context.read<RecitationListCubit>().refresh(),
+              onPressed: () => context.read<RecitationListCubit>().refresh(),
               icon: const Icon(Icons.refresh_rounded),
               label: Text(
                 'إعادة المحاولة',
@@ -1090,7 +1091,6 @@ class _RecitationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<AudioPlayerCubit>().updatePlaylist(items);
     final bottomInset = 120.0 + MediaQuery.of(context).padding.bottom;
     return SliverPadding(
       padding: EdgeInsets.fromLTRB(16, 8, 16, bottomInset),
@@ -1099,12 +1099,10 @@ class _RecitationList extends StatelessWidget {
         addAutomaticKeepAlives: false,
         addRepaintBoundaries: true,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (context, index) => RepaintBoundary(
-          child: _RecitationCard(
-            recitation: items[index],
-            isDark: isDark,
-            displayIndex: index + 1,
-          ),
+        itemBuilder: (context, index) => _RecitationCard(
+          recitation: items[index],
+          isDark: isDark,
+          displayIndex: index + 1,
         ),
       ),
     );
@@ -1132,7 +1130,8 @@ class _RecitationCard extends StatelessWidget {
           'حذف التلاوة المحمّلة',
           style: GoogleFonts.cairo(
             fontWeight: FontWeight.w700,
-            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+            color:
+                isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
           ),
         ),
         content: Text(
@@ -1180,7 +1179,6 @@ class _RecitationCard extends StatelessWidget {
     final r = recitation;
     final nahawand = r is NahawandRecitationModel ? r : null;
 
-    // Watch only the current recitation field to highlight the active card.
     final isActive = context.select<AudioPlayerCubit, bool>((cubit) {
       final s = cubit.state;
       if (s is AudioPlayerReady) return s.recitation.id == r.id;
@@ -1238,7 +1236,6 @@ class _RecitationCard extends StatelessWidget {
                   isDark: isDark,
                 ),
                 const SizedBox(width: 14),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1319,7 +1316,6 @@ class _RecitationCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-
                 _CardActionButtons(
                   recitation: r,
                   isActive: isActive,
@@ -1405,9 +1401,8 @@ class _MetaChip extends StatelessWidget {
         Icon(
           icon,
           size: 12,
-          color: isDark
-              ? AppColors.darkTextTertiary
-              : AppColors.lightTextTertiary,
+          color:
+              isDark ? AppColors.darkTextTertiary : AppColors.lightTextTertiary,
         ),
         const SizedBox(width: 3),
         Flexible(
@@ -1453,6 +1448,9 @@ class _CardActionButtons extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           BlocBuilder<FavoritesCubit, FavoritesState>(
+            buildWhen: (prev, curr) =>
+                prev.isFavorite(recitation.id) !=
+                curr.isFavorite(recitation.id),
             builder: (context, favState) {
               final isFav = favState.isFavorite(recitation.id);
               return PopupMenuButton<String>(
@@ -1486,8 +1484,7 @@ class _CardActionButtons extends StatelessWidget {
                     value: 'playlist',
                     child: Row(
                       children: [
-                        Icon(Icons.playlist_add_rounded,
-                            color: gold, size: 20),
+                        Icon(Icons.playlist_add_rounded, color: gold, size: 20),
                         const SizedBox(width: 10),
                         Text(
                           'إضافة إلى قائمة تشغيل',
@@ -1552,9 +1549,7 @@ class _CardActionButtons extends StatelessWidget {
               );
             },
           ),
-
           const SizedBox(width: 2),
-
           BlocBuilder<DownloadCubit, DownloadState>(
             buildWhen: (prev, curr) {
               return prev.isDownloading(recitation.id) !=
@@ -1570,7 +1565,6 @@ class _CardActionButtons extends StatelessWidget {
               final progress = downloadState.getProgress(recitation.id);
               final percent = (progress * 100).toInt();
 
-              // State 1: Downloading (Pause icon inside CircularProgressIndicator)
               if (isDownloading) {
                 return Tooltip(
                   message: 'إيقاف مؤقت ($percent%) · اضغط مطولاً للإلغاء',
@@ -1582,9 +1576,7 @@ class _CardActionButtons extends StatelessWidget {
                           .pauseDownload(recitation.id);
                     },
                     onLongPress: () {
-                      context
-                          .read<DownloadCubit>()
-                          .cancelDownload(recitation);
+                      context.read<DownloadCubit>().cancelDownload(recitation);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -1597,7 +1589,8 @@ class _CardActionButtons extends StatelessWidget {
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 4),
                       child: SizedBox(
                         width: 28,
                         height: 28,
@@ -1627,21 +1620,16 @@ class _CardActionButtons extends StatelessWidget {
                 );
               }
 
-              // State 2: Paused (Single white circular ring with solid white play triangle)
               if (isPaused) {
                 return Tooltip(
                   message: 'استئناف التنزيل ($percent%) · اضغط مطولاً للإلغاء',
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
-                      context
-                          .read<DownloadCubit>()
-                          .resumeDownload(recitation);
+                      context.read<DownloadCubit>().resumeDownload(recitation);
                     },
                     onLongPress: () {
-                      context
-                          .read<DownloadCubit>()
-                          .cancelDownload(recitation);
+                      context.read<DownloadCubit>().cancelDownload(recitation);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -1654,7 +1642,8 @@ class _CardActionButtons extends StatelessWidget {
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 4),
                       child: SizedBox(
                         width: 28,
                         height: 28,
@@ -1682,7 +1671,6 @@ class _CardActionButtons extends StatelessWidget {
                 );
               }
 
-              // State 3: Downloaded (Offline pin icon)
               if (recitation.isDownloaded) {
                 return IconButton(
                   icon: const Icon(
@@ -1698,7 +1686,6 @@ class _CardActionButtons extends StatelessWidget {
                 );
               }
 
-              // State 4: Not Downloaded (Cloud download icon)
               return IconButton(
                 icon: const Icon(
                   Icons.cloud_download_outlined,
@@ -1715,9 +1702,7 @@ class _CardActionButtons extends StatelessWidget {
               );
             },
           ),
-
           const SizedBox(width: 2),
-
           BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
             buildWhen: (prev, curr) {
               final prevActive = (prev is AudioPlayerReady &&
@@ -1728,10 +1713,8 @@ class _CardActionButtons extends StatelessWidget {
                       curr.recitation.id == recitation.id) ||
                   (curr is AudioPlayerLoading &&
                       curr.recitation.id == recitation.id);
-              final prevPlaying =
-                  prev is AudioPlayerReady && prev.isPlaying;
-              final currPlaying =
-                  curr is AudioPlayerReady && curr.isPlaying;
+              final prevPlaying = prev is AudioPlayerReady && prev.isPlaying;
+              final currPlaying = curr is AudioPlayerReady && curr.isPlaying;
               return prevActive != currActive ||
                   prevPlaying != currPlaying ||
                   (prev is AudioPlayerLoading) != (curr is AudioPlayerLoading);
@@ -1746,8 +1729,8 @@ class _CardActionButtons extends StatelessWidget {
                   playerState is AudioPlayerReady &&
                   playerState.isPlaying;
 
-              final isThisLoading = isThisActive &&
-                  playerState is AudioPlayerLoading;
+              final isThisLoading =
+                  isThisActive && playerState is AudioPlayerLoading;
 
               if (isThisLoading) {
                 return SizedBox(

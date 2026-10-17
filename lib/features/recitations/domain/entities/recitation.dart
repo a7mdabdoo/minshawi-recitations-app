@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Identifies the section/source of a recitation.
 enum RecitationType {
   murattal,
   mujawwad,
@@ -8,7 +7,6 @@ enum RecitationType {
   nahawand,
 }
 
-/// Pure domain entity — no JSON, no Hive, no Flutter imports.
 class Recitation extends Equatable {
   final String id;
   final int surahNumber;
@@ -24,8 +22,6 @@ class Recitation extends Equatable {
   final bool isRare;
   final String quality;
 
-  /// Absolute path to the locally downloaded file.
-  /// `null` means the recitation has not been downloaded yet.
   final String? localFilePath;
 
   const Recitation({
@@ -47,10 +43,8 @@ class Recitation extends Equatable {
 
   bool get isDownloaded => localFilePath != null;
 
-  /// Returns the effective playback URI: local file if downloaded, else stream URL.
   String get playbackUri => localFilePath ?? audioUrl;
 
-  /// Determines the [RecitationType] from [collectionId] or [id].
   RecitationType get recitationType {
     final cid = collectionId.trim().toLowerCase();
     if (cid == 'complete_murattal' ||
@@ -67,7 +61,6 @@ class Recitation extends Equatable {
     return RecitationType.rare;
   }
 
-  /// Human-readable Arabic label for the recitation source.
   String get sourceLabel {
     return switch (recitationType) {
       RecitationType.murattal => 'المصحف المرتل',
@@ -77,8 +70,6 @@ class Recitation extends Equatable {
     };
   }
 
-  /// Returns `true` ONLY when [verseRange] is an actual numeric range (e.g. `1-7`, `1-286`).
-  /// Returns `false` if empty or if it contains location/concert text (e.g. `مريم ليبيا`).
   bool get hasNumericVerseRange {
     final v = verseRange.trim();
     if (v.isEmpty) return false;
@@ -86,7 +77,6 @@ class Recitation extends Equatable {
         .hasMatch(v);
   }
 
-  /// Returns a clean location/concert label for external or Nahawand recordings.
   String get cleanLocationLabel {
     final loc = recordingLocation.trim();
     if (loc.isNotEmpty &&
@@ -101,7 +91,6 @@ class Recitation extends Equatable {
       return cleaned;
     }
 
-    // Check if surahNameAr has location after " - "
     if (surahNameAr.contains(' - ')) {
       final parts = surahNameAr.split(' - ');
       if (parts.length > 1) {
@@ -120,8 +109,6 @@ class Recitation extends Equatable {
     return loc.isNotEmpty ? loc : 'محفل خارجي';
   }
 
-  /// Returns either `'الآيات: X-Y'` (when [hasNumericVerseRange] is true)
-  /// or the concert/recording location without `'الآيات:'` (when false or for Nahawand concerts).
   String get trailingVerseOrLocation {
     if (recitationType == RecitationType.nahawand) {
       final loc = cleanLocationLabel;
@@ -140,9 +127,6 @@ class Recitation extends Equatable {
     return cleanLocationLabel;
   }
 
-  /// Builds a unified subtitle with source, duration, and either numeric verse range or location:
-  /// - Standard: `المصحف المرتل • 00:51 • الآيات: 1-7`
-  /// - Concert/Nahawand: `روائع النهاوند • 41:51 • تسجيل ليبيا`
   String formatSharedSubtitle(String formattedDuration) {
     final trailing = trailingVerseOrLocation.trim();
     if (trailing.isEmpty) {

@@ -15,7 +15,6 @@ import '../cubit/playlists_cubit.dart';
 import '../cubit/playlists_state.dart';
 import 'playlist_detail_page.dart';
 
-/// Standalone Playlists screen for viewing, searching, and managing custom collections.
 class PlaylistsPage extends StatelessWidget {
   const PlaylistsPage({super.key});
 
@@ -57,7 +56,6 @@ class PlaylistsPage extends StatelessWidget {
   }
 }
 
-/// The reusable content body displaying custom playlists with optional search.
 class PlaylistsContentView extends StatefulWidget {
   final ScrollPhysics? physics;
   final bool shrinkWrap;
@@ -92,7 +90,7 @@ class _PlaylistsContentViewState extends State<PlaylistsContentView> {
     super.dispose();
   }
 
-  void _showCreateDialog(BuildContext context) {
+  Future<void> _showCreateDialog(BuildContext context) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
     final cardBg =
@@ -104,83 +102,88 @@ class _PlaylistsContentViewState extends State<PlaylistsContentView> {
 
     final controller = TextEditingController();
 
-    showDialog<void>(
-      context: context,
-      builder: (dialogCtx) {
-        return AlertDialog(
-          backgroundColor: cardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: Text(
-            'إنشاء قائمة تشغيل جديدة',
-            style: GoogleFonts.cairo(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: textPrimary,
+    try {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogCtx) {
+          return AlertDialog(
+            backgroundColor: cardBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
             ),
-          ),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            textDirection: TextDirection.rtl,
-            style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
-            decoration: InputDecoration(
-              hintText: 'اسم القائمة (مثال: تلاوات مختارة)...',
-              hintStyle: GoogleFonts.cairo(color: textSecondary, fontSize: 13),
-              filled: true,
-              fillColor: (isDark ? Colors.white : Colors.black).withAlpha(10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: gold.withAlpha(isDark ? 80 : 50),
+            title: Text(
+              'إنشاء قائمة تشغيل جديدة',
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: textPrimary,
+              ),
+            ),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              textDirection: TextDirection.rtl,
+              style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: 'اسم القائمة (مثال: تلاوات مختارة)...',
+                hintStyle:
+                    GoogleFonts.cairo(color: textSecondary, fontSize: 13),
+                filled: true,
+                fillColor: (isDark ? Colors.white : Colors.black).withAlpha(10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: gold.withAlpha(isDark ? 80 : 50),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: gold, width: 1.5),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(),
+                child: Text(
+                  'إلغاء',
+                  style: GoogleFonts.cairo(
+                    color: textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: gold, width: 1.5),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogCtx).pop(),
-              child: Text(
-                'إلغاء',
-                style: GoogleFonts.cairo(
-                  color: textSecondary,
-                  fontWeight: FontWeight.w600,
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: gold,
+                  foregroundColor:
+                      isDark ? AppColors.darkBackground : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () async {
+                  final name = controller.text.trim();
+                  if (name.isNotEmpty) {
+                    Navigator.of(dialogCtx).pop();
+                    await context.read<PlaylistsCubit>().createPlaylist(name);
+                  }
+                },
+                child: Text(
+                  'إنشاء',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
                 ),
               ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: gold,
-                foregroundColor:
-                    isDark ? AppColors.darkBackground : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 0,
-              ),
-              onPressed: () async {
-                final name = controller.text.trim();
-                if (name.isNotEmpty) {
-                  Navigator.of(dialogCtx).pop();
-                  await context.read<PlaylistsCubit>().createPlaylist(name);
-                }
-              },
-              child: Text(
-                'إنشاء',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+            ],
+          );
+        },
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _showDeleteDialog(
@@ -300,7 +303,8 @@ class _PlaylistsContentViewState extends State<PlaylistsContentView> {
           ),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear_rounded, color: textSecondary, size: 18),
+                  icon:
+                      Icon(Icons.clear_rounded, color: textSecondary, size: 18),
                   onPressed: () {
                     _searchController.clear();
                     setState(() {
@@ -373,10 +377,9 @@ class _PlaylistsContentViewState extends State<PlaylistsContentView> {
 
           return BlocBuilder<RecitationListCubit, RecitationListState>(
             builder: (context, recitationListState) {
-              final allRecitations =
-                  recitationListState is RecitationListLoaded
-                      ? recitationListState.recitations
-                      : <Recitation>[];
+              final allRecitations = recitationListState is RecitationListLoaded
+                  ? recitationListState.recitations
+                  : <Recitation>[];
               final recitationsMap = {for (var r in allRecitations) r.id: r};
 
               final cleanQuery = _searchQuery.trim().toLowerCase();
@@ -385,10 +388,9 @@ class _PlaylistsContentViewState extends State<PlaylistsContentView> {
               final filteredPlaylists = playlists.where((playlist) {
                 if (cleanQuery.isEmpty) return true;
 
-                final pName = (playlist.name.isNotEmpty
-                        ? playlist.name
-                        : playlist.title)
-                    .toLowerCase();
+                final pName =
+                    (playlist.name.isNotEmpty ? playlist.name : playlist.title)
+                        .toLowerCase();
                 final pNameNorm = ArabicNormalizer.normalize(pName);
                 final pDesc = playlist.description.toLowerCase();
                 final pDescNorm = ArabicNormalizer.normalize(pDesc);
@@ -456,8 +458,8 @@ class _PlaylistsContentViewState extends State<PlaylistsContentView> {
               final listView = ListView.separated(
                 physics: widget.physics,
                 shrinkWrap: widget.shrinkWrap,
-                padding: widget.padding ??
-                    const EdgeInsets.fromLTRB(16, 8, 16, 96),
+                padding:
+                    widget.padding ?? const EdgeInsets.fromLTRB(16, 8, 16, 96),
                 addAutomaticKeepAlives: false,
                 addRepaintBoundaries: true,
                 itemCount: filteredPlaylists.length + 1,

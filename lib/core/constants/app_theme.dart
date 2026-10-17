@@ -3,18 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// Application theme definitions – Dark (Islamic Gold) + Warm Light.
-///
-/// Typography uses [GoogleFonts] exclusively — no local font assets required:
-///   • Arabic display / body text → `GoogleFonts.amiri()`
-///   • UI labels, titles, buttons → `GoogleFonts.cairo()`
 abstract class AppTheme {
   AppTheme._();
 
-  /// Builds a [TextTheme] where every style is sourced from [GoogleFonts].
-  /// [primaryColor]   → headings and body text.
-  /// [secondaryColor] → subtitles and captions.
-  /// [tertiaryColor]  → hints, placeholders, disabled text.
   static TextTheme _textTheme({
     required Color primaryColor,
     required Color secondaryColor,
@@ -37,7 +28,6 @@ abstract class AppTheme {
         fontWeight: FontWeight.w700,
         color: primaryColor,
       ),
-
       headlineLarge: GoogleFonts.cairo(
         fontSize: 32,
         fontWeight: FontWeight.w700,
@@ -53,7 +43,6 @@ abstract class AppTheme {
         fontWeight: FontWeight.w600,
         color: primaryColor,
       ),
-
       titleLarge: GoogleFonts.cairo(
         fontSize: 22,
         fontWeight: FontWeight.w600,
@@ -71,7 +60,6 @@ abstract class AppTheme {
         color: secondaryColor,
         letterSpacing: 0.1,
       ),
-
       bodyLarge: GoogleFonts.cairo(
         fontSize: 16,
         fontWeight: FontWeight.w400,
@@ -90,7 +78,6 @@ abstract class AppTheme {
         color: tertiaryColor,
         letterSpacing: 0.4,
       ),
-
       labelLarge: GoogleFonts.cairo(
         fontSize: 14,
         fontWeight: FontWeight.w600,
@@ -231,22 +218,27 @@ abstract class AppTheme {
           backgroundColor: AppColors.goldPrimary,
           foregroundColor: AppColors.darkBackground,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 15),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle:
+              GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 15),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.goldPrimary,
           side: const BorderSide(color: AppColors.goldPrimary),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle:
+              GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.goldPrimary,
-          textStyle: GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
+          textStyle:
+              GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -265,7 +257,8 @@ abstract class AppTheme {
           borderSide: const BorderSide(color: AppColors.goldPrimary, width: 2),
         ),
         hintStyle: GoogleFonts.cairo(color: AppColors.darkTextTertiary),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
@@ -389,22 +382,27 @@ abstract class AppTheme {
           backgroundColor: AppColors.goldDark,
           foregroundColor: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 15),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle:
+              GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 15),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.goldDark,
           side: const BorderSide(color: AppColors.goldDark),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle:
+              GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.goldDark,
-          textStyle: GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
+          textStyle:
+              GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -423,7 +421,8 @@ abstract class AppTheme {
           borderSide: const BorderSide(color: AppColors.goldDark, width: 2),
         ),
         hintStyle: GoogleFonts.cairo(color: AppColors.lightTextTertiary),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }

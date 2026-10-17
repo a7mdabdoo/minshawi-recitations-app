@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../constants/app_constants.dart';
 import '../errors/exceptions.dart';
 
-/// Factory that builds and configures the singleton [Dio] client.
 class DioClient {
   DioClient._();
 
@@ -16,8 +16,10 @@ class DioClient {
   static Dio _buildDio() {
     final dio = Dio(
       BaseOptions(
-        connectTimeout: const Duration(seconds: AppConstants.connectTimeoutSeconds),
-        receiveTimeout: const Duration(seconds: AppConstants.receiveTimeoutSeconds),
+        connectTimeout:
+            const Duration(seconds: AppConstants.connectTimeoutSeconds),
+        receiveTimeout:
+            const Duration(seconds: AppConstants.receiveTimeoutSeconds),
         headers: {
           'Accept': 'application/json, audio/*, */*',
           'User-Agent': 'AlMinshawi-RecitationsApp/1.0',
@@ -39,18 +41,17 @@ class _LogInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     assert(() {
-      // ignore: avoid_print
-      print('[DIO] → ${options.method} ${options.uri}');
+      debugPrint('[DIO] → ${options.method} ${options.uri}');
       return true;
     }());
     handler.next(options);
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+      Response<dynamic> response, ResponseInterceptorHandler handler) {
     assert(() {
-      // ignore: avoid_print
-      print('[DIO] ← ${response.statusCode} ${response.realUri}');
+      debugPrint('[DIO] ← ${response.statusCode} ${response.realUri}');
       return true;
     }());
     handler.next(response);
@@ -59,8 +60,7 @@ class _LogInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     assert(() {
-      // ignore: avoid_print
-      print('[DIO] ✗ ${err.type} – ${err.message}');
+      debugPrint('[DIO] ✗ ${err.type} – ${err.message}');
       return true;
     }());
     handler.next(err);
@@ -104,7 +104,6 @@ class _ErrorInterceptor extends Interceptor {
   }
 }
 
-/// Maps a [DioException] to the appropriate [AppException].
 AppException dioExceptionToAppException(DioException e) {
   if (e.error is AppException) return e.error as AppException;
 

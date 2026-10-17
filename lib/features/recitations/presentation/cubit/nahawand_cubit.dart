@@ -5,7 +5,6 @@ import '../../data/datasources/manifest_data_source.dart';
 import '../../data/models/nahawand_recitation_model.dart';
 import 'nahawand_state.dart';
 
-/// Cubit responsible for loading, filtering, and searching Maqam Nahawand recitations.
 class NahawandCubit extends Cubit<NahawandState> {
   final ManifestDataSource _manifestDataSource;
   final LocalRecitationDataSource _localDataSource;
@@ -17,8 +16,6 @@ class NahawandCubit extends Cubit<NahawandState> {
         _localDataSource = localDataSource,
         super(const NahawandInitial());
 
-  /// Loads `assets/data/nahawand_candidates.json` and defaults to showing
-  /// the Golden Selection (`is_golden_selection: true`).
   Future<void> loadNahawandRecitations() async {
     if (state is NahawandLoaded) return;
 
@@ -51,7 +48,6 @@ class NahawandCubit extends Cubit<NahawandState> {
     }
   }
 
-  /// Changes the active filter mode (`golden`, `iconic`, or `all`).
   void setFilterMode(NahawandFilterMode mode) {
     final current = state;
     if (current is! NahawandLoaded) return;
@@ -71,13 +67,11 @@ class NahawandCubit extends Cubit<NahawandState> {
     );
   }
 
-  /// Filters by Surah category chip (or `null` for all categories).
   void setCategory(String? category) {
     final current = state;
     if (current is! NahawandLoaded) return;
 
-    final nextCategory =
-        current.selectedCategory == category ? null : category;
+    final nextCategory = current.selectedCategory == category ? null : category;
 
     final filtered = _applyFilters(
       all: current.allRecitations,
@@ -95,13 +89,10 @@ class NahawandCubit extends Cubit<NahawandState> {
     );
   }
 
-  /// Searches Nahawand recitations using [ArabicNormalizer].
   void search(String query) {
     final current = state;
     if (current is! NahawandLoaded) return;
 
-    // When user types a search query while in `golden` mode, if golden has no matches,
-    // automatically search across all Nahawand tracks so they find any recitation.
     var effectiveMode = current.filterMode;
     var filtered = _applyFilters(
       all: current.allRecitations,
@@ -133,7 +124,6 @@ class NahawandCubit extends Cubit<NahawandState> {
 
   void clearSearch() => search('');
 
-  /// Updates the local file path when a track finishes downloading.
   void markAsDownloaded(String recitationId, String localFilePath) {
     final current = state;
     if (current is! NahawandLoaded) return;
@@ -157,7 +147,6 @@ class NahawandCubit extends Cubit<NahawandState> {
     );
   }
 
-  /// Clears the local file path when a downloaded file is deleted.
   void markAsDeleted(String recitationId) {
     final current = state;
     if (current is! NahawandLoaded) return;

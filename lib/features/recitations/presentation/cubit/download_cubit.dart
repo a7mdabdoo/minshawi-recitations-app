@@ -25,12 +25,9 @@ class DownloadCubit extends Cubit<DownloadState> {
         _nahawandCubit = nahawandCubit,
         super(const DownloadState());
 
-  /// Starts downloading a recitation.
   Future<void> startDownload(Recitation recitation) async {
-    // Guard 1: Ignore if already actively downloading
     if (state.isDownloading(recitation.id)) return;
 
-    // Guard 2: If not in a paused session, check on-disk validity first
     if (!state.isPaused(recitation.id)) {
       final existingPath =
           await _downloadService.getValidLocalPath(recitation.id);
@@ -48,14 +45,11 @@ class DownloadCubit extends Cubit<DownloadState> {
     _cancelTokens[recitation.id] = cancelToken;
     _pausedRecitations.remove(recitation.id);
 
-    // Update status to downloading and initialize progress from disk if partial
-    final updatedStatusMap =
-        Map<String, DownloadStatus>.from(state.statusMap);
+    final updatedStatusMap = Map<String, DownloadStatus>.from(state.statusMap);
     updatedStatusMap[recitation.id] = DownloadStatus.downloading;
 
     final updatedProgressMap = Map<String, double>.from(state.progressMap);
-    final partialBytes =
-        await _downloadService.getPartialFileSize(recitation);
+    final partialBytes = await _downloadService.getPartialFileSize(recitation);
     if (partialBytes > 0 && recitation.fileSizeBytes > 0) {
       updatedProgressMap[recitation.id] =
           (partialBytes / recitation.fileSizeBytes).clamp(0.0, 1.0);
@@ -97,7 +91,6 @@ class DownloadCubit extends Cubit<DownloadState> {
           progressMap: pMap,
         ));
 
-        // On native platforms, mark as downloaded in list cubit and Hive
         if (!kIsWeb) {
           await _recitationListCubit.markDownloaded(
             recitationId: recitation.id,
@@ -107,10 +100,8 @@ class DownloadCubit extends Cubit<DownloadState> {
         }
       }
     } on DownloadPausedException {
-      // User paused download – maintain progress and update status to paused
       _handlePause(recitation.id);
     } on DownloadCancelledException {
-      // User cancelled download – clean up state silently
       _handleCancellation(recitation.id);
     } on InsufficientStorageException catch (e) {
       if (!isClosed) {
@@ -131,7 +122,8 @@ class DownloadCubit extends Cubit<DownloadState> {
         ));
       }
     } catch (e) {
-      if (cancelToken.isCancelled || _pausedRecitations.contains(recitation.id)) {
+      if (cancelToken.isCancelled ||
+          _pausedRecitations.contains(recitation.id)) {
         _handlePause(recitation.id);
       } else if (!isClosed) {
         _cancelTokens.remove(recitation.id);
@@ -158,13 +150,11 @@ class DownloadCubit extends Cubit<DownloadState> {
     }
   }
 
-  /// Resumes a paused download or starts from existing on-disk progress.
   Future<void> resumeDownload(Recitation recitation) {
     _pausedRecitations.remove(recitation.id);
     return startDownload(recitation);
   }
 
-  /// Pauses an active download, keeping partial file on disk.
   void pauseDownload(String recitationId) {
     _pausedRecitations.add(recitationId);
     final token = _cancelTokens.remove(recitationId);
@@ -184,7 +174,6 @@ class DownloadCubit extends Cubit<DownloadState> {
     }
   }
 
-  /// Cancels an active or paused download and deletes the partial file from disk.
   Future<void> cancelDownload(dynamic recitationOrId) async {
     final String recitationId = recitationOrId is Recitation
         ? recitationOrId.id
@@ -217,7 +206,6 @@ class DownloadCubit extends Cubit<DownloadState> {
     }
   }
 
-  /// Deletes a previously downloaded recitation (or in-progress/paused session).
   Future<void> deleteDownload(Recitation recitation) async {
     if (kIsWeb) return;
 

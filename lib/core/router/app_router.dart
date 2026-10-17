@@ -7,7 +7,6 @@ import '../../features/recitations/presentation/pages/home_page.dart';
 import '../../features/recitations/presentation/pages/landing_page.dart';
 import '../../features/recitations/presentation/pages/player_page.dart';
 
-/// Route name constants.
 abstract class AppRoutes {
   AppRoutes._();
 
@@ -19,7 +18,6 @@ abstract class AppRoutes {
   static const String player = '/player';
 }
 
-/// Application router built with [GoRouter].
 class AppRouter {
   AppRouter._();
 
@@ -44,7 +42,10 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.downloads,
         name: 'downloads',
-        builder: (context, state) => const DownloadsPage(),
+        builder: (context, state) {
+          final collectionId = state.uri.queryParameters['collectionId'];
+          return DownloadsPage(collectionId: collectionId);
+        },
       ),
       GoRoute(
         path: AppRoutes.playlists,
@@ -67,7 +68,8 @@ class AppRouter {
           return CustomTransitionPage<void>(
             key: state.pageKey,
             child: PlayerPage(initialRecitationId: recitationId),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 1.0);
               const end = Offset.zero;
               const curve = Curves.easeOutCubic;
@@ -86,7 +88,6 @@ class AppRouter {
   );
 }
 
-/// Fallback page shown when a route cannot be resolved.
 class _RouterErrorPage extends StatelessWidget {
   final Exception? error;
   const _RouterErrorPage({this.error});

@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import '../../../recitations/data/models/recitation_model.dart';
 import '../../../recitations/domain/entities/recitation.dart';
 
-/// Represents a custom user-created playlist/collection.
 class Playlist extends Equatable {
   final String id;
   final String title;
@@ -21,7 +20,6 @@ class Playlist extends Equatable {
     this.recitations = const [],
   });
 
-  /// Alias for title for consistency with user code / search queries.
   String get name => title;
 
   Playlist copyWith({
@@ -101,9 +99,7 @@ class Playlist extends Equatable {
                 ),
               ),
             );
-          } catch (_) {
-            // Ignore malformed individual item
-          }
+          } catch (_) {}
         }
       }
     }

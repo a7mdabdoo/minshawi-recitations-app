@@ -7,8 +7,6 @@ import '../../../recitations/domain/entities/recitation.dart';
 import '../cubit/playlists_cubit.dart';
 import '../cubit/playlists_state.dart';
 
-/// Modal bottom sheet allowing users to add/remove a recitation from their custom playlists
-/// or create a new playlist on the fly.
 class AddToPlaylistBottomSheet extends StatelessWidget {
   final Recitation recitation;
 
@@ -26,7 +24,7 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
     );
   }
 
-  void _showCreatePlaylistDialog(BuildContext context) {
+  Future<void> _showCreatePlaylistDialog(BuildContext context) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
     final cardBg =
@@ -38,115 +36,121 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
 
     final controller = TextEditingController();
 
-    showDialog<void>(
-      context: context,
-      builder: (dialogCtx) {
-        return AlertDialog(
-          backgroundColor: cardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: Text(
-            'إنشاء قائمة تشغيل جديدة',
-            style: GoogleFonts.cairo(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: textPrimary,
+    try {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogCtx) {
+          return AlertDialog(
+            backgroundColor: cardBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'أدخل اسماً لقائمة التشغيل (مثال: تلاوات الفجر، المصحف المفضل):',
-                style: GoogleFonts.cairo(
-                  fontSize: 12.5,
-                  color: textSecondary,
-                  height: 1.4,
+            title: Text(
+              'إنشاء قائمة تشغيل جديدة',
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: textPrimary,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'أدخل اسماً لقائمة التشغيل (مثال: تلاوات الفجر، المصحف المفضل):',
+                  style: GoogleFonts.cairo(
+                    fontSize: 12.5,
+                    color: textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  textDirection: TextDirection.rtl,
+                  style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: 'اسم القائمة...',
+                    hintStyle:
+                        GoogleFonts.cairo(color: textSecondary, fontSize: 13),
+                    filled: true,
+                    fillColor:
+                        (isDark ? Colors.white : Colors.black).withAlpha(10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: gold.withAlpha(isDark ? 80 : 50),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: gold, width: 1.5),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(),
+                child: Text(
+                  'إلغاء',
+                  style: GoogleFonts.cairo(
+                    color: textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: controller,
-                autofocus: true,
-                textDirection: TextDirection.rtl,
-                style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'اسم القائمة...',
-                  hintStyle: GoogleFonts.cairo(color: textSecondary, fontSize: 13),
-                  filled: true,
-                  fillColor: (isDark ? Colors.white : Colors.black).withAlpha(10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: gold.withAlpha(isDark ? 80 : 50),
-                    ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: gold,
+                  foregroundColor:
+                      isDark ? AppColors.darkBackground : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: gold, width: 1.5),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  elevation: 0,
+                ),
+                onPressed: () async {
+                  final name = controller.text.trim();
+                  if (name.isNotEmpty) {
+                    Navigator.of(dialogCtx).pop();
+                    await context.read<PlaylistsCubit>().createPlaylist(
+                          name,
+                          initialRecitationId: recitation.id,
+                          initialRecitation: recitation,
+                        );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'تم إنشاء قائمة $name وإضافة سورة ${recitation.surahNameAr}',
+                            style: GoogleFonts.cairo(color: Colors.white),
+                          ),
+                          backgroundColor: const Color(0xFF1E293B),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: Text(
+                  'إنشاء وإضافة',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
                 ),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogCtx).pop(),
-              child: Text(
-                'إلغاء',
-                style: GoogleFonts.cairo(
-                  color: textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: gold,
-                foregroundColor:
-                    isDark ? AppColors.darkBackground : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 0,
-              ),
-              onPressed: () async {
-                final name = controller.text.trim();
-                if (name.isNotEmpty) {
-                  Navigator.of(dialogCtx).pop();
-                  await context.read<PlaylistsCubit>().createPlaylist(
-                        name,
-                        initialRecitationId: recitation.id,
-                        initialRecitation: recitation,
-                      );
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'تم إنشاء قائمة $name وإضافة سورة ${recitation.surahNameAr}',
-                          style: GoogleFonts.cairo(color: Colors.white),
-                        ),
-                        backgroundColor: const Color(0xFF1E293B),
-                        behavior: SnackBarBehavior.floating,
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                }
-              },
-              child: Text(
-                'إنشاء وإضافة',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+          );
+        },
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   @override
@@ -189,7 +193,6 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
               child: Row(
@@ -231,15 +234,14 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close_rounded, color: textSecondary, size: 20),
+                    icon: Icon(Icons.close_rounded,
+                        color: textSecondary, size: 20),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
-
             const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: InkWell(
@@ -275,7 +277,6 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                 ),
               ),
             ),
-
             Flexible(
               child: BlocBuilder<PlaylistsCubit, PlaylistsState>(
                 builder: (context, state) {
@@ -332,7 +333,8 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                         final playlist = playlists[index];
                         final isInPlaylist =
                             playlist.recitationIds.contains(recitation.id) ||
-                            playlist.recitations.any((r) => r.id == recitation.id);
+                                playlist.recitations
+                                    .any((r) => r.id == recitation.id);
                         final trackCount = playlist.recitations.isNotEmpty
                             ? playlist.recitations.length
                             : playlist.recitationIds.length;
@@ -380,7 +382,8 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.library_music_rounded,
-                                      color: isInPlaylist ? gold : textSecondary,
+                                      color:
+                                          isInPlaylist ? gold : textSecondary,
                                       size: 20,
                                     ),
                                     const SizedBox(width: 12),

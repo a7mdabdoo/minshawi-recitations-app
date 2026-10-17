@@ -11,9 +11,15 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   }
 
   void _loadFavorites() {
-    final rawList = _favoritesBox.get(_favoritesKey, defaultValue: <dynamic>[]) as List<dynamic>;
-    final set = rawList.map((e) => e.toString()).toSet();
-    emit(FavoritesLoaded(set));
+    try {
+      final dynamic raw = _favoritesBox.get(_favoritesKey);
+      if (raw is Iterable) {
+        final set = raw.map((e) => e.toString()).toSet();
+        emit(FavoritesLoaded(set));
+        return;
+      }
+    } catch (_) {}
+    emit(const FavoritesLoaded(<String>{}));
   }
 
   bool isFavorite(String recitationId) {

@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import '../../../../core/utils/arabic_normalizer.dart';
 import '../../domain/entities/recitation.dart';
 
-/// All possible states of the recitation list screen.
 abstract class RecitationListState extends Equatable {
   const RecitationListState();
 
@@ -10,22 +9,17 @@ abstract class RecitationListState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Initial state before any load has been attempted.
 class RecitationListInitial extends RecitationListState {
   const RecitationListInitial();
 }
 
-/// Asset is being read and parsed.
 class RecitationListLoading extends RecitationListState {
   const RecitationListLoading();
 }
 
-/// Data loaded and ready to display.
 class RecitationListLoaded extends RecitationListState {
-  /// All recitations from the manifest, with download status merged in.
   final List<Recitation> recitations;
 
-  /// The active search query (empty string = no filter).
   final String searchQuery;
 
   const RecitationListLoaded({
@@ -33,7 +27,6 @@ class RecitationListLoaded extends RecitationListState {
     this.searchQuery = '',
   });
 
-  /// Returns the filtered subset based on [searchQuery] using smart Arabic normalization.
   List<Recitation> get filtered {
     final q = searchQuery.trim();
     if (q.isEmpty) return recitations;
@@ -64,7 +57,6 @@ class RecitationListLoaded extends RecitationListState {
   List<Object?> get props => [recitations, searchQuery];
 }
 
-/// An error occurred while loading.
 class RecitationListError extends RecitationListState {
   final String message;
   const RecitationListError(this.message);

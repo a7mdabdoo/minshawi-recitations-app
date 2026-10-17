@@ -13,7 +13,6 @@ class SleepTimerCubit extends Cubit<SleepTimerState> {
 
   SleepTimerCubit(this._audioPlayerCubit) : super(SleepTimerState.initial);
 
-  /// Starts a countdown timer for a specific [duration] with human-readable [label].
   void startTimer(Duration duration, String label) {
     cancelTimer();
 
@@ -36,7 +35,6 @@ class SleepTimerCubit extends Cubit<SleepTimerState> {
     });
   }
 
-  /// Sets the timer to automatically pause at the end of the current playing surah.
   void setTimerEndOfSurah({String label = 'عند نهاية السورة'}) {
     cancelTimer();
 
@@ -50,7 +48,6 @@ class SleepTimerCubit extends Cubit<SleepTimerState> {
 
     _playerSub = _audioPlayerCubit.stream.listen((pState) {
       if (_targetRecitationId != null) {
-        // If track changed or completed or player reset to idle
         if (pState.currentRecitation?.id != _targetRecitationId ||
             pState is AudioPlayerIdle) {
           _onTimerExpired();
@@ -59,7 +56,6 @@ class SleepTimerCubit extends Cubit<SleepTimerState> {
     });
   }
 
-  /// Cancels any active timer and resets state to inactive.
   void cancelTimer() {
     _countdownTimer?.cancel();
     _countdownTimer = null;

@@ -7,13 +7,6 @@ import '../../features/recitations/domain/entities/recitation.dart';
 import '../constants/app_constants.dart';
 import '../errors/exceptions.dart';
 
-/// Mobile (Android / iOS) implementation of [DownloadService].
-///
-/// Implements manual Stream and Append logic using HTTP Range headers,
-/// [FileMode.append], and chunk-by-chunk manual writing via [RandomAccessFile].
-///
-/// This file is only compiled when [dart.library.io] is available —
-/// i.e. never on Flutter Web. Import via [download_service.dart].
 class DownloadService {
   final Dio _dio;
   final LocalRecitationDataSource _localDataSource;
@@ -24,7 +17,6 @@ class DownloadService {
   })  : _dio = dio,
         _localDataSource = localDataSource;
 
-  /// Returns the partially downloaded file size on disk in bytes (0 if not found).
   Future<int> getPartialFileSize(Recitation recitation) async {
     try {
       final savePath = await _buildSavePath(recitation);
@@ -36,18 +28,6 @@ class DownloadService {
     return 0;
   }
 
-  /// Downloads or resumes downloading [recitation] to the app-documents directory.
-  ///
-  /// 1. Checks existing partially downloaded file size: `int existingLength = file.lengthSync();`
-  /// 2. Calls `dio.get()` with `ResponseType.stream` and header `'Range': 'bytes=$existingLength-'`.
-  /// 3. Opens the file strictly using [FileMode.append]: `var raf = file.openSync(mode: FileMode.append);`
-  /// 4. Iterates over the incoming data stream chunk by chunk: `raf.writeFromSync(chunk);`
-  /// 5. Accurately calculates progress as: `(existingLength + receivedChunks) / totalSize`
-  ///
-  /// Returns the absolute path of the saved file upon completion.
-  /// Throws [DownloadPausedException] if paused by the user (preserving partial file).
-  /// Throws [DownloadCancelledException] if cancelled by the user.
-  /// Throws [DownloadException] on network or I/O failure.
   Future<String> download({
     required Recitation recitation,
     required void Function(double progress) onProgress,
@@ -61,8 +41,8 @@ class DownloadService {
       existingLength = file.lengthSync();
     }
 
-    // Check if the file is already completely downloaded
-    if (recitation.fileSizeBytes > 0 && existingLength >= recitation.fileSizeBytes) {
+    if (recitation.fileSizeBytes > 0 &&
+        existingLength >= recitation.fileSizeBytes) {
       await _localDataSource.saveDownloadedPath(
         recitationId: recitation.id,
         localFilePath: savePath,
@@ -99,8 +79,9 @@ class DownloadService {
       final statusCode = response.statusCode ?? 200;
       final contentLengthHeader =
           response.headers.value(HttpHeaders.contentLengthHeader);
-      final contentLength =
-          contentLengthHeader != null ? int.tryParse(contentLengthHeader) ?? 0 : 0;
+      final contentLength = contentLengthHeader != null
+          ? int.tryParse(contentLengthHeader) ?? 0
+          : 0;
 
       int totalSize = 0;
       int receivedChunks = 0;
@@ -118,7 +99,6 @@ class DownloadService {
           totalSize = existingLength + contentLength;
         }
       } else {
-        // 200 OK -> Server sent entire file from 0 (fallback or fresh download)
         existingLength = 0;
         raf = file.openSync(mode: FileMode.write);
         totalSize =
@@ -129,39 +109,51 @@ class DownloadService {
         totalSize = recitation.fileSizeBytes;
       }
 
-      // Initial progress calculation
       if (totalSize > 0) {
-        final initialProgress =
-            (existingLength + receivedChunks) / totalSize;
+        final initialProgress = (existingLength + receivedChunks) / totalSize;
         onProgress(initialProgress.clamp(0.0, 1.0));
       }
 
       final stream = response.data!.stream;
+      final stopwatch = Stopwatch()..start();
+      double lastReportedProgress = -1.0;
+      int lastReportedMs = 0;
+
       await for (final chunk in stream) {
         raf.writeFromSync(chunk);
         receivedChunks += chunk.length;
 
-        // Progress formula: (existingLength + receivedChunks) / totalSize
         if (totalSize > 0) {
-          final progress = (existingLength + receivedChunks) / totalSize;
-          onProgress(progress.clamp(0.0, 1.0));
+          final progress =
+              ((existingLength + receivedChunks) / totalSize).clamp(0.0, 1.0);
+          final elapsed = stopwatch.elapsedMilliseconds;
+          if (progress >= 1.0 ||
+              (progress - lastReportedProgress).abs() >= 0.01 ||
+              (elapsed - lastReportedMs) >= 200) {
+            lastReportedProgress = progress;
+            lastReportedMs = elapsed;
+            onProgress(progress);
+          }
         }
+      }
+      stopwatch.stop();
+      if (totalSize > 0 && lastReportedProgress < 1.0) {
+        onProgress(1.0);
       }
 
       raf.flushSync();
       raf.closeSync();
       raf = null;
 
-      // Verify file presence
       if (!file.existsSync() || file.lengthSync() == 0) {
         throw const DownloadException('الملف المنزَّل فارغ أو تالف');
       }
-      // Verify file size matches expected size if known
+
       if (totalSize > 0 && file.lengthSync() != totalSize) {
-        throw const DownloadException('حجم الملف المنزَّل لا يتطابق مع الحجم المتوقع');
+        throw const DownloadException(
+            'حجم الملف المنزَّل لا يتطابق مع الحجم المتوقع');
       }
 
-      // Persist path in Hive for offline playback
       await _localDataSource.saveDownloadedPath(
         recitationId: recitation.id,
         localFilePath: savePath,
@@ -176,7 +168,6 @@ class DownloadService {
         } catch (_) {}
       }
 
-      // Detect disk full (ENOSPC: 28 on Linux/Android, ERROR_DISK_FULL: 112 on Windows)
       final isDiskFull = e.osError?.errorCode == 28 ||
           e.osError?.errorCode == 112 ||
           e.message.toLowerCase().contains('space') ||
@@ -201,11 +192,9 @@ class DownloadService {
       }
 
       if (e.type == DioExceptionType.cancel || CancelToken.isCancel(e)) {
-        // Preserves partial file on disk without deletion
         throw const DownloadPausedException();
       }
 
-      // Check if underlying Dio error is disk space full
       final underlying = e.error;
       final errorStr = '${e.message} ${e.error}'.toLowerCase();
       if ((underlying is FileSystemException &&
@@ -251,7 +240,6 @@ class DownloadService {
     }
   }
 
-  /// Deletes the locally cached file (or partial download) and removes its Hive entry.
   Future<void> deleteDownload(String recitationId) async {
     final path = _localDataSource.getDownloadedPath(recitationId);
     if (path != null) {
@@ -264,7 +252,6 @@ class DownloadService {
       await _localDataSource.removeDownloadedPath(recitationId);
     }
 
-    // Also remove any partial file in downloads folder
     try {
       final dir = await getApplicationDocumentsDirectory();
       final recitationsDir =
@@ -282,14 +269,12 @@ class DownloadService {
     } catch (_) {}
   }
 
-  /// Returns the local file path if the cached file exists and is non-empty.
-  /// Cleans up stale Hive entries if the file was deleted outside the app.
   Future<String?> getValidLocalPath(String recitationId) async {
     final path = _localDataSource.getDownloadedPath(recitationId);
     if (path == null) return null;
     final file = File(path);
     if (file.existsSync() && file.lengthSync() > 0) return path;
-    // Stale entry — clean up.
+
     await _localDataSource.removeDownloadedPath(recitationId);
     return null;
   }

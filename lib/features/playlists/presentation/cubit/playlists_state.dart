@@ -54,8 +54,6 @@ class PlaylistsLoaded extends PlaylistsState {
   List<Object?> get props => [playlists, message];
 }
 
-/// Explicit empty state for custom playlists.
-/// Inherits from [PlaylistsLoaded] for seamless backward compatibility.
 class PlaylistsEmpty extends PlaylistsLoaded {
   const PlaylistsEmpty({super.message}) : super(playlists: const []);
 }

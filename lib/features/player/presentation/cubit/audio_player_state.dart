@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../../recitations/domain/entities/recitation.dart';
 
-/// All possible states of the audio engine.
 abstract class AudioPlayerState extends Equatable {
   const AudioPlayerState();
 
@@ -10,12 +9,10 @@ abstract class AudioPlayerState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// No track has been loaded yet.
 class AudioPlayerIdle extends AudioPlayerState {
   const AudioPlayerIdle();
 }
 
-/// A new source URI is being resolved / buffered.
 class AudioPlayerLoading extends AudioPlayerState {
   final Recitation recitation;
   const AudioPlayerLoading(this.recitation);
@@ -24,19 +21,14 @@ class AudioPlayerLoading extends AudioPlayerState {
   List<Object?> get props => [recitation];
 }
 
-/// A-B Repeat loop state for memorization / focused listening.
 enum AbLoopState {
-  /// No A-B repeat active.
   off,
 
-  /// Point A has been marked, awaiting Point B.
   pointASet,
 
-  /// Both points A and B are active and looping.
   active,
 }
 
-/// Source is loaded and the player is ready (playing or paused).
 class AudioPlayerReady extends AudioPlayerState {
   final Recitation recitation;
   final Duration position;
@@ -48,7 +40,7 @@ class AudioPlayerReady extends AudioPlayerState {
   final double speed;
   final Duration? abPointA;
   final Duration? abPointB;
-  final int? abRepeatCount; // null means infinite (∞)
+  final int? abRepeatCount;
 
   const AudioPlayerReady({
     required this.recitation,
@@ -103,9 +95,8 @@ class AudioPlayerReady extends AudioPlayerState {
       speed: speed ?? this.speed,
       abPointA: clearAbPoints ? null : (abPointA ?? this.abPointA),
       abPointB: clearAbPoints ? null : (abPointB ?? this.abPointB),
-      abRepeatCount: clearAbRepeatCount
-          ? null
-          : (abRepeatCount ?? this.abRepeatCount),
+      abRepeatCount:
+          clearAbRepeatCount ? null : (abRepeatCount ?? this.abRepeatCount),
     );
   }
 
@@ -125,7 +116,6 @@ class AudioPlayerReady extends AudioPlayerState {
       ];
 }
 
-/// A playback or source-load error occurred.
 class AudioPlayerError extends AudioPlayerState {
   final String message;
   final Recitation? recitation;
@@ -136,7 +126,6 @@ class AudioPlayerError extends AudioPlayerState {
   List<Object?> get props => [message, recitation];
 }
 
-/// Convenience extension for reading the active recitation across states.
 extension AudioPlayerStateX on AudioPlayerState {
   Recitation? get currentRecitation {
     final s = this;

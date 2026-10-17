@@ -17,6 +17,7 @@ import '../../../playlists/presentation/pages/playlist_detail_page.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
+import '../../../../core/services/battery_optimization_service.dart';
 import '../../../../core/services/update_service.dart';
 import '../../../recitations/domain/entities/recitation.dart';
 import '../../../recitations/presentation/cubit/recitation_list_cubit.dart';
@@ -41,6 +42,7 @@ class _LandingPageState extends State<LandingPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         UpdateService.checkForUpdate(context);
+        BatteryOptimizationService.checkAndPromptBatteryOptimization(context);
       }
     });
   }
@@ -103,64 +105,46 @@ class _LandingPageState extends State<LandingPage> {
         backgroundColor: bg,
         body: Stack(
           children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: IntrinsicHeight(
-                      child: SafeArea(
-                        bottom: false,
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            16,
-                            10,
-                            16,
-                            96.0 + MediaQuery.of(context).padding.bottom,
-                          ),
-                          child: Column(
-                            children: [
-                              _UnifiedHeroBanner(
-                                isDark: isDark,
-                                gold: gold,
-                                portraitUiImage: widget.portraitUiImage,
-                              ),
-
-                              const SizedBox(height: 14),
-
-                              _LandingSegmentedTabs(
-                                selectedTab: _selectedTab,
-                                isDark: isDark,
-                                onTabSelected: (tab) =>
-                                    setState(() => _selectedTab = tab),
-                              ),
-
-                              if (_selectedTab == _LandingTab.collections) ...[
-                                _VerticalCategoryCards(isDark: isDark),
-                              ] else ...[
-                                _LandingPlaylistsSection(
-                                  isDark: isDark,
-                                  gold: gold,
-                                ),
-                              ],
-
-                              const Spacer(),
-                              const SizedBox(height: 16),
-
-                              _FramelessDeveloperFooter(isDark: isDark),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    10,
+                    16,
+                    96.0 + MediaQuery.of(context).padding.bottom,
                   ),
-                );
-              },
+                  child: Column(
+                    children: [
+                      _UnifiedHeroBanner(
+                        isDark: isDark,
+                        gold: gold,
+                        portraitUiImage: widget.portraitUiImage,
+                      ),
+                      const SizedBox(height: 14),
+                      _LandingSegmentedTabs(
+                        selectedTab: _selectedTab,
+                        isDark: isDark,
+                        onTabSelected: (tab) =>
+                            setState(() => _selectedTab = tab),
+                      ),
+                      if (_selectedTab == _LandingTab.collections) ...[
+                        _VerticalCategoryCards(isDark: isDark),
+                      ] else ...[
+                        _LandingPlaylistsSection(
+                          isDark: isDark,
+                          gold: gold,
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      _FramelessDeveloperFooter(isDark: isDark),
+                    ],
+                  ),
+                ),
+              ),
             ),
-
             const Positioned(
               left: 0,
               right: 0,
@@ -183,106 +167,111 @@ class _LandingPlaylistsSection extends StatelessWidget {
     required this.gold,
   });
 
-  void _showCreateDialog(BuildContext context) {
+  Future<void> _showCreateDialog(BuildContext context) async {
     final cardBg =
-    isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
+        isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
     final textPrimary =
-    isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final textSecondary =
-    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     final controller = TextEditingController();
 
-    showDialog<void>(
-      context: context,
-      builder: (dialogCtx) {
-        return AlertDialog(
-          backgroundColor: cardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: Text(
-            'إنشاء قائمة تشغيل جديدة',
-            style: GoogleFonts.cairo(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: textPrimary,
+    try {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogCtx) {
+          return AlertDialog(
+            backgroundColor: cardBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
             ),
-          ),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            textDirection: TextDirection.rtl,
-            style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
-            decoration: InputDecoration(
-              hintText: 'اسم القائمة (مثال: تلاوات مختارة)...',
-              hintStyle: GoogleFonts.cairo(color: textSecondary, fontSize: 13),
-              filled: true,
-              fillColor: (isDark ? Colors.white : Colors.black).withAlpha(10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: gold.withAlpha(isDark ? 80 : 50),
+            title: Text(
+              'إنشاء قائمة تشغيل جديدة',
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: textPrimary,
+              ),
+            ),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              textDirection: TextDirection.rtl,
+              style: GoogleFonts.cairo(color: textPrimary, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: 'اسم القائمة (مثال: تلاوات مختارة)...',
+                hintStyle:
+                    GoogleFonts.cairo(color: textSecondary, fontSize: 13),
+                filled: true,
+                fillColor: (isDark ? Colors.white : Colors.black).withAlpha(10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: gold.withAlpha(isDark ? 80 : 50),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: gold, width: 1.5),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(),
+                child: Text(
+                  'إلغاء',
+                  style: GoogleFonts.cairo(
+                    color: textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: gold, width: 1.5),
-              ),
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogCtx).pop(),
-              child: Text(
-                'إلغاء',
-                style: GoogleFonts.cairo(
-                  color: textSecondary,
-                  fontWeight: FontWeight.w600,
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: gold,
+                  foregroundColor:
+                      isDark ? AppColors.darkBackground : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () async {
+                  final name = controller.text.trim();
+                  if (name.isNotEmpty) {
+                    Navigator.of(dialogCtx).pop();
+                    await context.read<PlaylistsCubit>().createPlaylist(name);
+                  }
+                },
+                child: Text(
+                  'إنشاء',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
                 ),
               ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: gold,
-                foregroundColor:
-                isDark ? AppColors.darkBackground : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 0,
-              ),
-              onPressed: () async {
-                final name = controller.text.trim();
-                if (name.isNotEmpty) {
-                  Navigator.of(dialogCtx).pop();
-                  await context.read<PlaylistsCubit>().createPlaylist(name);
-                }
-              },
-              child: Text(
-                'إنشاء',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+            ],
+          );
+        },
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _showDeleteDialog(
-      BuildContext context,
-      String playlistId,
-      String playlistTitle,
-      ) {
+    BuildContext context,
+    String playlistId,
+    String playlistTitle,
+  ) {
     final cardBg =
-    isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
+        isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
     final textPrimary =
-    isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final textSecondary =
-    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     showDialog<void>(
       context: context,
@@ -346,25 +335,26 @@ class _LandingPlaylistsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cardBg =
-    isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
+        isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
     final textPrimary =
-    isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final textSecondary =
-    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return BlocBuilder<PlaylistsCubit, PlaylistsState>(
       builder: (context, state) {
-        final playlists = state is PlaylistsLoaded ? state.playlists : <Playlist>[];
+        final playlists =
+            state is PlaylistsLoaded ? state.playlists : <Playlist>[];
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // زر إنشاء قائمة جديدة دائماً في الأعلى
             InkWell(
               borderRadius: BorderRadius.circular(14),
               onTap: () => _showCreateDialog(context),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
                 decoration: BoxDecoration(
                   color: gold.withAlpha(isDark ? 25 : 15),
                   borderRadius: BorderRadius.circular(14),
@@ -376,7 +366,8 @@ class _LandingPlaylistsSection extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.add_circle_outline_rounded, color: gold, size: 20),
+                    Icon(Icons.add_circle_outline_rounded,
+                        color: gold, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       'إنشاء قائمة تشغيل جديدة',
@@ -390,18 +381,18 @@ class _LandingPlaylistsSection extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 10),
-
             if (playlists.isEmpty)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                 decoration: BoxDecoration(
                   color: cardBg,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
                 ),
                 child: Column(
@@ -423,10 +414,13 @@ class _LandingPlaylistsSection extends StatelessWidget {
             else
               BlocBuilder<RecitationListCubit, RecitationListState>(
                 builder: (context, recitationListState) {
-                  final allRecitations = recitationListState is RecitationListLoaded
-                      ? recitationListState.recitations
-                      : <Recitation>[];
-                  final recitationsMap = {for (var r in allRecitations) r.id: r};
+                  final allRecitations =
+                      recitationListState is RecitationListLoaded
+                          ? recitationListState.recitations
+                          : <Recitation>[];
+                  final recitationsMap = {
+                    for (var r in allRecitations) r.id: r
+                  };
 
                   return Column(
                     mainAxisSize: MainAxisSize.min,
@@ -553,9 +547,9 @@ class _LandingPlaylistsSection extends StatelessWidget {
                   onPressed: () {
                     if (effectiveRecitations.isNotEmpty) {
                       context.read<AudioPlayerCubit>().play(
-                        effectiveRecitations.first,
-                        playlist: effectiveRecitations,
-                      );
+                            effectiveRecitations.first,
+                            playlist: effectiveRecitations,
+                          );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -593,9 +587,6 @@ class _LandingPlaylistsSection extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// باقي الويدجتس الخاصة بالصفحة الرئيسية كما هي دون تغيير
-// ─────────────────────────────────────────────────────────
 class _UnifiedHeroBanner extends StatelessWidget {
   final bool isDark;
   final Color gold;
@@ -610,7 +601,7 @@ class _UnifiedHeroBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textSecondary =
-    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return Container(
       width: double.infinity,
@@ -645,9 +636,11 @@ class _UnifiedHeroBanner extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.06),
+                  color: (isDark ? Colors.white : Colors.black)
+                      .withValues(alpha: 0.06),
                   border: Border.all(
-                    color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
+                    color: (isDark ? Colors.white : Colors.black)
+                        .withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -675,9 +668,11 @@ class _UnifiedHeroBanner extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.06),
+                  color: (isDark ? Colors.white : Colors.black)
+                      .withValues(alpha: 0.06),
                   border: Border.all(
-                    color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
+                    color: (isDark ? Colors.white : Colors.black)
+                        .withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -726,30 +721,30 @@ class _UnifiedHeroBanner extends StatelessWidget {
               child: ClipOval(
                 child: portraitUiImage != null
                     ? RawImage(
-                  image: portraitUiImage,
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0, -0.25),
-                )
+                        image: portraitUiImage,
+                        fit: BoxFit.cover,
+                        alignment: const Alignment(0, -0.25),
+                      )
                     : Image(
-                  image: const ResizeImage(
-                    AssetImage('assets/images/minshawi_portrait.jpg'),
-                    width: 500,
-                    height: 500,
-                  ),
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0, -0.25),
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Image(
-                      image: ResizeImage(
-                        AssetImage('assets/images/minshawi_portrait.jpg'),
-                        width: 500,
-                        height: 500,
+                        image: const ResizeImage(
+                          AssetImage('assets/images/minshawi_portrait.jpg'),
+                          width: 500,
+                          height: 500,
+                        ),
+                        fit: BoxFit.cover,
+                        alignment: const Alignment(0, -0.25),
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Image(
+                            image: ResizeImage(
+                              AssetImage('assets/images/minshawi_portrait.jpg'),
+                              width: 500,
+                              height: 500,
+                            ),
+                            fit: BoxFit.cover,
+                            alignment: Alignment(0, -0.25),
+                          );
+                        },
                       ),
-                      fit: BoxFit.cover,
-                      alignment: Alignment(0, -0.25),
-                    );
-                  },
-                ),
               ),
             ),
           ),
@@ -765,11 +760,11 @@ class _UnifiedHeroBanner extends StatelessWidget {
               height: 1.2,
               shadows: isDark
                   ? [
-                Shadow(
-                  color: gold.withValues(alpha: 0.3),
-                  blurRadius: 18,
-                ),
-              ]
+                      Shadow(
+                        color: gold.withValues(alpha: 0.3),
+                        blurRadius: 18,
+                      ),
+                    ]
                   : null,
             ),
           ),
@@ -885,12 +880,12 @@ class _LandingTabButton extends StatelessWidget {
             ),
             boxShadow: isSelected
                 ? [
-              BoxShadow(
-                color: gold.withAlpha(isDark ? 60 : 35),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ]
+                    BoxShadow(
+                      color: gold.withAlpha(isDark ? 60 : 35),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
                 : null,
           ),
           child: Row(
@@ -902,8 +897,8 @@ class _LandingTabButton extends StatelessWidget {
                 color: isSelected
                     ? (isDark ? AppColors.darkBackground : Colors.white)
                     : (isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary),
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary),
               ),
               const SizedBox(width: 7),
               Flexible(
@@ -915,8 +910,8 @@ class _LandingTabButton extends StatelessWidget {
                     color: isSelected
                         ? (isDark ? AppColors.darkBackground : Colors.white)
                         : (isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.lightTextPrimary),
+                            ? AppColors.darkTextPrimary
+                            : AppColors.lightTextPrimary),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1001,9 +996,9 @@ class _WideCategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     const gold = Color(0xFFD4AF37);
     final textPrimary =
-    isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final textSecondary =
-    isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return Container(
       decoration: BoxDecoration(
@@ -1098,11 +1093,11 @@ class _WideCategoryCard extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color:
-                              gold.withValues(alpha: isDark ? 0.12 : 0.08),
+                                  gold.withValues(alpha: isDark ? 0.12 : 0.08),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color:
-                                gold.withValues(alpha: isDark ? 0.35 : 0.4),
+                                    gold.withValues(alpha: isDark ? 0.35 : 0.4),
                                 width: 0.9,
                               ),
                             ),

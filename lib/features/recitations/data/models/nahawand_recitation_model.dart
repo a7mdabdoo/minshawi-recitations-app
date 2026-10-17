@@ -1,11 +1,5 @@
 import 'recitation_model.dart';
 
-/// Model representing a Maqam Nahawand recitation from `assets/data/nahawand_candidates.json`.
-///
-/// Extends [RecitationModel] (and thus [Recitation]) so that it integrates natively
-/// with [AudioPlayerCubit], [MiniPlayer], [AudioPlayerScreen], A-B Repeat,
-/// background playback (`just_audio_background`), [FavoritesCubit], [PlaylistsCubit],
-/// and offline downloads ([DownloadCubit]).
 class NahawandRecitationModel extends RecitationModel {
   final int nahawandId;
   final int? siteId;
@@ -47,7 +41,6 @@ class NahawandRecitationModel extends RecitationModel {
     this.isGoldenSelection = false,
   });
 
-  /// Parses `"MM:SS"` or `"H:MM:SS"` duration string into total seconds.
   static int parseDurationSeconds(String rawDuration) {
     final trimmed = rawDuration.trim();
     if (trimmed.isEmpty) return 0;
@@ -62,24 +55,20 @@ class NahawandRecitationModel extends RecitationModel {
     return 0;
   }
 
-  /// Builds a clear, descriptive main title for the card so tracks never just
-  /// repeat the Surah name alone (e.g., `"مريم - تسجيل ليبيا 1964"`, `"يوسف - المسجد الأقصى"`).
   static String formatDisplayTitle({
     required String title,
     required String surah,
     required String placeOrYear,
   }) {
     final cleanTitle = title.trim();
-    final isGenericPlace = placeOrYear.contains('غير محدد') ||
-        placeOrYear.contains('تسجيل تراثي');
+    final isGenericPlace =
+        placeOrYear.contains('غير محدد') || placeOrYear.contains('تسجيل تراثي');
 
-    // Primary surah display (if multiple surahs, keep concise)
     final surahParts = surah.split('،').map((e) => e.trim()).toList();
     final primarySurah = surahParts.length > 2
         ? '${surahParts.first} و${surahParts[1]} والقصار'
         : surahParts.join(' و');
 
-    // Extract verse range if present in title (e.g. "1-27", "17-40", "70-87")
     final verseMatch = RegExp(r'\b(\d+\s*-\s*\d+)\b').firstMatch(cleanTitle);
     final versePart = verseMatch != null
         ? ' (${verseMatch.group(1)!.replaceAll(' ', '')})'
@@ -87,10 +76,11 @@ class NahawandRecitationModel extends RecitationModel {
 
     if (!isGenericPlace && placeOrYear.trim().isNotEmpty) {
       final place = placeOrYear.trim();
-      final formattedPlace =
-          (place.startsWith('ليبيا') || place.startsWith('سوريا') || place.startsWith('الكويت'))
-              ? 'تسجيل ${place.replaceAll('(', '').replaceAll(')', '')}'
-              : place.replaceAll('(', '').replaceAll(')', '');
+      final formattedPlace = (place.startsWith('ليبيا') ||
+              place.startsWith('سوريا') ||
+              place.startsWith('الكويت'))
+          ? 'تسجيل ${place.replaceAll('(', '').replaceAll(')', '')}'
+          : place.replaceAll('(', '').replaceAll(')', '');
       return '$primarySurah$versePart - $formattedPlace';
     }
 
@@ -98,11 +88,9 @@ class NahawandRecitationModel extends RecitationModel {
       return cleanTitle;
     }
 
-    // Fallback when place is not specified: include title details so it's unique
     return '$primarySurah - محفل تراثي ($cleanTitle)';
   }
 
-  /// Resolves the primary Surah number (1-114) from the extracted [surah] or [category].
   static int resolveSurahNumber(String surah, String category) {
     const surahMap = <String, int>{
       'الفاتحة': 1,
@@ -228,8 +216,7 @@ class NahawandRecitationModel extends RecitationModel {
       placeOrYear: placeOrYear,
     );
 
-    final numericRangeMatch =
-        RegExp(r'\b(\d+\s*-\s*\d+)\b').firstMatch(title);
+    final numericRangeMatch = RegExp(r'\b(\d+\s*-\s*\d+)\b').firstMatch(title);
     final extractedNumericRange = numericRangeMatch != null
         ? numericRangeMatch.group(1)!.replaceAll(' ', '')
         : '';

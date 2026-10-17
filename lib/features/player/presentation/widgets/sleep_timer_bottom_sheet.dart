@@ -7,7 +7,6 @@ import '../../../../core/utils/formatters.dart';
 import '../cubit/sleep_timer_cubit.dart';
 import '../cubit/sleep_timer_state.dart';
 
-/// Displays an ultra-compact, minimalist Sleep Timer bottom sheet.
 Future<void> showSleepTimerBottomSheet(BuildContext context) {
   return showModalBottomSheet(
     context: context,
@@ -70,9 +69,7 @@ class _SleepTimerBottomSheetContent extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 10),
-
               Row(
                 children: [
                   Icon(
@@ -90,10 +87,7 @@ class _SleepTimerBottomSheetContent extends StatelessWidget {
                       height: 1.1,
                     ),
                   ),
-
                   const Spacer(),
-
-                  // If active: show live countdown badge + cancel button
                   if (isActive) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -160,8 +154,6 @@ class _SleepTimerBottomSheetContent extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                   ],
-
-                  // Close Button
                   IconButton(
                     icon: Icon(
                       Icons.close_rounded,
@@ -175,9 +167,7 @@ class _SleepTimerBottomSheetContent extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 14),
-
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -247,8 +237,8 @@ class _SleepTimerBottomSheetContent extends StatelessWidget {
                           .read<SleepTimerCubit>()
                           .setTimerEndOfSurah(label: 'نهاية السورة');
                       Navigator.pop(context);
-                      _showFeedback(
-                          context, 'تم ضبط مؤقت النوم للإيقاف عند نهاية السورة');
+                      _showFeedback(context,
+                          'تم ضبط مؤقت النوم للإيقاف عند نهاية السورة');
                     },
                   ),
                 ],
@@ -319,9 +309,8 @@ class _CompactTimerChip extends StatelessWidget {
             width: 0.8,
           );
 
-    final chipTextColor = isSelected
-        ? gold
-        : (isDark ? Colors.white70 : const Color(0xFF334155));
+    final chipTextColor =
+        isSelected ? gold : (isDark ? Colors.white70 : const Color(0xFF334155));
 
     return Material(
       color: Colors.transparent,

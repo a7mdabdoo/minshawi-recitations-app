@@ -8,8 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/app_colors.dart';
 
-/// Lightweight, non-intrusive service that checks the repository's `version.json`
-/// on startup and shows [UpdateDialog] if a newer version or build number exists.
 class UpdateService {
   UpdateService._();
 
@@ -21,8 +19,6 @@ class UpdateService {
 
   static bool _hasCheckedThisSession = false;
 
-  /// Checks for updates once per session and displays [UpdateDialog] if a newer
-  /// version is available on the server. Fails silently on any network/parsing error.
   static Future<void> checkForUpdate(BuildContext context) async {
     if (_hasCheckedThisSession) return;
     _hasCheckedThisSession = true;
@@ -74,12 +70,9 @@ class UpdateService {
           forceUpdate: forceUpdate,
         ),
       );
-    } catch (_) {
-      // Silently ignore offline or network/parsing errors without disturbing the user.
-    }
+    } catch (_) {}
   }
 
-  /// Compares semantic versions (`X.Y.Z`) and `build_number`.
   static bool _isRemoteNewer({
     required String currentVersion,
     required int currentBuild,
@@ -105,7 +98,6 @@ class UpdateService {
     return remoteBuild > currentBuild;
   }
 
-  /// Extracts a clean URL even if markdown syntax `[url](url)` was accidentally used.
   static String _sanitizeUrl(String raw) {
     final trimmed = raw.trim();
     final mdMatch = RegExp(r'\((https?://[^\s\)]+)\)').firstMatch(trimmed);
@@ -119,8 +111,6 @@ class UpdateService {
   }
 }
 
-/// Dialog notifying the user of a new app update, styled in complete harmony
-/// with the app's dark navy/charcoal & gold theme.
 class UpdateDialog extends StatelessWidget {
   final String latestVersion;
   final String releaseNotes;

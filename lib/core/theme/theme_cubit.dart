@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../constants/app_constants.dart';
 
-/// Manages the app-wide theme mode (dark / light).
 class ThemeCubit extends Cubit<ThemeMode> {
   static const _key = AppConstants.themeKey;
 
@@ -41,14 +40,12 @@ class ThemeCubit extends Cubit<ThemeMode> {
     }
   }
 
-  /// Toggle between dark and light.
   Future<void> toggle() async {
     final next = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     await _persist(next);
     emit(next);
   }
 
-  /// Explicitly set a [ThemeMode].
   Future<void> setTheme(ThemeMode mode) async {
     await _persist(mode);
     emit(mode);
@@ -58,8 +55,6 @@ class ThemeCubit extends Cubit<ThemeMode> {
     try {
       final box = Hive.box<dynamic>(AppConstants.settingsBoxName);
       await box.put(_key, _toString(mode));
-    } catch (_) {
-      // Fail silently – theme preference is non-critical.
-    }
+    } catch (_) {}
   }
 }

@@ -4,13 +4,9 @@ import 'package:hive/hive.dart';
 
 import '../constants/app_constants.dart';
 
-/// Immutable settings snapshot persisted in Hive's `settings_box`.
 class SettingsState extends Equatable {
-  /// The ID of the last recitation that was played.
-  /// `null` if the user has not played anything yet.
   final String? lastPlayedRecitationId;
 
-  /// The position in seconds of the last played recitation.
   final int? lastPlayedPositionSeconds;
 
   const SettingsState({
@@ -34,15 +30,10 @@ class SettingsState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [lastPlayedRecitationId, lastPlayedPositionSeconds];
+  List<Object?> get props =>
+      [lastPlayedRecitationId, lastPlayedPositionSeconds];
 }
 
-/// Manages user preferences that are **not** already covered by [ThemeCubit],
-/// currently:
-///  - [lastPlayedRecitationId] & [lastPlayedPositionSeconds] – restored on next cold start.
-///
-/// All writes go directly to the open Hive `settings_box` so they survive
-/// process restarts without any extra plumbing.
 class SettingsCubit extends Cubit<SettingsState> {
   final Box<dynamic> _box;
 
@@ -63,7 +54,6 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  /// Persists [recitationId] and optional [positionSeconds] as the last-played track.
   Future<void> saveLastPlayed({
     required String recitationId,
     int positionSeconds = 0,
@@ -76,12 +66,9 @@ class SettingsCubit extends Cubit<SettingsState> {
         lastPlayedRecitationId: recitationId,
         lastPlayedPositionSeconds: positionSeconds,
       ));
-    } catch (_) {
-      // Fail silently — preference is non-critical.
-    }
+    } catch (_) {}
   }
 
-  /// Backwards-compatible helper to save recitation ID.
   Future<void> saveLastPlayedRecitationId(String recitationId) async {
     return saveLastPlayed(
       recitationId: recitationId,
@@ -89,7 +76,6 @@ class SettingsCubit extends Cubit<SettingsState> {
     );
   }
 
-  /// Clears the stored last-played state (e.g. on data-reset or when finished).
   Future<void> clearLastPlayed() async {
     try {
       await _box.delete(AppConstants.lastPlayedRecitationIdKey);
@@ -98,6 +84,5 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (_) {}
   }
 
-  /// Clears the stored last-played ID.
   Future<void> clearLastPlayedRecitationId() => clearLastPlayed();
 }

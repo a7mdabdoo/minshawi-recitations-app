@@ -1,16 +1,11 @@
 import 'package:equatable/equatable.dart';
 import '../../data/models/nahawand_recitation_model.dart';
 
-/// Filter mode for the Nahawand section.
-/// Defaults to [golden] (`is_golden_selection: true`).
 enum NahawandFilterMode {
-  /// Top 21 handpicked golden masterpieces (`is_golden_selection: true`).
   golden,
 
-  /// All 188 documented historic concerts (`is_iconic_concert: true`).
   iconic,
 
-  /// All 303 candidate Nahawand recitations.
   all,
 }
 
@@ -47,8 +42,7 @@ final class NahawandLoaded extends NahawandState {
   int get goldenCount =>
       allRecitations.where((r) => r.isGoldenSelection).length;
 
-  int get iconicCount =>
-      allRecitations.where((r) => r.isIconicConcert).length;
+  int get iconicCount => allRecitations.where((r) => r.isIconicConcert).length;
 
   int get totalCount => allRecitations.length;
 
