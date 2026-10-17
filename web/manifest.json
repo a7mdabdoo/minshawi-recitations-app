@@ -1,11 +1,11 @@
 {
-    "name": "al_minshawi_recitations",
-    "short_name": "al_minshawi_recitations",
+    "name": "جامع تلاوات المنشاوي",
+    "short_name": "تلاوات المنشاوي",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0D1117",
+    "theme_color": "#D4A832",
+    "description": "تطبيق جامع تلاوات فضيلة الشيخ محمد صديق المنشاوي",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
