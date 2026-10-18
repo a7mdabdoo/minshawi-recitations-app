@@ -9,6 +9,13 @@
 <br>
 
 <p align="center">
+  <img src="screenshots/feature_graphic.png" alt="جامع تلاوات المنشاوي" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://a7mdabdoo.github.io/minshawi-recitations-app/">
+    <img src="https://img.shields.io/badge/Live-Web%20App-0ea5e9?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Live Web App">
+  </a>
   <a href="https://apkpure.com/p/com.minshawi.recitations">
     <img src="https://img.shields.io/badge/Download%20on-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white" alt="Download on APKPure">
   </a>
@@ -24,12 +31,13 @@
 
 ---
 
-## التحميل والتثبيت (الإصدار الحالي: v1.2.0)
+## التحميل والتشغيل (الإصدار الحالي: v1.2.0)
 
-يمكنك الآن تحميل التطبيق وتثبيته مباشرة على هاتفك الأندرويد من الروابط التالية:
+يمكنك الآن استخدام التطبيق عبر الويب مباشرة أو تحميله وتثبيته على هاتفك الأندرويد:
 
-| المصدر | نوع التثبيت | رابط التحميل المباشر | الحالة |
+| المصدر | نوع التثبيت | رابط الاستخدام / التحميل | الحالة |
 | :--- | :--- | :---: | :---: |
+| **نسخة الويب (Web App)** | تصفح واستماع فوري بدون تحميل | [![Live Web App](https://img.shields.io/badge/Open-Web%20App-0ea5e9?style=for-the-badge&logo=google-chrome&logoColor=white)](https://a7mdabdoo.github.io/minshawi-recitations-app/) | متاح ويعمل |
 | **متجر APKPure** | المتجر الرسمي المعتمد للتطبيق | [![Download on APKPure](https://img.shields.io/badge/Download-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white)](https://apkpure.com/p/com.minshawi.recitations) | متاح على المتجر |
 | **مستودع GitHub** | تحميل ملف الـ APK المباشر (v1.2.0) | [![Download APK](https://img.shields.io/badge/Download-AlMinshawi--v1.2.0.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest) | متاح ومباشر |
 
@@ -62,6 +70,29 @@
 **Al-Minshawi Quran Recitations (v1.2.0)** is a modern, open-source audio streaming and offline playback platform engineered to present the timeless recordings of Sheikh Muhammad Siddiq Al-Minshawi.
 
 The app bundles four comprehensive collections: his complete Murattal recitation (114 Surahs), complete Mujawwad recitation (114 Surahs), rare historic external concert recordings from 1387 AH (26 Surahs), and the Nahawand Masterpieces collection (303 historic recordings alongside a curated 21-track Golden Selection). It provides an elegant audio experience with Quranic memorization tools, offline caching, automatic in-app update checking, and strict zero-advertising and privacy commitments.
+
+---
+
+## لقطات الشاشة / App Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <th align="center">الرئيسية (الوضع الليلي)</th>
+      <th align="center">الرئيسية (الوضع النهاري)</th>
+      <th align="center">مشغل التلاوات</th>
+      <th align="center">تكرار الحفظ (A-B)</th>
+      <th align="center">قوائم التشغيل</th>
+    </tr>
+    <tr>
+      <td align="center"><img src="screenshots/screenshot_1.png" alt="الرئيسية - الوضع الليلي" width="180"></td>
+      <td align="center"><img src="screenshots/screenshot_2.png" alt="الرئيسية - الوضع النهاري" width="180"></td>
+      <td align="center"><img src="screenshots/screenshot_3.png" alt="مشغل التلاوات" width="180"></td>
+      <td align="center"><img src="screenshots/screenshot_4.png" alt="تكرار مقطع للحفظ A-B" width="180"></td>
+      <td align="center"><img src="screenshots/screenshot_5.png" alt="قوائم التشغيل المخصصة" width="180"></td>
+    </tr>
+  </table>
+</div>
 
 ---
 
