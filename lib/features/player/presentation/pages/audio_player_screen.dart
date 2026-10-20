@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../../../core/router/app_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/battery_optimization_service.dart';
 import '../../../../core/utils/formatters.dart';
@@ -41,6 +42,16 @@ class AudioPlayerScreen extends StatefulWidget {
 
 class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   double _volume = 1.0;
+
+  void _closePlayer(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      context.go(AppRouter.lastNonPlayerRoute);
+    }
+  }
   double _lastNonZeroVolume = 1.0;
 
   @override
@@ -174,7 +185,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         onVerticalDragEnd: (details) {
           if (details.primaryVelocity != null &&
               details.primaryVelocity! > 200) {
-            Navigator.of(context).maybePop();
+            _closePlayer(context);
           }
         },
         child: Scaffold(
@@ -351,22 +362,28 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
-              size: 32,
-              color: textSecondary,
-            ),
-            tooltip: 'إغلاق',
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              } else if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/');
-              }
-            },
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.close_fullscreen_rounded,
+                  size: 20,
+                  color: textSecondary,
+                ),
+                tooltip: 'تصغير المشغل (العودة)',
+                onPressed: () => _closePlayer(context),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 30,
+                  color: textSecondary,
+                ),
+                tooltip: 'إغلاق والعودة',
+                onPressed: () => _closePlayer(context),
+              ),
+            ],
           ),
           Text(
             'مشغل التلاوات',
@@ -1095,15 +1112,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               ),
             ),
           ),
-          onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              } else if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/');
-              }
-            },
+          onPressed: () => _closePlayer(context),
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
             size: 20,
@@ -1704,15 +1713,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              } else if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/');
-              }
-            },
+            onPressed: () => _closePlayer(context),
             icon: const Icon(Icons.arrow_back_rounded, size: 18),
             label: Text(
               'العودة للتلاوات',

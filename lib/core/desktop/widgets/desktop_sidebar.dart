@@ -54,305 +54,342 @@ class DesktopSidebar extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOutCubic,
       width: sidebarWidth,
+      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: bg,
         border: Border(
           left: BorderSide(color: border, width: 1.0),
         ),
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              isCollapsed ? 8 : 14,
-              16,
-              isCollapsed ? 8 : 14,
-              12,
-            ),
-            child: isCollapsed
-                ? Column(
-                    children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: gold, width: 1.5),
-                          image: const DecorationImage(
-                            image: ResizeImage(
-                              AssetImage('assets/images/minshawi_portrait.jpg'),
-                              width: 76,
-                              height: 76,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = isCollapsed || constraints.maxWidth < 200;
+
+          return Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  isCompact ? 8 : 12,
+                  16,
+                  isCompact ? 8 : 12,
+                  12,
+                ),
+                child: isCompact
+                    ? Column(
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: gold, width: 1.5),
+                              image: const DecorationImage(
+                                image: ResizeImage(
+                                  AssetImage('assets/images/minshawi_portrait.jpg'),
+                                  width: 76,
+                                  height: 76,
+                                ),
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            fit: BoxFit.cover,
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      IconButton(
-                        tooltip: 'توسيع القائمة الجانبية',
-                        icon: Icon(
-                          Icons.menu_rounded,
-                          color: gold,
-                          size: 22,
-                        ),
-                        onPressed: onToggleCollapse,
-                      ),
-                      IconButton(
-                        tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
-                        icon: Icon(
-                          isDark
-                              ? Icons.light_mode_rounded
-                              : Icons.dark_mode_rounded,
-                          color: gold,
-                          size: 18,
-                        ),
-                        onPressed: () => context.read<ThemeCubit>().toggle(),
-                      ),
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: gold, width: 1.5),
-                          image: const DecorationImage(
-                            image: ResizeImage(
-                              AssetImage('assets/images/minshawi_portrait.jpg'),
-                              width: 80,
-                              height: 80,
+                          const SizedBox(height: 10),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 36,
+                              minHeight: 36,
                             ),
-                            fit: BoxFit.cover,
+                            tooltip: 'توسيع القائمة الجانبية',
+                            icon: Icon(
+                              Icons.menu_rounded,
+                              color: gold,
+                              size: 22,
+                            ),
+                            onPressed: onToggleCollapse,
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 36,
+                              minHeight: 36,
+                            ),
+                            tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
+                            icon: Icon(
+                              isDark
+                                  ? Icons.light_mode_rounded
+                                  : Icons.dark_mode_rounded,
+                              color: gold,
+                              size: 18,
+                            ),
+                            onPressed: () => context.read<ThemeCubit>().toggle(),
+                          ),
+                        ],
+                      )
+                    : ClipRect(
+                        child: Row(
                           children: [
-                            Text(
-                              'تلاوات المنشاوي',
-                              style: GoogleFonts.cairo(
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w700,
-                                color: gold,
-                                height: 1.2,
+                            Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: gold, width: 1.5),
+                                image: const DecorationImage(
+                                  image: ResizeImage(
+                                    AssetImage('assets/images/minshawi_portrait.jpg'),
+                                    width: 76,
+                                    height: 76,
+                                  ),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                            Text(
-                              'الشيخ محمد صديق المنشاوي',
-                              style: GoogleFonts.cairo(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w500,
-                                color: textSecondary,
-                                height: 1.2,
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'تلاوات المنشاوي',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: gold,
+                                      height: 1.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    'الشيخ محمد صديق المنشاوي',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                      color: textSecondary,
+                                      height: 1.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            ),
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                minWidth: 32,
+                                minHeight: 32,
+                              ),
+                              tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
+                              icon: Icon(
+                                isDark
+                                    ? Icons.light_mode_rounded
+                                    : Icons.dark_mode_rounded,
+                                color: gold,
+                                size: 18,
+                              ),
+                              onPressed: () => context.read<ThemeCubit>().toggle(),
+                            ),
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                minWidth: 32,
+                                minHeight: 32,
+                              ),
+                              tooltip: 'طي القائمة الجانبية',
+                              icon: Icon(
+                                Icons.menu_open_rounded,
+                                color: gold,
+                                size: 20,
+                              ),
+                              onPressed: onToggleCollapse,
                             ),
                           ],
                         ),
                       ),
-                      IconButton(
-                        tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
-                        icon: Icon(
-                          isDark
-                              ? Icons.light_mode_rounded
-                              : Icons.dark_mode_rounded,
-                          color: gold,
-                          size: 19,
-                        ),
-                        onPressed: () => context.read<ThemeCubit>().toggle(),
-                      ),
-                      IconButton(
-                        tooltip: 'طي القائمة الجانبية',
-                        icon: Icon(
-                          Icons.menu_open_rounded,
-                          color: gold,
-                          size: 21,
-                        ),
-                        onPressed: onToggleCollapse,
-                      ),
-                    ],
-                  ),
-          ),
-          Divider(color: border, height: 1),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.symmetric(
-                horizontal: isCollapsed ? 6 : 10,
-                vertical: 8,
               ),
-              children: [
-                if (!isCollapsed)
-                  _buildSectionHeader('المصاحف والتلاوات', textSecondary),
-                _SidebarItem(
-                  icon: Icons.home_rounded,
-                  title: 'الرئيسية',
-                  route: '/',
-                  currentPath: currentPath,
-                  isCollapsed: isCollapsed,
-                  onTap: () => _safeNavigate(context, '/'),
-                ),
-                _SidebarItem(
-                  icon: Icons.auto_stories_rounded,
-                  title: 'المصحف المرتل',
-                  badgeText: '١١٤',
-                  route: '/recitations/complete_murattal',
-                  currentPath: currentPath,
-                  isCollapsed: isCollapsed,
-                  onTap: () =>
-                      _safeNavigate(context, '/recitations/complete_murattal'),
-                ),
-                _SidebarItem(
-                  icon: Icons.menu_book_rounded,
-                  title: 'المصحف المجود',
-                  badgeText: '١١٤',
-                  route: '/recitations/mojawad',
-                  currentPath: currentPath,
-                  isCollapsed: isCollapsed,
-                  onTap: () => _safeNavigate(context, '/recitations/mojawad'),
-                ),
-                _SidebarItem(
-                  icon: Icons.star_rounded,
-                  title: 'التلاوات النادرة',
-                  badgeText: '٢٦',
-                  route: '/recitations/rare_1387',
-                  currentPath: currentPath,
-                  isCollapsed: isCollapsed,
-                  onTap: () => _safeNavigate(context, '/recitations/rare_1387'),
-                ),
-                _SidebarItem(
-                  icon: Icons.graphic_eq_rounded,
-                  title: 'روائع النهاوند',
-                  badgeText: '٣٠٣',
-                  route: '/recitations/nahawand',
-                  currentPath: currentPath,
-                  isCollapsed: isCollapsed,
-                  onTap: () => _safeNavigate(context, '/recitations/nahawand'),
-                ),
-                const SizedBox(height: 10),
-                if (!isCollapsed)
-                  _buildSectionHeader('مكتبتي الخاصة', textSecondary),
-                _SidebarItem(
-                  icon: Icons.download_done_rounded,
-                  title: 'التلاوات المحملة',
-                  route: '/downloads',
-                  currentPath: currentPath,
-                  isCollapsed: isCollapsed,
-                  onTap: () => _safeNavigate(context, '/downloads'),
-                ),
-                _SidebarItem(
-                  icon: Icons.favorite_rounded,
-                  title: 'المفضلة',
-                  route: '/favorites',
-                  currentPath: currentPath,
-                  isCollapsed: isCollapsed,
-                  onTap: () => _safeNavigate(context, '/favorites'),
-                ),
-                _SidebarItem(
-                  icon: Icons.playlist_play_rounded,
-                  title: 'قوائم التشغيل',
-                  route: '/playlists',
-                  currentPath: currentPath,
-                  isCollapsed: isCollapsed,
-                  onTap: () => _safeNavigate(context, '/playlists'),
-                ),
-              ],
-            ),
-          ),
-          Divider(color: border, height: 1),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: isCollapsed ? 6 : 14,
-              vertical: 10,
-            ),
-            child: isCollapsed
-                ? Tooltip(
-                    message:
-                        'تطوير: ${AppConstants.devNameAr}\n${AppConstants.devDedication}\nالإصدار v1.2.0',
-                    child: Center(
-                      child: Icon(
-                        Icons.verified_user_rounded,
-                        size: 20,
-                        color: gold.withAlpha(180),
-                      ),
+              Divider(color: border, height: 1),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isCompact ? 6 : 10,
+                    vertical: 8,
+                  ),
+                  children: [
+                    if (!isCompact)
+                      _buildSectionHeader('المصاحف والتلاوات', textSecondary),
+                    _SidebarItem(
+                      icon: Icons.home_rounded,
+                      title: 'الرئيسية',
+                      route: '/',
+                      currentPath: currentPath,
+                      isCollapsed: isCompact,
+                      onTap: () => _safeNavigate(context, '/'),
                     ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'تطوير: ${AppConstants.devNameAr}',
-                        style: GoogleFonts.cairo(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: textPrimary,
+                    _SidebarItem(
+                      icon: Icons.auto_stories_rounded,
+                      title: 'المصحف المرتل',
+                      badgeText: '١١٤',
+                      route: '/recitations/complete_murattal',
+                      currentPath: currentPath,
+                      isCollapsed: isCompact,
+                      onTap: () =>
+                          _safeNavigate(context, '/recitations/complete_murattal'),
+                    ),
+                    _SidebarItem(
+                      icon: Icons.menu_book_rounded,
+                      title: 'المصحف المجود',
+                      badgeText: '١١٤',
+                      route: '/recitations/mojawad',
+                      currentPath: currentPath,
+                      isCollapsed: isCompact,
+                      onTap: () => _safeNavigate(context, '/recitations/mojawad'),
+                    ),
+                    _SidebarItem(
+                      icon: Icons.star_rounded,
+                      title: 'التلاوات النادرة',
+                      badgeText: '٢٦',
+                      route: '/recitations/rare_1387',
+                      currentPath: currentPath,
+                      isCollapsed: isCompact,
+                      onTap: () => _safeNavigate(context, '/recitations/rare_1387'),
+                    ),
+                    _SidebarItem(
+                      icon: Icons.graphic_eq_rounded,
+                      title: 'روائع النهاوند',
+                      badgeText: '٣٠٣',
+                      route: '/recitations/nahawand',
+                      currentPath: currentPath,
+                      isCollapsed: isCompact,
+                      onTap: () => _safeNavigate(context, '/recitations/nahawand'),
+                    ),
+                    const SizedBox(height: 10),
+                    if (!isCompact)
+                      _buildSectionHeader('مكتبتي الخاصة', textSecondary),
+                    _SidebarItem(
+                      icon: Icons.download_done_rounded,
+                      title: 'التلاوات المحملة',
+                      route: '/downloads',
+                      currentPath: currentPath,
+                      isCollapsed: isCompact,
+                      onTap: () => _safeNavigate(context, '/downloads'),
+                    ),
+                    _SidebarItem(
+                      icon: Icons.favorite_rounded,
+                      title: 'المفضلة',
+                      route: '/favorites',
+                      currentPath: currentPath,
+                      isCollapsed: isCompact,
+                      onTap: () => _safeNavigate(context, '/favorites'),
+                    ),
+                    _SidebarItem(
+                      icon: Icons.playlist_play_rounded,
+                      title: 'قوائم التشغيل',
+                      route: '/playlists',
+                      currentPath: currentPath,
+                      isCollapsed: isCompact,
+                      onTap: () => _safeNavigate(context, '/playlists'),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(color: border, height: 1),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isCompact ? 6 : 14,
+                  vertical: 10,
+                ),
+                child: isCompact
+                    ? Tooltip(
+                        message:
+                            'تطوير: \n\nالإصدار v1.2.0',
+                        child: Center(
+                          child: Icon(
+                            Icons.verified_user_rounded,
+                            size: 20,
+                            color: gold.withAlpha(180),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          _SocialIconButton(
-                            iconPath: _SvgIcons.facebook,
-                            tooltip: 'فيسبوك',
-                            onTap: () => _launchUrl(AppConstants.devFacebookUrl),
+                          Text(
+                            'تطوير: ',
+                            style: GoogleFonts.cairo(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: textPrimary,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(width: 6),
-                          _SocialIconButton(
-                            iconPath: _SvgIcons.linkedin,
-                            tooltip: 'لينكد إن',
-                            onTap: () => _launchUrl(AppConstants.devLinkedinUrl),
+                          const SizedBox(height: 6),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _SocialIconButton(
+                                  iconPath: _SvgIcons.facebook,
+                                  tooltip: 'فيسبوك',
+                                  onTap: () => _launchUrl(AppConstants.devFacebookUrl),
+                                ),
+                                const SizedBox(width: 6),
+                                _SocialIconButton(
+                                  iconPath: _SvgIcons.linkedin,
+                                  tooltip: 'لينكد إن',
+                                  onTap: () => _launchUrl(AppConstants.devLinkedinUrl),
+                                ),
+                                const SizedBox(width: 6),
+                                _SocialIconButton(
+                                  iconPath: _SvgIcons.github,
+                                  tooltip: 'جيت هب',
+                                  onTap: () => _launchUrl(AppConstants.devGithubUrl),
+                                ),
+                                const SizedBox(width: 6),
+                                _SocialIconButton(
+                                  iconPath: _SvgIcons.email,
+                                  tooltip: 'البريد الإلكتروني',
+                                  onTap: () => _launchUrl(AppConstants.devEmail),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(width: 6),
-                          _SocialIconButton(
-                            iconPath: _SvgIcons.github,
-                            tooltip: 'جيت هب',
-                            onTap: () => _launchUrl(AppConstants.devGithubUrl),
+                          const SizedBox(height: 6),
+                          Text(
+                            AppConstants.devDedication,
+                            style: GoogleFonts.cairo(
+                              fontSize: 9.5,
+                              color: textSecondary,
+                              height: 1.25,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(width: 6),
-                          _SocialIconButton(
-                            iconPath: _SvgIcons.email,
-                            tooltip: 'البريد الإلكتروني',
-                            onTap: () => _launchUrl(AppConstants.devEmail),
+                          const SizedBox(height: 4),
+                          Text(
+                            'الإصدار v1.2.0 • ويندوز وويب',
+                            style: GoogleFonts.cairo(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w600,
+                              color: gold.withAlpha(190),
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        AppConstants.devDedication,
-                        style: GoogleFonts.cairo(
-                          fontSize: 9.5,
-                          color: textSecondary,
-                          height: 1.25,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'الإصدار v1.2.0 • ويندوز وويب',
-                        style: GoogleFonts.cairo(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w600,
-                          color: gold.withAlpha(190),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-          ),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -457,7 +494,8 @@ class _SidebarItemState extends State<_SidebarItem> {
                     color: itemColor,
                   ),
                 )
-              : Row(
+              : ClipRect(
+                  child: Row(
                   children: [
                     Icon(
                       widget.icon,
@@ -501,6 +539,7 @@ class _SidebarItemState extends State<_SidebarItem> {
                       ),
                   ],
                 ),
+              ),
         ),
       ),
     );

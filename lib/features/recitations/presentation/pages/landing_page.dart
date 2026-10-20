@@ -138,8 +138,10 @@ class _LandingPageState extends State<LandingPage> {
                           gold: gold,
                         ),
                       ],
-                      const SizedBox(height: 24),
-                      _FramelessDeveloperFooter(isDark: isDark),
+                      if (MediaQuery.sizeOf(context).width < 600) ...[
+                        const SizedBox(height: 24),
+                        _FramelessDeveloperFooter(isDark: isDark),
+                      ],
                     ],
                   ),
                 ),

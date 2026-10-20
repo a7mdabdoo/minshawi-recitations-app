@@ -24,12 +24,17 @@ abstract class AppRoutes {
 class AppRouter {
   AppRouter._();
 
+  static String lastNonPlayerRoute = AppRoutes.landing;
+
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.landing,
     debugLogDiagnostics: true,
     routes: [
       ShellRoute(
         builder: (context, state, child) {
+          if (state.matchedLocation != AppRoutes.player) {
+            lastNonPlayerRoute = state.uri.toString();
+          }
           return DesktopAppShell(
             currentPath: state.matchedLocation,
             child: child,

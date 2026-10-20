@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../router/app_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../features/favorites/presentation/cubit/favorites_cubit.dart';
@@ -480,28 +481,38 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
 
                     const SizedBox(width: 8),
 
-                    IconButton(
-                      tooltip: 'مشغل التلاوات الكامل',
-                      icon: Icon(
-                        Icons.open_in_full_rounded,
-                        size: 19,
-                        color: gold,
-                      ),
-                      onPressed: () {
-                        if (!_canPerformAction(400)) return;
+                    Builder(
+                      builder: (context) {
                         final currentLoc =
                             GoRouterState.of(context).matchedLocation;
-                        if (currentLoc == '/player') {
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
-                          } else if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go('/');
-                          }
-                          return;
-                        }
-                        context.push('/player', extra: recitation?.id);
+                        final isOnPlayer = currentLoc == AppRoutes.player;
+
+                        return IconButton(
+                          tooltip: isOnPlayer
+                              ? 'تصغير المشغل (العودة)'
+                              : 'مشغل التلاوات الكامل',
+                          icon: Icon(
+                            isOnPlayer
+                                ? Icons.close_fullscreen_rounded
+                                : Icons.open_in_full_rounded,
+                            size: 19,
+                            color: gold,
+                          ),
+                          onPressed: () {
+                            if (!_canPerformAction(300)) return;
+                            if (isOnPlayer) {
+                              if (context.canPop()) {
+                                context.pop();
+                              } else if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              } else {
+                                context.go(AppRouter.lastNonPlayerRoute);
+                              }
+                            } else {
+                              context.go(AppRoutes.player, extra: recitation?.id);
+                            }
+                          },
+                        );
                       },
                     ),
                   ],
