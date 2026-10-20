@@ -728,8 +728,8 @@ class _UnifiedHeroBanner extends StatelessWidget {
                     : Image(
                         image: const ResizeImage(
                           AssetImage('assets/images/minshawi_portrait.jpg'),
-                          width: 500,
-                          height: 500,
+                          width: 244,
+                          height: 244,
                         ),
                         fit: BoxFit.cover,
                         alignment: const Alignment(0, -0.25),
