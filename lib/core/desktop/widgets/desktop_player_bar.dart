@@ -88,7 +88,8 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
         final ready = state is AudioPlayerReady ? state : null;
         final isPlaying = ready?.isPlaying ?? false;
         final isBuffering =
-            state is AudioPlayerLoading || (ready?.isBuffering ?? false);
+            (state is AudioPlayerLoading || (ready?.isBuffering ?? false)) &&
+                !isPlaying;
 
         final isShuffle = ready?.isShuffleEnabled ?? cubit.isShuffleEnabled;
         final loopMode = ready?.loopMode ?? cubit.loopMode;

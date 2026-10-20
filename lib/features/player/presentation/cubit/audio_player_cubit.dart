@@ -155,7 +155,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       if (s is AudioPlayerReady) {
         final diff = (position - s.position).inMilliseconds.abs();
         if (diff >= 200 || position == Duration.zero) {
-          emit(s.copyWith(position: position));
+          emit(s.copyWith(position: position, isBuffering: false));
         }
       }
 
@@ -183,9 +183,11 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
         if (_loopMode == LoopMode.one) {
           try {
             await _player.seek(Duration.zero);
-            await _player.play();
-          } catch (_) {}
-          _isTransitioning = false;
+            _isTransitioning = false;
+            unawaited(_player.play().catchError((_) {}));
+          } catch (_) {
+            _isTransitioning = false;
+          }
         } else if (_loopMode == LoopMode.all || _isShuffleEnabled) {
           await playNext();
         } else {
@@ -392,7 +394,8 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       if (initialPosition != null) {
         await _player.seek(initialPosition);
       }
-      if (readyState.isPlaying) {
+      final isCurrentlyPlaying = readyState.isPlaying || _player.playing;
+      if (isCurrentlyPlaying) {
         await pause();
       } else {
         await resume();
@@ -464,9 +467,11 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       );
       await _player
           .setLoopMode(_loopMode == LoopMode.one ? LoopMode.one : LoopMode.off);
-      await _player.play();
-      unawaited(BatteryOptimizationService.acquireLocks());
       _isTransitioning = false;
+      unawaited(BatteryOptimizationService.acquireLocks());
+      unawaited(_player.play().catchError((Object e) {
+        _handlePlaybackError(e, recitation);
+      }));
     } on PlayerException catch (e) {
       _handlePlaybackError(e, recitation);
     } catch (e) {
@@ -570,25 +575,42 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
 
   Future<void> pause() async {
     saveCurrentPosition();
-    await _player.pause();
     unawaited(BatteryOptimizationService.releaseLocks());
     final s = state;
     if (s is AudioPlayerReady) {
-      emit(s.copyWith(isPlaying: false));
+      emit(s.copyWith(isPlaying: false, isBuffering: false));
     }
+    try {
+      await _player.pause();
+    } catch (_) {}
   }
 
   Future<void> resume() async {
-    await _player.play();
     unawaited(BatteryOptimizationService.acquireLocks());
     final s = state;
     if (s is AudioPlayerReady) {
-      emit(s.copyWith(isPlaying: true));
+      emit(s.copyWith(isPlaying: true, isBuffering: false));
+    }
+    try {
+      unawaited(_player.play().catchError((Object e) {
+        final rec = _currentRecitation;
+        if (rec != null) {
+          _handlePlaybackError(e, rec);
+        }
+      }));
+    } catch (e) {
+      final rec = _currentRecitation;
+      if (rec != null) {
+        _handlePlaybackError(e, rec);
+      }
     }
   }
 
   Future<void> togglePlayPause() async {
-    if (_player.playing) {
+    final s = state;
+    final isCurrentlyPlaying =
+        (s is AudioPlayerReady && s.isPlaying) || _player.playing;
+    if (isCurrentlyPlaying) {
       await pause();
     } else {
       await resume();
