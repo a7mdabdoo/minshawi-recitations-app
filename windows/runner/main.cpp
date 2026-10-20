@@ -27,7 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
-  if (!window.Create(L"جامع تلاوات المنشاوي", origin, size)) {
+  if (!window.Create(L"\u062c\u0627\u0645\u0639 \u062a\u0644\u0627\u0648\u0627\u062a \u0627\u0644\u0645\u0646\u0634\u0627\u0648\u064a", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

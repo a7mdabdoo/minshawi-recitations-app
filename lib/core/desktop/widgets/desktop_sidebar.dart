@@ -206,10 +206,9 @@ class DesktopSidebar extends StatelessWidget {
       child: Text(
         title,
         style: GoogleFonts.cairo(
-          fontSize: 11,
+          fontSize: 11.5,
           fontWeight: FontWeight.w700,
-          color: color.withAlpha(190),
-          letterSpacing: 0.5,
+          color: color.withAlpha(200),
         ),
       ),
     );
@@ -300,8 +299,8 @@ class _SidebarItemState extends State<_SidebarItem> {
                 child: Text(
                   widget.title,
                   style: GoogleFonts.cairo(
-                    fontSize: 13,
-                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                    fontSize: 13.5,
+                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
                     color: itemColor,
                   ),
                 ),

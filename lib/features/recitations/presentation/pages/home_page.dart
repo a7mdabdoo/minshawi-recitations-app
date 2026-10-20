@@ -280,32 +280,34 @@ class _AppBar extends StatelessWidget {
         tooltip: 'الرئيسية',
       ),
       actions: [
-        IconButton(
-          icon: Icon(
-            Icons.queue_music_rounded,
-            color: isDark ? AppColors.goldPrimary : AppColors.goldDark,
+        if (MediaQuery.sizeOf(context).width < 600) ...[
+          IconButton(
+            icon: Icon(
+              Icons.queue_music_rounded,
+              color: isDark ? AppColors.goldPrimary : AppColors.goldDark,
+            ),
+            onPressed: () => context.push(AppRoutes.playlists),
+            tooltip: 'قوائم التشغيل',
           ),
-          onPressed: () => context.push(AppRoutes.playlists),
-          tooltip: 'قوائم التشغيل',
-        ),
-        IconButton(
-          icon: Icon(
-            Icons.folder_special_outlined,
-            color: isDark ? AppColors.goldPrimary : AppColors.goldDark,
+          IconButton(
+            icon: Icon(
+              Icons.folder_special_outlined,
+              color: isDark ? AppColors.goldPrimary : AppColors.goldDark,
+            ),
+            onPressed: () =>
+                context.push('${AppRoutes.downloads}?collectionId=$collectionId'),
+            tooltip: 'التلاوات المحمّلة',
           ),
-          onPressed: () =>
-              context.push('${AppRoutes.downloads}?collectionId=$collectionId'),
-          tooltip: 'التلاوات المحمّلة',
-        ),
-        IconButton(
-          icon: Icon(
-            isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-            color: isDark ? AppColors.goldPrimary : AppColors.goldDark,
+          IconButton(
+            icon: Icon(
+              isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+              color: isDark ? AppColors.goldPrimary : AppColors.goldDark,
+            ),
+            onPressed: () => context.read<ThemeCubit>().toggle(),
+            tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
           ),
-          onPressed: () => context.read<ThemeCubit>().toggle(),
-          tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
-        ),
-        const SizedBox(width: 4),
+          const SizedBox(width: 4),
+        ],
       ],
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(right: 56, bottom: 16),
@@ -1124,10 +1126,10 @@ class _RecitationList extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(20, 8, 20, bottomInset),
         sliver: SliverGrid(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: width > 900 ? 380 : 440,
-            mainAxisExtent: 88,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            maxCrossAxisExtent: width > 1300 ? 460 : (width > 900 ? 420 : 460),
+            mainAxisExtent: 96,
+            crossAxisSpacing: 14,
+            mainAxisSpacing: 14,
           ),
           delegate: SliverChildBuilderDelegate(
             (context, index) => _RecitationCard(
@@ -1302,7 +1304,7 @@ class _RecitationCardState extends State<_RecitationCard> {
               ? () => _showDeleteDialog(context, context.read<DownloadCubit>())
               : null,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             child: Row(
               children: [
                 _SurahBadge(

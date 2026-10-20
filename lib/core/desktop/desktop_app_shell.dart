@@ -28,38 +28,38 @@ class DesktopAppShell extends StatelessWidget {
             return child;
           }
 
-          // 2. Tablet (600px - 900px): Compact NavigationRail + Content + Player Bar
+          // 2. Tablet (600px - 900px): Compact NavigationRail + Content + Bottom Player Bar
           if (width <= Responsive.tabletBreakpoint) {
             return Scaffold(
-              body: Row(
+              body: Column(
                 children: [
-                  DesktopNavigationRail(currentPath: currentPath),
                   Expanded(
-                    child: Column(
+                    child: Row(
                       children: [
+                        DesktopNavigationRail(currentPath: currentPath),
                         Expanded(child: child),
-                        const DesktopPlayerBar(),
                       ],
                     ),
                   ),
+                  const DesktopPlayerBar(),
                 ],
               ),
             );
           }
 
-          // 3. Desktop (> 900px): Full Sidebar + Main Content + Persistent Player Bar
+          // 3. Desktop (> 900px): Full Sidebar + Main Content + Full-width Persistent Player Bar
           return Scaffold(
-            body: Row(
+            body: Column(
               children: [
-                DesktopSidebar(currentPath: currentPath),
                 Expanded(
-                  child: Column(
+                  child: Row(
                     children: [
+                      DesktopSidebar(currentPath: currentPath),
                       Expanded(child: child),
-                      const DesktopPlayerBar(),
                     ],
                   ),
                 ),
+                const DesktopPlayerBar(),
               ],
             ),
           );
