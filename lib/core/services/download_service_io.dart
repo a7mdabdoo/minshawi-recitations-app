@@ -255,7 +255,7 @@ class DownloadService {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final recitationsDir =
-          Directory('${dir.path}/${AppConstants.downloadsDirName}');
+          Directory('${dir.path}/al_minshawi_data/${AppConstants.downloadsDirName}');
       if (recitationsDir.existsSync()) {
         for (final entity in recitationsDir.listSync()) {
           final p = entity.path;
@@ -282,7 +282,7 @@ class DownloadService {
   Future<String> _buildSavePath(Recitation recitation) async {
     final dir = await getApplicationDocumentsDirectory();
     final recitationsDir =
-        Directory('${dir.path}/${AppConstants.downloadsDirName}');
+        Directory('${dir.path}/al_minshawi_data/${AppConstants.downloadsDirName}');
     if (!await recitationsDir.exists()) {
       await recitationsDir.create(recursive: true);
     }

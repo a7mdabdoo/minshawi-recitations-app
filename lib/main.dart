@@ -82,7 +82,7 @@ void main() async {
       }
 
       try {
-        await Hive.initFlutter().timeout(const Duration(seconds: 15));
+        await Hive.initFlutter('al_minshawi_data').timeout(const Duration(seconds: 15));
       } catch (e, st) {
         debugPrint('[INIT WARNING] Hive.initFlutter: $e\n$st');
       }
