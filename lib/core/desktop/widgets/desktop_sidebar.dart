@@ -45,8 +45,11 @@ class DesktopSidebar extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: gold, width: 1.5),
                     image: const DecorationImage(
-                      image:
-                          AssetImage('assets/images/minshawi_portrait.jpg'),
+                      image: ResizeImage(
+                        AssetImage('assets/images/minshawi_portrait.jpg'),
+                        width: 92,
+                        height: 92,
+                      ),
                       fit: BoxFit.cover,
                     ),
                   ),

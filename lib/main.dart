@@ -28,6 +28,10 @@ void main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
 
+      // Optimize memory: limit image cache to 20MB / 40 images
+      PaintingBinding.instance.imageCache.maximumSize = 40;
+      PaintingBinding.instance.imageCache.maximumSizeBytes = 20 * 1024 * 1024;
+
       FlutterError.onError = (details) {
         debugPrint(
             '[FLUTTER ERROR] ${details.exceptionAsString()}\n${details.stack}');

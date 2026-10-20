@@ -24,8 +24,6 @@ class DesktopPlayerBar extends StatefulWidget {
 
 class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
   double _lastVolume = 1.0;
-  bool _isDraggingSeek = false;
-  double _dragValue = 0.0;
 
   String _getCollectionName(String? collectionId) {
     switch (collectionId) {
@@ -53,6 +51,19 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
+      buildWhen: (prev, curr) {
+        if (prev is AudioPlayerReady && curr is AudioPlayerReady) {
+          return prev.recitation.id != curr.recitation.id ||
+              prev.isPlaying != curr.isPlaying ||
+              prev.isBuffering != curr.isBuffering ||
+              prev.speed != curr.speed ||
+              prev.loopMode != curr.loopMode ||
+              prev.isShuffleEnabled != curr.isShuffleEnabled ||
+              prev.abLoopState != curr.abLoopState ||
+              prev.duration != curr.duration;
+        }
+        return prev != curr;
+      },
       builder: (context, state) {
         final cubit = context.read<AudioPlayerCubit>();
 
@@ -68,19 +79,11 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
         final isBuffering =
             state is AudioPlayerLoading || (ready?.isBuffering ?? false);
 
-        final position = ready?.position ?? Duration.zero;
-        final duration = ready?.duration ?? Duration.zero;
-
         final isShuffle = ready?.isShuffleEnabled ?? cubit.isShuffleEnabled;
         final loopMode = ready?.loopMode ?? cubit.loopMode;
         final abState = ready?.abLoopState ?? cubit.abLoopState;
         final isAbActive = abState != AbLoopState.off;
         final speed = ready?.speed ?? cubit.speed;
-
-        final maxDurationMs = duration.inMilliseconds.toDouble();
-        final currentPositionMs = _isDraggingSeek
-            ? _dragValue
-            : position.inMilliseconds.toDouble().clamp(0.0, maxDurationMs > 0 ? maxDurationMs : 1.0);
 
         return Container(
           height: 94,
@@ -284,71 +287,13 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                       ],
                     ),
 
-                    // Progress Bar Row
-                    Row(
-                      children: [
-                        Text(
-                          Formatters.formatDurationObj(
-                            Duration(milliseconds: currentPositionMs.round()),
-                          ),
-                          style: GoogleFonts.cairo(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: textSecondary,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: SliderTheme(
-                            data: SliderThemeData(
-                              trackHeight: 3.5,
-                              activeTrackColor: gold,
-                              inactiveTrackColor: isDark
-                                  ? const Color(0xFF30363D)
-                                  : const Color(0xFFE2E8F0),
-                              thumbColor: gold,
-                              overlayColor: gold.withAlpha(40),
-                              thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 5.5,
-                              ),
-                              overlayShape: const RoundSliderOverlayShape(
-                                overlayRadius: 12,
-                              ),
-                            ),
-                            child: Slider(
-                              value: currentPositionMs,
-                              max: maxDurationMs > 0 ? maxDurationMs : 1.0,
-                              onChanged: recitation != null && maxDurationMs > 0
-                                  ? (val) {
-                                      setState(() {
-                                        _isDraggingSeek = true;
-                                        _dragValue = val;
-                                      });
-                                    }
-                                  : null,
-                              onChangeEnd: recitation != null && maxDurationMs > 0
-                                  ? (val) {
-                                      cubit.seekTo(
-                                        Duration(milliseconds: val.round()),
-                                      );
-                                      setState(() {
-                                        _isDraggingSeek = false;
-                                      });
-                                    }
-                                  : null,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          Formatters.formatDurationObj(duration),
-                          style: GoogleFonts.cairo(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: textSecondary,
-                          ),
-                        ),
-                      ],
+                    // Progress Bar Row (Isolated for high-performance position updates)
+                    _DesktopPlayerProgressBar(
+                      cubit: cubit,
+                      recitation: recitation,
+                      gold: gold,
+                      textSecondary: textSecondary,
+                      isDark: isDark,
                     ),
                   ],
                 ),
@@ -572,7 +517,11 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
               color: isDark ? const Color(0xFF21262D) : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(10),
               image: const DecorationImage(
-                image: AssetImage('assets/images/minshawi_portrait.jpg'),
+                image: ResizeImage(
+                  AssetImage('assets/images/minshawi_portrait.jpg'),
+                  width: 96,
+                  height: 96,
+                ),
                 fit: BoxFit.cover,
               ),
             ),
@@ -615,7 +564,11 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
               width: 1.0,
             ),
             image: const DecorationImage(
-              image: AssetImage('assets/images/minshawi_portrait.jpg'),
+              image: ResizeImage(
+                AssetImage('assets/images/minshawi_portrait.jpg'),
+                width: 100,
+                height: 100,
+              ),
               fit: BoxFit.cover,
             ),
           ),
@@ -668,6 +621,123 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
           },
         ),
       ],
+    );
+  }
+}
+
+
+class _DesktopPlayerProgressBar extends StatefulWidget {
+  final AudioPlayerCubit cubit;
+  final Recitation? recitation;
+  final Color gold;
+  final Color textSecondary;
+  final bool isDark;
+
+  const _DesktopPlayerProgressBar({
+    required this.cubit,
+    required this.recitation,
+    required this.gold,
+    required this.textSecondary,
+    required this.isDark,
+  });
+
+  @override
+  State<_DesktopPlayerProgressBar> createState() =>
+      _DesktopPlayerProgressBarState();
+}
+
+class _DesktopPlayerProgressBarState extends State<_DesktopPlayerProgressBar> {
+  bool _isDraggingSeek = false;
+  double _dragValue = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
+      buildWhen: (prev, curr) {
+        if (prev is AudioPlayerReady && curr is AudioPlayerReady) {
+          return prev.position != curr.position ||
+              prev.duration != curr.duration ||
+              prev.recitation.id != curr.recitation.id;
+        }
+        return prev != curr;
+      },
+      builder: (context, state) {
+        final ready = state is AudioPlayerReady ? state : null;
+        final position = ready?.position ?? Duration.zero;
+        final duration = ready?.duration ?? Duration.zero;
+        final maxDurationMs = duration.inMilliseconds.toDouble();
+        final currentPositionMs = _isDraggingSeek
+            ? _dragValue
+            : position.inMilliseconds
+                .toDouble()
+                .clamp(0.0, maxDurationMs > 0 ? maxDurationMs : 1.0);
+
+        return Row(
+          children: [
+            Text(
+              Formatters.formatDurationObj(
+                Duration(milliseconds: currentPositionMs.round()),
+              ),
+              style: GoogleFonts.cairo(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: widget.textSecondary,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SliderTheme(
+                data: SliderThemeData(
+                  trackHeight: 3.5,
+                  activeTrackColor: widget.gold,
+                  inactiveTrackColor: widget.isDark
+                      ? const Color(0xFF30363D)
+                      : const Color(0xFFE2E8F0),
+                  thumbColor: widget.gold,
+                  overlayColor: widget.gold.withAlpha(40),
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 5.5,
+                  ),
+                  overlayShape: const RoundSliderOverlayShape(
+                    overlayRadius: 12,
+                  ),
+                ),
+                child: Slider(
+                  value: currentPositionMs,
+                  max: maxDurationMs > 0 ? maxDurationMs : 1.0,
+                  onChanged: widget.recitation != null && maxDurationMs > 0
+                      ? (val) {
+                          setState(() {
+                            _isDraggingSeek = true;
+                            _dragValue = val;
+                          });
+                        }
+                      : null,
+                  onChangeEnd: widget.recitation != null && maxDurationMs > 0
+                      ? (val) {
+                          widget.cubit.seekTo(
+                            Duration(milliseconds: val.round()),
+                          );
+                          setState(() {
+                            _isDraggingSeek = false;
+                          });
+                        }
+                      : null,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              Formatters.formatDurationObj(duration),
+              style: GoogleFonts.cairo(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: widget.textSecondary,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
