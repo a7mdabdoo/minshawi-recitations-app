@@ -1,7 +1,21 @@
 {
-  "latest_version": "1.2.1",
-  "build_number": 5,
-  "release_notes": "- تحديث وإصلاح شامل لتطبيق ويندوز ومتجر مايكروسوفت.\n- تحسين استقرار مشغل الصوت ومنع تعارض الملفات أثناء التنزيل.\n- إصلاح التنقل والرجوع للشاشة الرئيسية وضمان استقرار العرض التام.",
+  "latest_version": "1.2.0",
+  "build_number": 4,
+  "release_notes": "إصلاحات عامة وتحسينات في الأداء ومكتبة التلاوات.",
   "apk_url": "https://apkpure.com/p/com.minshawi.recitations",
-  "force_update": false
+  "force_update": false,
+  "android": {
+    "latest_version": "1.2.0",
+    "build_number": 4,
+    "release_notes": "إصلاحات عامة وتحسينات في الأداء ومكتبة التلاوات.",
+    "apk_url": "https://apkpure.com/p/com.minshawi.recitations",
+    "force_update": false
+  },
+  "windows": {
+    "latest_version": "1.2.1",
+    "build_number": 5,
+    "release_notes": "- تحديث وإصلاح شامل لتطبيق ويندوز ومتجر مايكروسوفت.\n- تحسين استقرار مشغل الصوت ومنع تعارض الملفات أثناء التنزيل.\n- إصلاح التنقل والرجوع للشاشة الرئيسية وضمان استقرار العرض التام.",
+    "download_url": "https://github.com/a7mdabdoo/minshawi-recitations-app/releases/tag/v1.2.1",
+    "force_update": false
+  }
 }

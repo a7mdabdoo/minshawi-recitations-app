@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -17,9 +19,13 @@ class UpdateService {
   static const String _defaultApkUrl =
       'https://apkpure.com/p/com.minshawi.recitations';
 
+  static const String _defaultWindowsUrl =
+      'https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest';
+
   static bool _hasCheckedThisSession = false;
 
   static Future<void> checkForUpdate(BuildContext context) async {
+    if (kIsWeb) return;
     if (_hasCheckedThisSession) return;
     _hasCheckedThisSession = true;
 
@@ -33,14 +39,38 @@ class UpdateService {
       final dynamic decoded = jsonDecode(utf8.decode(response.bodyBytes));
       if (decoded is! Map<String, dynamic>) return;
 
+      Map<String, dynamic>? platformConfig;
+      String fallbackUrl = _defaultApkUrl;
+
+      if (Platform.isAndroid) {
+        if (decoded['android'] is Map<String, dynamic>) {
+          platformConfig = decoded['android'] as Map<String, dynamic>;
+        }
+        fallbackUrl = _defaultApkUrl;
+      } else if (Platform.isWindows) {
+        if (decoded['windows'] is Map<String, dynamic>) {
+          platformConfig = decoded['windows'] as Map<String, dynamic>;
+        }
+        fallbackUrl = _defaultWindowsUrl;
+      } else if (Platform.isIOS) {
+        if (decoded['ios'] is Map<String, dynamic>) {
+          platformConfig = decoded['ios'] as Map<String, dynamic>;
+        }
+      }
+
+      final targetData = platformConfig ?? decoded;
+
       final remoteVersion =
-          (decoded['latest_version']?.toString() ?? '').trim();
+          (targetData['latest_version']?.toString() ?? '').trim();
       final remoteBuild =
-          int.tryParse(decoded['build_number']?.toString() ?? '0') ?? 0;
-      final releaseNotes = (decoded['release_notes']?.toString() ?? '').trim();
-      final rawApkUrl =
-          (decoded['apk_url']?.toString() ?? _defaultApkUrl).trim();
-      final forceUpdate = decoded['force_update'] == true;
+          int.tryParse(targetData['build_number']?.toString() ?? '0') ?? 0;
+      final releaseNotes =
+          (targetData['release_notes']?.toString() ?? '').trim();
+      final rawDownloadUrl = (targetData['download_url']?.toString() ??
+              targetData['apk_url']?.toString() ??
+              fallbackUrl)
+          .trim();
+      final forceUpdate = targetData['force_update'] == true;
 
       if (remoteVersion.isEmpty) return;
 
@@ -58,7 +88,7 @@ class UpdateService {
       if (!isNewer) return;
       if (!context.mounted) return;
 
-      final cleanUrl = _sanitizeUrl(rawApkUrl);
+      final cleanUrl = _sanitizeUrl(rawDownloadUrl, fallback: fallbackUrl);
 
       await showDialog<void>(
         context: context,
@@ -98,7 +128,7 @@ class UpdateService {
     return remoteBuild > currentBuild;
   }
 
-  static String _sanitizeUrl(String raw) {
+  static String _sanitizeUrl(String raw, {String fallback = _defaultApkUrl}) {
     final trimmed = raw.trim();
     final mdMatch = RegExp(r'\((https?://[^\s\)]+)\)').firstMatch(trimmed);
     if (mdMatch != null) {
@@ -107,7 +137,7 @@ class UpdateService {
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
       return trimmed;
     }
-    return _defaultApkUrl;
+    return fallback;
   }
 }
 
