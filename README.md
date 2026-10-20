@@ -8,9 +8,7 @@
 
 <br>
 
-<p align="center">
-  <img src="screenshots/feature_graphic.png" alt="جامع تلاوات المنشاوي" width="100%">
-</p>
+
 
 <p align="center">
   <a href="https://a7mdabdoo.github.io/minshawi-recitations-app/">
