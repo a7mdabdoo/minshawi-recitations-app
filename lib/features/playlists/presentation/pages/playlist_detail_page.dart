@@ -215,8 +215,8 @@ class PlaylistDetailPage extends StatelessWidget {
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_rounded, color: gold),
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
+                  if (context.canPop()) {
+                    context.pop();
                   } else {
                     context.go('/playlists');
                   }
@@ -294,8 +294,8 @@ class PlaylistDetailPage extends StatelessWidget {
               leading: IconButton(
                 icon: Icon(Icons.arrow_back_rounded, color: gold),
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
+                  if (context.canPop()) {
+                    context.pop();
                   } else {
                     context.go('/playlists');
                   }
@@ -350,8 +350,8 @@ class PlaylistDetailPage extends StatelessWidget {
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back_rounded, color: gold),
                   onPressed: () {
-                    if (Navigator.of(context).canPop()) {
-                      Navigator.of(context).pop();
+                    if (context.canPop()) {
+                      context.pop();
                     } else {
                       context.go('/playlists');
                     }

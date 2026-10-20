@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/arabic_normalizer.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
@@ -42,10 +43,10 @@ class PlaylistsPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: gold),
           onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
+            if (context.canPop()) {
+              context.pop();
             } else {
-              context.go('/');
+              context.go(AppRoutes.landing);
             }
           },
           tooltip: 'رجوع',

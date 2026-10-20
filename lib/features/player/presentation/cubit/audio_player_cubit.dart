@@ -7,9 +7,11 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/di/service_locator.dart';
 import '../../../../core/services/battery_optimization_service.dart';
 import '../../../recitations/data/datasources/local_recitation_data_source.dart';
 import '../../../recitations/domain/entities/recitation.dart';
+import '../../../recitations/presentation/cubit/download_cubit.dart';
 import 'audio_player_state.dart';
 
 class AudioPlayerCubit extends Cubit<AudioPlayerState> {
@@ -418,15 +420,26 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       await _player.stop();
 
       String? validHivePath;
-      final hivePath = recitation.localFilePath ??
-          _localDataSource.getDownloadedPath(recitation.id);
+      final isCurrentlyDownloading = sl.isRegistered<DownloadCubit>() &&
+          sl<DownloadCubit>().state.isDownloading(recitation.id);
 
-      if (!kIsWeb && hivePath != null) {
-        final file = File(hivePath);
-        if (await file.exists() && (await file.length()) > 0) {
-          validHivePath = hivePath;
-        } else {
-          await _localDataSource.removeDownloadedPath(recitation.id);
+      if (!kIsWeb && !isCurrentlyDownloading) {
+        final hivePath = recitation.localFilePath ??
+            _localDataSource.getDownloadedPath(recitation.id);
+
+        if (hivePath != null) {
+          final file = File(hivePath);
+          if (await file.exists() && (await file.length()) > 0) {
+            try {
+              final testAccess = await file.open(mode: FileMode.read);
+              await testAccess.close();
+              validHivePath = hivePath;
+            } catch (_) {
+              validHivePath = null;
+            }
+          } else {
+            await _localDataSource.removeDownloadedPath(recitation.id);
+          }
         }
       }
 

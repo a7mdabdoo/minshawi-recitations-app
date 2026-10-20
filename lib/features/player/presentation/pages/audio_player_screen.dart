@@ -46,10 +46,11 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   void _closePlayer(BuildContext context) {
     if (context.canPop()) {
       context.pop();
-    } else if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
     } else {
-      context.go(AppRouter.lastNonPlayerRoute);
+      final target = AppRouter.lastNonPlayerRoute.isNotEmpty
+          ? AppRouter.lastNonPlayerRoute
+          : AppRoutes.landing;
+      context.go(target);
     }
   }
   double _lastNonZeroVolume = 1.0;

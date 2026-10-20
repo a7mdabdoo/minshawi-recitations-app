@@ -257,12 +257,20 @@ class DownloadService {
       final recitationsDir =
           Directory('${dir.path}/al_minshawi_data/${AppConstants.downloadsDirName}');
       if (recitationsDir.existsSync()) {
+        final sanitizedId =
+            recitationId.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '_');
         for (final entity in recitationsDir.listSync()) {
           final p = entity.path;
           if (entity is File &&
-              (p.contains('/${recitationId}_') ||
-                  p.contains('\\${recitationId}_'))) {
-            if (entity.existsSync()) entity.deleteSync();
+              (p.contains('/$recitationId') ||
+                  p.contains('\\$recitationId') ||
+                  p.contains('/$sanitizedId') ||
+                  p.contains('\\$sanitizedId'))) {
+            if (entity.existsSync()) {
+              try {
+                entity.deleteSync();
+              } catch (_) {}
+            }
           }
         }
       }
@@ -286,8 +294,9 @@ class DownloadService {
     if (!await recitationsDir.exists()) {
       await recitationsDir.create(recursive: true);
     }
-    final fileName =
-        '${recitation.id}_${recitation.surahNameEn.replaceAll(' ', '_')}.mp3';
+    final sanitizedId =
+        recitation.id.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '_');
+    final fileName = '$sanitizedId.mp3';
     return '${recitationsDir.path}/$fileName';
   }
 }

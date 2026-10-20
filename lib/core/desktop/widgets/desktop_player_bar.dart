@@ -504,10 +504,12 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                             if (isOnPlayer) {
                               if (context.canPop()) {
                                 context.pop();
-                              } else if (Navigator.of(context).canPop()) {
-                                Navigator.of(context).pop();
                               } else {
-                                context.go(AppRouter.lastNonPlayerRoute);
+                                final target =
+                                    AppRouter.lastNonPlayerRoute.isNotEmpty
+                                        ? AppRouter.lastNonPlayerRoute
+                                        : AppRoutes.landing;
+                                context.go(target);
                               }
                             } else {
                               context.go(AppRoutes.player, extra: recitation?.id);

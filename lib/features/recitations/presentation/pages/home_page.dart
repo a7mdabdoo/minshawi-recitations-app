@@ -271,10 +271,10 @@ class _AppBar extends StatelessWidget {
           color: isDark ? AppColors.goldPrimary : AppColors.goldDark,
         ),
         onPressed: () {
-          if (Navigator.of(context).canPop()) {
+          if (context.canPop()) {
             context.pop();
           } else {
-            context.go('/');
+            context.go(AppRoutes.landing);
           }
         },
         tooltip: 'الرئيسية',

@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
@@ -138,7 +140,11 @@ class _DownloadsPageState extends State<DownloadsPage> {
                 context.read<DownloadedRecitationsCubit>().search('');
               });
             } else {
-              Navigator.of(context).pop();
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(AppRoutes.landing);
+              }
             }
           },
           tooltip: 'رجوع',
