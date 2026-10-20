@@ -86,12 +86,13 @@ flutter:
 # Run:  dart run msix:create
 msix_config:
   display_name: "جامع تلاوات المنشاوي"
-  publisher_display_name: "Ahmed Abdo"
-  identity_name: "com.minshawi.recitations"
-  publisher: "CN=Ahmed Abdo"
+  publisher_display_name: "AhmedAbdo"
+  identity_name: "AhmedAbdo.51462064CBD6A"
+  publisher: "CN=F4E87648-E5A1-4685-9B79-8A8E16C5FFCA"
   msix_version: 1.2.0.0
   logo_path: "assets/images/app_logo.png"
   capabilities: "internetClient"
   languages: "ar-EG, ar, en-US"
   output_name: "AlMinshawi-Windows-v1.2.0"
   install_certificate: false
+  store: true
