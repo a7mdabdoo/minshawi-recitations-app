@@ -82,13 +82,13 @@ void main() async {
       }
 
       try {
-        await Hive.initFlutter().timeout(const Duration(seconds: 3));
+        await Hive.initFlutter().timeout(const Duration(seconds: 15));
       } catch (e, st) {
         debugPrint('[INIT WARNING] Hive.initFlutter: $e\n$st');
       }
 
       try {
-        await setupServiceLocator().timeout(const Duration(seconds: 4));
+        await setupServiceLocator().timeout(const Duration(seconds: 15));
       } catch (e, st) {
         debugPrint('[INIT WARNING] setupServiceLocator: $e\n$st');
       } finally {
