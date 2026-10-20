@@ -61,3 +61,6 @@ key.properties
 # Symbolication & Obfuscation
 app.*.symbols
 app.*.map.json
+*.zip
+*.msix
+
