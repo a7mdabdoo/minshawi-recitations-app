@@ -1,7 +1,7 @@
 name: al_minshawi_recitations
 description: "تلاوات الشيخ محمد صديق المنشاوي النادرة"
 publish_to: "none"
-version: 1.2.0+4
+version: 1.2.1+5
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -89,10 +89,10 @@ msix_config:
   publisher_display_name: "AhmedAbdo"
   identity_name: "AhmedAbdo.51462064CBD6A"
   publisher: "CN=F4E87648-E5A1-4685-9B79-8A8E16C5FFCA"
-  msix_version: 1.2.0.0
+  msix_version: 1.2.1.0
   logo_path: "assets/images/app_logo.png"
   capabilities: "internetClient"
   languages: "ar-EG, ar, en-US"
-  output_name: "AlMinshawi-Recitations-v1.2.0"
+  output_name: "AlMinshawi-Recitations-v1.2.1"
   install_certificate: false
   store: true
