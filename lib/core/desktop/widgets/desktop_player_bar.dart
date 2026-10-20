@@ -24,6 +24,16 @@ class DesktopPlayerBar extends StatefulWidget {
 
 class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
   double _lastVolume = 1.0;
+  DateTime _lastActionTime = DateTime.fromMillisecondsSinceEpoch(0);
+
+  bool _canPerformAction([int cooldownMs = 250]) {
+    final now = DateTime.now();
+    if (now.difference(_lastActionTime).inMilliseconds < cooldownMs) {
+      return false;
+    }
+    _lastActionTime = now;
+    return true;
+  }
 
   String _getCollectionName(String? collectionId) {
     switch (collectionId) {
@@ -146,7 +156,9 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                                 : textSecondary.withAlpha(100),
                           ),
                           onPressed: recitation != null
-                              ? () => cubit.playPrevious()
+                              ? () {
+                                  if (_canPerformAction(250)) cubit.playPrevious();
+                                }
                               : null,
                         ),
                         IconButton(
@@ -159,13 +171,17 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                                 : textSecondary.withAlpha(100),
                           ),
                           onPressed: recitation != null
-                              ? () => cubit.skipBackward()
+                              ? () {
+                                  if (_canPerformAction(150)) cubit.skipBackward();
+                                }
                               : null,
                         ),
                         const SizedBox(width: 4),
                         GestureDetector(
                           onTap: recitation != null
-                              ? () => cubit.togglePlayPause()
+                              ? () {
+                                  if (_canPerformAction(250)) cubit.togglePlayPause();
+                                }
                               : null,
                           child: Container(
                             width: 42,
@@ -225,7 +241,9 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                                 : textSecondary.withAlpha(100),
                           ),
                           onPressed: recitation != null
-                              ? () => cubit.skipForward()
+                              ? () {
+                                  if (_canPerformAction(150)) cubit.skipForward();
+                                }
                               : null,
                         ),
                         IconButton(
@@ -238,7 +256,9 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                                 : textSecondary.withAlpha(100),
                           ),
                           onPressed: recitation != null
-                              ? () => cubit.playNext()
+                              ? () {
+                                  if (_canPerformAction(250)) cubit.playNext();
+                                }
                               : null,
                         ),
                         IconButton(
@@ -468,6 +488,19 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                         color: gold,
                       ),
                       onPressed: () {
+                        if (!_canPerformAction(400)) return;
+                        final currentLoc =
+                            GoRouterState.of(context).matchedLocation;
+                        if (currentLoc == '/player') {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          } else if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/');
+                          }
+                          return;
+                        }
                         context.push('/player', extra: recitation?.id);
                       },
                     ),

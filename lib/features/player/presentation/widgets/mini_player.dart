@@ -49,7 +49,11 @@ class _MiniPlayerContent extends StatelessWidget {
   final AudioPlayerState state;
   const _MiniPlayerContent({required this.state});
 
+  static bool _isOpeningFullPlayer = false;
+
   void _openFullPlayer(BuildContext context, String? recitationId) {
+    if (_isOpeningFullPlayer) return;
+    _isOpeningFullPlayer = true;
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         pageBuilder: (context, animation, secondaryAnimation) {
@@ -66,7 +70,9 @@ class _MiniPlayerContent extends StatelessWidget {
         },
         transitionDuration: const Duration(milliseconds: 320),
       ),
-    );
+    ).whenComplete(() {
+      _isOpeningFullPlayer = false;
+    });
   }
 
   @override

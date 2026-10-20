@@ -312,13 +312,15 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     _isTransitioning = false;
     _cancelNetworkTimeout();
 
-    final hivePath = _localDataSource.getDownloadedPath(recitation.id);
-    if (hivePath != null && File(hivePath).existsSync()) {
-      emit(AudioPlayerError(
-        message: _mapErrorMessage(error),
-        recitation: recitation,
-      ));
-      return;
+    if (!kIsWeb) {
+      final hivePath = _localDataSource.getDownloadedPath(recitation.id);
+      if (hivePath != null && File(hivePath).existsSync()) {
+        emit(AudioPlayerError(
+          message: _mapErrorMessage(error),
+          recitation: recitation,
+        ));
+        return;
+      }
     }
 
     _networkTimeoutTimer = Timer(const Duration(seconds: 7), () {
@@ -416,7 +418,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       final hivePath = recitation.localFilePath ??
           _localDataSource.getDownloadedPath(recitation.id);
 
-      if (hivePath != null) {
+      if (!kIsWeb && hivePath != null) {
         final file = File(hivePath);
         if (await file.exists() && (await file.length()) > 0) {
           validHivePath = hivePath;

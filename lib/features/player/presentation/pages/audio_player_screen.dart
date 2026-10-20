@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -358,7 +358,15 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               color: textSecondary,
             ),
             tooltip: 'إغلاق',
-            onPressed: () => Navigator.of(context).maybePop(),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            },
           ),
           Text(
             'مشغل التلاوات',
@@ -387,9 +395,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   }
 
   Widget _buildPortrait(double size, Color gold, bool isDark) {
-    final imageFile = File('assets/images/minshawi_portrait.jpg');
-    final hasLocalImage = imageFile.existsSync();
-
     return Center(
       child: Container(
         width: size,
@@ -418,27 +423,12 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   image: widget.portraitUiImage,
                   fit: BoxFit.cover,
                 )
-              : (hasLocalImage
-                  ? Image(
-                      image: ResizeImage(
-                        FileImage(imageFile),
-                        width: 500,
-                        height: 500,
-                      ),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _fallbackPortrait(size, gold, isDark),
-                    )
-                  : Image(
-                      image: const ResizeImage(
-                        AssetImage('assets/images/minshawi_portrait.jpg'),
-                        width: 500,
-                        height: 500,
-                      ),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _fallbackPortrait(size, gold, isDark),
-                    )),
+              : Image.asset(
+                  'assets/images/minshawi_portrait.jpg',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      _fallbackPortrait(size, gold, isDark),
+                ),
         ),
       ),
     );
@@ -1105,7 +1095,15 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               ),
             ),
           ),
-          onPressed: () => Navigator.of(context).maybePop(),
+          onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            },
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
             size: 20,
@@ -1706,7 +1704,15 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            onPressed: () => Navigator.of(context).maybePop(),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            },
             icon: const Icon(Icons.arrow_back_rounded, size: 18),
             label: Text(
               'العودة للتلاوات',

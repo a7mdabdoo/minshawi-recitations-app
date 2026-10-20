@@ -13,6 +13,11 @@ class DesktopNavigationRail extends StatelessWidget {
     required this.currentPath,
   });
 
+  void _safeNavigate(BuildContext context, String path) {
+    if (currentPath == path) return;
+    context.go(path);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -58,56 +63,56 @@ class DesktopNavigationRail extends StatelessWidget {
                   tooltip: 'الرئيسية',
                   route: '/',
                   currentPath: currentPath,
-                  onTap: () => context.go('/'),
+                  onTap: () => _safeNavigate(context, '/'),
                 ),
                 _RailIconItem(
                   icon: Icons.menu_book_rounded,
                   tooltip: 'المصحف المرتل',
                   route: '/recitations/complete_murattal',
                   currentPath: currentPath,
-                  onTap: () => context.go('/recitations/complete_murattal'),
+                  onTap: () => _safeNavigate(context, '/recitations/complete_murattal'),
                 ),
                 _RailIconItem(
                   icon: Icons.auto_stories_rounded,
                   tooltip: 'المصحف المجود',
                   route: '/recitations/mojawad',
                   currentPath: currentPath,
-                  onTap: () => context.go('/recitations/mojawad'),
+                  onTap: () => _safeNavigate(context, '/recitations/mojawad'),
                 ),
                 _RailIconItem(
                   icon: Icons.star_rounded,
                   tooltip: 'التلاوات النادرة',
                   route: '/recitations/rare_1387',
                   currentPath: currentPath,
-                  onTap: () => context.go('/recitations/rare_1387'),
+                  onTap: () => _safeNavigate(context, '/recitations/rare_1387'),
                 ),
                 _RailIconItem(
                   icon: Icons.queue_music_rounded,
                   tooltip: 'روائع النهاوند',
                   route: '/recitations/nahawand',
                   currentPath: currentPath,
-                  onTap: () => context.go('/recitations/nahawand'),
+                  onTap: () => _safeNavigate(context, '/recitations/nahawand'),
                 ),
                 _RailIconItem(
                   icon: Icons.download_done_rounded,
                   tooltip: 'التلاوات المحملة',
                   route: '/downloads',
                   currentPath: currentPath,
-                  onTap: () => context.go('/downloads'),
+                  onTap: () => _safeNavigate(context, '/downloads'),
                 ),
                 _RailIconItem(
                   icon: Icons.favorite_rounded,
                   tooltip: 'المفضلة',
                   route: '/favorites',
                   currentPath: currentPath,
-                  onTap: () => context.go('/favorites'),
+                  onTap: () => _safeNavigate(context, '/favorites'),
                 ),
                 _RailIconItem(
                   icon: Icons.playlist_play_rounded,
                   tooltip: 'قوائم التشغيل',
                   route: '/playlists',
                   currentPath: currentPath,
-                  onTap: () => context.go('/playlists'),
+                  onTap: () => _safeNavigate(context, '/playlists'),
                 ),
               ],
             ),

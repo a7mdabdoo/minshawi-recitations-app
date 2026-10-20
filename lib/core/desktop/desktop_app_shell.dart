@@ -6,7 +6,7 @@ import 'widgets/desktop_player_bar.dart';
 import 'widgets/desktop_shortcuts_handler.dart';
 import 'widgets/desktop_sidebar.dart';
 
-class DesktopAppShell extends StatelessWidget {
+class DesktopAppShell extends StatefulWidget {
   final String currentPath;
   final Widget child;
 
@@ -17,14 +17,29 @@ class DesktopAppShell extends StatelessWidget {
   });
 
   @override
+  State<DesktopAppShell> createState() => _DesktopAppShellState();
+}
+
+class _DesktopAppShellState extends State<DesktopAppShell> {
+  bool _isSidebarCollapsed = false;
+
+  void _toggleSidebar() {
+    setState(() {
+      _isSidebarCollapsed = !_isSidebarCollapsed;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isPlayerPage = widget.currentPath == '/player';
+
     return DesktopShortcutsHandler(
       child: LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth;
 
           if (width < Responsive.mobileBreakpoint) {
-            return child;
+            return widget.child;
           }
 
           if (width <= Responsive.tabletBreakpoint) {
@@ -34,12 +49,12 @@ class DesktopAppShell extends StatelessWidget {
                   Expanded(
                     child: Row(
                       children: [
-                        DesktopNavigationRail(currentPath: currentPath),
-                        Expanded(child: child),
+                        DesktopNavigationRail(currentPath: widget.currentPath),
+                        Expanded(child: widget.child),
                       ],
                     ),
                   ),
-                  const DesktopPlayerBar(),
+                  if (!isPlayerPage) const DesktopPlayerBar(),
                 ],
               ),
             );
@@ -51,12 +66,16 @@ class DesktopAppShell extends StatelessWidget {
                 Expanded(
                   child: Row(
                     children: [
-                      DesktopSidebar(currentPath: currentPath),
-                      Expanded(child: child),
+                      DesktopSidebar(
+                        currentPath: widget.currentPath,
+                        isCollapsed: _isSidebarCollapsed,
+                        onToggleCollapse: _toggleSidebar,
+                      ),
+                      Expanded(child: widget.child),
                     ],
                   ),
                 ),
-                const DesktopPlayerBar(),
+                if (!isPlayerPage) const DesktopPlayerBar(),
               ],
             ),
           );
