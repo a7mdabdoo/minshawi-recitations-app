@@ -19,6 +19,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   flutter::DartProject project(L"data");
 
+  // Disable experimental Impeller backend on Windows to use the stable, battle-tested Skia renderer
+  // and prevent driver/shader access violation crashes on Intel/AMD/NVIDIA and VM environments.
+  project.set_impeller_switch(flutter::ImpellerSwitch::Disabled);
+
   std::vector<std::string> command_line_arguments =
       GetCommandLineArguments();
 
