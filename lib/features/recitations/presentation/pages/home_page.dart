@@ -23,14 +23,22 @@ import '../cubit/recitation_list_state.dart';
 
 class HomePage extends StatelessWidget {
   final String collectionId;
-  const HomePage({super.key, this.collectionId = 'rare_1387'});
+  final bool initialFavoritesTab;
+  const HomePage({
+    super.key,
+    this.collectionId = 'rare_1387',
+    this.initialFavoritesTab = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     context
         .read<RecitationListCubit>()
         .loadRecitations(collectionId: collectionId);
-    return _HomeView(collectionId: collectionId);
+    return _HomeView(
+      collectionId: collectionId,
+      initialFavoritesTab: initialFavoritesTab,
+    );
   }
 }
 
@@ -38,7 +46,11 @@ enum _ListTab { golden, all, favorites }
 
 class _HomeView extends StatefulWidget {
   final String collectionId;
-  const _HomeView({required this.collectionId});
+  final bool initialFavoritesTab;
+  const _HomeView({
+    required this.collectionId,
+    this.initialFavoritesTab = false,
+  });
 
   @override
   State<_HomeView> createState() => _HomeViewState();
@@ -50,8 +62,20 @@ class _HomeViewState extends State<_HomeView> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    _selectedTab = _ListTab.all;
+    _selectedTab =
+        widget.initialFavoritesTab ? _ListTab.favorites : _ListTab.all;
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didUpdateWidget(covariant _HomeView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialFavoritesTab != oldWidget.initialFavoritesTab) {
+      setState(() {
+        _selectedTab =
+            widget.initialFavoritesTab ? _ListTab.favorites : _ListTab.all;
+      });
+    }
   }
 
   @override
@@ -1091,7 +1115,34 @@ class _RecitationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = 120.0 + MediaQuery.of(context).padding.bottom;
+    final width = MediaQuery.sizeOf(context).width;
+    final isLarge = width >= 600;
+    final bottomInset = isLarge ? 24.0 : (120.0 + MediaQuery.of(context).padding.bottom);
+
+    if (isLarge) {
+      return SliverPadding(
+        padding: EdgeInsets.fromLTRB(20, 8, 20, bottomInset),
+        sliver: SliverGrid(
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: width > 900 ? 380 : 440,
+            mainAxisExtent: 88,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => _RecitationCard(
+              recitation: items[index],
+              isDark: isDark,
+              displayIndex: index + 1,
+            ),
+            childCount: items.length,
+            addAutomaticKeepAlives: false,
+            addRepaintBoundaries: true,
+          ),
+        ),
+      );
+    }
+
     return SliverPadding(
       padding: EdgeInsets.fromLTRB(16, 8, 16, bottomInset),
       sliver: SliverList.separated(
@@ -1109,7 +1160,7 @@ class _RecitationList extends StatelessWidget {
   }
 }
 
-class _RecitationCard extends StatelessWidget {
+class _RecitationCard extends StatefulWidget {
   final Recitation recitation;
   final bool isDark;
   final int? displayIndex;
@@ -1119,26 +1170,33 @@ class _RecitationCard extends StatelessWidget {
     this.displayIndex,
   });
 
+  @override
+  State<_RecitationCard> createState() => _RecitationCardState();
+}
+
+class _RecitationCardState extends State<_RecitationCard> {
+  bool _isHovered = false;
+
   void _showDeleteDialog(BuildContext context, DownloadCubit cubit) {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
         backgroundColor:
-            isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface,
+            widget.isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'حذف التلاوة المحمّلة',
           style: GoogleFonts.cairo(
             fontWeight: FontWeight.w700,
             color:
-                isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                widget.isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
           ),
         ),
         content: Text(
-          'هل تريد حذف تلاوة سورة ${recitation.surahNameAr} من التخزين المحلي؟',
+          'هل تريد حذف تلاوة سورة ${widget.recitation.surahNameAr} من التخزين المحلي؟',
           style: GoogleFonts.cairo(
             fontSize: 13,
-            color: isDark
+            color: widget.isDark
                 ? AppColors.darkTextSecondary
                 : AppColors.lightTextSecondary,
           ),
@@ -1149,7 +1207,7 @@ class _RecitationCard extends StatelessWidget {
             child: Text(
               'إلغاء',
               style: GoogleFonts.cairo(
-                color: isDark
+                color: widget.isDark
                     ? AppColors.darkTextSecondary
                     : AppColors.lightTextSecondary,
               ),
@@ -1162,7 +1220,7 @@ class _RecitationCard extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.of(dialogCtx).pop();
-              cubit.deleteDownload(recitation);
+              cubit.deleteDownload(widget.recitation);
             },
             child: Text(
               'حذف',
@@ -1176,7 +1234,7 @@ class _RecitationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final r = recitation;
+    final r = widget.recitation;
     final nahawand = r is NahawandRecitationModel ? r : null;
 
     final isActive = context.select<AudioPlayerCubit, bool>((cubit) {
@@ -1186,28 +1244,47 @@ class _RecitationCard extends StatelessWidget {
       return false;
     });
 
-    final activeGold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
+    final activeGold = widget.isDark ? AppColors.goldPrimary : AppColors.goldDark;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      decoration: BoxDecoration(
-        color: isActive
-            ? (isDark
-                ? AppColors.goldPrimary.withAlpha(18)
-                : AppColors.goldDark.withAlpha(12))
-            : (isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        transform: _isHovered
+            ? Matrix4.translationValues(0, -2, 0)
+            : Matrix4.identity(),
+        decoration: BoxDecoration(
           color: isActive
-              ? activeGold.withAlpha(160)
-              : r.isDownloaded
-                  ? AppColors.downloadedColor.withAlpha(90)
-                  : isDark
-                      ? AppColors.darkBorder
-                      : AppColors.lightBorder,
-          width: isActive ? 1.5 : 1.0,
+              ? (widget.isDark
+                  ? AppColors.goldPrimary.withAlpha(22)
+                  : AppColors.goldDark.withAlpha(14))
+              : (_isHovered
+                  ? (widget.isDark ? const Color(0xFF222834) : const Color(0xFFF1F5F9))
+                  : (widget.isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface)),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            if (_isHovered)
+              BoxShadow(
+                color: activeGold.withAlpha(widget.isDark ? 35 : 20),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+          ],
+          border: Border.all(
+            color: isActive
+                ? activeGold.withAlpha(160)
+                : (_isHovered
+                    ? activeGold.withAlpha(widget.isDark ? 110 : 70)
+                    : (r.isDownloaded
+                        ? AppColors.downloadedColor.withAlpha(90)
+                        : (widget.isDark
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder))),
+            width: isActive || _isHovered ? 1.5 : 1.0,
+          ),
         ),
-      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -1230,10 +1307,10 @@ class _RecitationCard extends StatelessWidget {
               children: [
                 _SurahBadge(
                   number: nahawand != null
-                      ? (displayIndex ?? nahawand.nahawandId)
+                      ? (widget.displayIndex ?? nahawand.nahawandId)
                       : r.surahNumber,
                   isActive: isActive,
-                  isDark: isDark,
+                  isDark: widget.isDark,
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -1250,7 +1327,7 @@ class _RecitationCard extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                                 color: isActive
                                     ? activeGold
-                                    : (isDark
+                                    : (widget.isDark
                                         ? AppColors.darkTextPrimary
                                         : AppColors.lightTextPrimary),
                               ),
@@ -1275,7 +1352,7 @@ class _RecitationCard extends StatelessWidget {
                             : '${r.sourceLabel} • ${r.surahNameEn} • ${r.trailingVerseOrLocation}',
                         style: GoogleFonts.cairo(
                           fontSize: 11.5,
-                          color: isDark
+                          color: widget.isDark
                               ? AppColors.darkTextSecondary
                               : AppColors.lightTextSecondary,
                         ),
@@ -1294,7 +1371,7 @@ class _RecitationCard extends StatelessWidget {
                                     ? '${nahawand.durationFormatted} دقيقة'
                                     : Formatters.formatDuration(
                                         r.durationSeconds),
-                                isDark: isDark,
+                                isDark: widget.isDark,
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -1307,7 +1384,7 @@ class _RecitationCard extends StatelessWidget {
                                   : (r.recordingYear.contains('/')
                                       ? r.recordingYear.split('/')[0].trim()
                                       : r.recordingYear),
-                              isDark: isDark,
+                              isDark: widget.isDark,
                             ),
                           ),
                         ],
@@ -1319,7 +1396,7 @@ class _RecitationCard extends StatelessWidget {
                 _CardActionButtons(
                   recitation: r,
                   isActive: isActive,
-                  isDark: isDark,
+                  isDark: widget.isDark,
                   onDeleteRequested: () =>
                       _showDeleteDialog(context, context.read<DownloadCubit>()),
                 ),
@@ -1328,7 +1405,7 @@ class _RecitationCard extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 

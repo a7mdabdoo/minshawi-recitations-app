@@ -36,6 +36,9 @@ class MiniPlayer extends StatelessWidget {
         if (state is AudioPlayerIdle) {
           return const SizedBox.shrink();
         }
+        if (MediaQuery.sizeOf(context).width >= 600) {
+          return const SizedBox.shrink();
+        }
         return RepaintBoundary(child: _MiniPlayerContent(state: state));
       },
     );

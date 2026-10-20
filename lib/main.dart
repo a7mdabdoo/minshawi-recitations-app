@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show PointerDeviceKind;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,7 +33,11 @@ void main() async {
             '[FLUTTER ERROR] ${details.exceptionAsString()}\n${details.stack}');
       };
 
-      if (!kIsWeb) {
+      final isMobilePlatform = !kIsWeb &&
+          (defaultTargetPlatform == TargetPlatform.android ||
+              defaultTargetPlatform == TargetPlatform.iOS);
+
+      if (isMobilePlatform) {
         try {
           await JustAudioBackground.init(
             androidNotificationChannelId:
@@ -98,6 +103,18 @@ void main() async {
   );
 }
 
+class AppScrollBehavior extends MaterialScrollBehavior {
+  const AppScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.trackpad,
+      };
+}
+
 class AlMinshawIApp extends StatelessWidget {
   const AlMinshawIApp({super.key});
 
@@ -123,6 +140,7 @@ class AlMinshawIApp extends StatelessWidget {
           return MaterialApp.router(
             title: 'جامع تلاوات المنشاوي',
             debugShowCheckedModeBanner: false,
+            scrollBehavior: const AppScrollBehavior(),
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeMode,

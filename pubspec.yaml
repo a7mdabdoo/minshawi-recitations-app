@@ -49,6 +49,7 @@ dependencies:
   web: ^1.1.0
 
   cupertino_icons: ^1.0.8
+  just_audio_windows: ^0.2.3
 
 dev_dependencies:
   flutter_test:

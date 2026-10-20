@@ -224,6 +224,22 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
                   return LayoutBuilder(
                     builder: (context, constraints) {
+                      if (constraints.maxWidth > 900) {
+                        return _buildDesktopSplitView(
+                          context: context,
+                          constraints: constraints,
+                          recitation: recitation,
+                          state: state,
+                          cubit: cubit,
+                          gold: gold,
+                          textPrimary: textPrimary,
+                          textSecondary: textSecondary,
+                          cardSurface: cardSurface,
+                          cardBorder: cardBorder,
+                          inactiveTrackColor: inactiveTrackColor,
+                          isDark: isDark,
+                        );
+                      }
                       final maxHeight = constraints.maxHeight;
                       final isTall = maxHeight > 680;
                       final portraitSize =
@@ -1701,7 +1717,341 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       ),
     );
   }
+
+  Widget _buildDesktopSplitView({
+    required BuildContext context,
+    required BoxConstraints constraints,
+    required Recitation? recitation,
+    required AudioPlayerState state,
+    required AudioPlayerCubit cubit,
+    required Color gold,
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color cardSurface,
+    required Color cardBorder,
+    required Color inactiveTrackColor,
+    required bool isDark,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+              decoration: BoxDecoration(
+                color: cardSurface.withAlpha(isDark ? 50 : 160),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: cardBorder),
+              ),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    _buildTopBar(
+                      context,
+                      recitation,
+                      textPrimary,
+                      textSecondary,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildPortrait(
+                      190,
+                      gold,
+                      isDark,
+                    ),
+                    const SizedBox(height: 16),
+                    if (recitation != null)
+                      _buildTrackInfo(
+                        context,
+                        recitation,
+                        textPrimary,
+                        textSecondary,
+                      ),
+                    const SizedBox(height: 14),
+                    _PlayerSeekBarSection(
+                      gold: gold,
+                      textSecondary: textSecondary,
+                      inactiveTrackColor: inactiveTrackColor,
+                      cubit: cubit,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildPrimaryControls(
+                      state,
+                      cubit,
+                      gold,
+                      textPrimary,
+                      textSecondary,
+                      isDark,
+                    ),
+                    const SizedBox(height: 16),
+                    if (recitation != null)
+                      _buildSecondaryToolsBar(
+                        context,
+                        recitation,
+                        state,
+                        cubit,
+                        gold,
+                        textSecondary,
+                        cardSurface,
+                        cardBorder,
+                        isDark,
+                      ),
+                    const SizedBox(height: 12),
+                    _buildVolumeSlider(
+                      context,
+                      cubit,
+                      gold,
+                      textSecondary,
+                      inactiveTrackColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            flex: 5,
+            child: _DesktopPlaylistPanel(
+              playlist: cubit.playlist,
+              currentRecitation: recitation,
+              gold: gold,
+              textPrimary: textPrimary,
+              textSecondary: textSecondary,
+              cardSurface: cardSurface,
+              cardBorder: cardBorder,
+              isDark: isDark,
+              onSelectRecitation: (r) => cubit.play(r),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
+
+
+class _DesktopPlaylistPanel extends StatefulWidget {
+  final List<Recitation> playlist;
+  final Recitation? currentRecitation;
+  final Color gold;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color cardSurface;
+  final Color cardBorder;
+  final bool isDark;
+  final void Function(Recitation) onSelectRecitation;
+
+  const _DesktopPlaylistPanel({
+    required this.playlist,
+    required this.currentRecitation,
+    required this.gold,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.cardSurface,
+    required this.cardBorder,
+    required this.isDark,
+    required this.onSelectRecitation,
+  });
+
+  @override
+  State<_DesktopPlaylistPanel> createState() => _DesktopPlaylistPanelState();
+}
+
+class _DesktopPlaylistPanelState extends State<_DesktopPlaylistPanel> {
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = widget.playlist.where((r) {
+      if (_query.isEmpty) return true;
+      return r.surahNameAr.contains(_query) ||
+          r.surahNumber.toString().contains(_query);
+    }).toList();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.cardSurface.withAlpha(widget.isDark ? 60 : 160),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: widget.cardBorder),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+            child: Row(
+              children: [
+                Icon(Icons.queue_music_rounded, color: widget.gold, size: 22),
+                const SizedBox(width: 8),
+                Text(
+                  'قائمة السور والتلاوات (${widget.playlist.length})',
+                  style: GoogleFonts.cairo(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: widget.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: TextField(
+              controller: _searchController,
+              textDirection: TextDirection.rtl,
+              style: GoogleFonts.cairo(
+                fontSize: 13,
+                color: widget.textPrimary,
+              ),
+              onChanged: (val) => setState(() => _query = val.trim()),
+              decoration: InputDecoration(
+                hintText: 'بحث في قائمة السور...',
+                hintStyle: GoogleFonts.cairo(
+                  fontSize: 12.5,
+                  color: widget.textSecondary,
+                ),
+                prefixIcon: Icon(
+                  Icons.search_rounded,
+                  size: 19,
+                  color: widget.gold,
+                ),
+                suffixIcon: _query.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded, size: 16),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _query = '');
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: (widget.isDark ? Colors.white : Colors.black).withAlpha(12),
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: widget.cardBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: widget.gold, width: 1.2),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Expanded(
+            child: filtered.isEmpty
+                ? Center(
+                    child: Text(
+                      'لا توجد تلاوات مطابقة للبحث',
+                      style: GoogleFonts.cairo(
+                        fontSize: 12.5,
+                        color: widget.textSecondary,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: filtered.length,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    itemBuilder: (context, index) {
+                      final item = filtered[index];
+                      final isCurrent =
+                          item.id == widget.currentRecitation?.id;
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 3),
+                        decoration: BoxDecoration(
+                          color: isCurrent
+                              ? widget.gold.withAlpha(widget.isDark ? 36 : 28)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isCurrent
+                                ? widget.gold
+                                    .withAlpha(widget.isDark ? 110 : 80)
+                                : Colors.transparent,
+                          ),
+                        ),
+                        child: ListTile(
+                          dense: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          leading: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isCurrent
+                                  ? widget.gold
+                                  : (widget.isDark
+                                      ? Colors.white.withAlpha(14)
+                                      : Colors.black.withAlpha(8)),
+                            ),
+                            child: Center(
+                              child: isCurrent
+                                  ? const Icon(
+                                      Icons.volume_up_rounded,
+                                      size: 16,
+                                      color: Colors.black,
+                                    )
+                                  : Text(
+                                      item.surahNumber.toString(),
+                                      style: GoogleFonts.cairo(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: isCurrent
+                                            ? Colors.black
+                                            : widget.textSecondary,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          title: Text(
+                            'سورة ${item.surahNameAr}',
+                            style: GoogleFonts.cairo(
+                              fontSize: 13,
+                              fontWeight: isCurrent
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: isCurrent
+                                  ? widget.gold
+                                  : widget.textPrimary,
+                            ),
+                          ),
+                          trailing: Text(
+                            Formatters.formatDuration(item.durationSeconds),
+                            style: GoogleFonts.cairo(
+                              fontSize: 11,
+                              color: widget.textSecondary,
+                            ),
+                          ),
+                          onTap: () => widget.onSelectRecitation(item),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _PlayerSeekBarSection extends StatefulWidget {
   final Color gold;

@@ -28,6 +28,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
   Recitation? get currentRecitation => _currentRecitation;
 
   List<Recitation> _playlist = [];
+  List<Recitation> get playlist => List.unmodifiable(_playlist);
 
   LoopMode _loopMode = LoopMode.off;
   LoopMode get loopMode => _loopMode;

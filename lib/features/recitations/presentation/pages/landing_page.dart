@@ -931,53 +931,67 @@ class _VerticalCategoryCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final isLarge = width >= 600;
+
+    final cards = [
+      _WideCategoryCard(
+        title: 'المصحف المرتل',
+        subtitle: 'الختمة الكاملة برواية حفص عن عاصم',
+        countBadge: '١١٤ سورة',
+        isDark: isDark,
+        onTap: () => context.push('/recitations/complete_murattal'),
+      ),
+      _WideCategoryCard(
+        title: 'المصحف المجود',
+        subtitle: 'المصحف المجود كاملاً برواية حفص عن عاصم',
+        countBadge: '١١٤ سورة',
+        isDark: isDark,
+        onTap: () => context.push('/recitations/mojawad'),
+      ),
+      _WideCategoryCard(
+        title: 'التلاوات النادرة',
+        subtitle: 'تسجيلات ١٣٨٧ هـ الخارجية النادرة',
+        countBadge: '٢٦ سورة',
+        isDark: isDark,
+        onTap: () => context.push('/recitations/rare_1387'),
+      ),
+      _WideCategoryCard(
+        title: 'روائع النهاوند',
+        subtitle: 'أشهر المحافل التاريخية الخالدة بمقام النهاوند',
+        countBadge: '٣٠٣ تسجيلات',
+        isDark: isDark,
+        onTap: () => context.push('/recitations/nahawand'),
+      ),
+    ];
+
+    if (isLarge) {
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: width > 900 ? 460 : 520,
+          mainAxisExtent: 84,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 12,
+        ),
+        itemCount: cards.length,
+        itemBuilder: (context, index) => RepaintBoundary(child: cards[index]),
+      );
+    }
+
     return Column(
       children: [
-        RepaintBoundary(
-          child: _WideCategoryCard(
-            title: 'المصحف المرتل',
-            subtitle: 'الختمة الكاملة برواية حفص عن عاصم',
-            countBadge: '١١٤ سورة',
-            isDark: isDark,
-            onTap: () => context.push('/recitations/complete_murattal'),
-          ),
-        ),
-        const SizedBox(height: 10),
-        RepaintBoundary(
-          child: _WideCategoryCard(
-            title: 'المصحف المجود',
-            subtitle: 'المصحف المجود كاملاً برواية حفص عن عاصم',
-            countBadge: '١١٤ سورة',
-            isDark: isDark,
-            onTap: () => context.push('/recitations/mojawad'),
-          ),
-        ),
-        const SizedBox(height: 10),
-        RepaintBoundary(
-          child: _WideCategoryCard(
-            title: 'التلاوات النادرة',
-            subtitle: 'تسجيلات ١٣٨٧ هـ الخارجية النادرة',
-            countBadge: '٢٦ سورة',
-            isDark: isDark,
-            onTap: () => context.push('/recitations/rare_1387'),
-          ),
-        ),
-        const SizedBox(height: 10),
-        RepaintBoundary(
-          child: _WideCategoryCard(
-            title: 'روائع النهاوند',
-            subtitle: 'أشهر المحافل التاريخية الخالدة بمقام النهاوند',
-            countBadge: '٣٠٣ تسجيلات',
-            isDark: isDark,
-            onTap: () => context.push('/recitations/nahawand'),
-          ),
-        ),
+        for (int i = 0; i < cards.length; i++) ...[
+          RepaintBoundary(child: cards[i]),
+          if (i < cards.length - 1) const SizedBox(height: 10),
+        ],
       ],
     );
   }
 }
 
-class _WideCategoryCard extends StatelessWidget {
+class _WideCategoryCard extends StatefulWidget {
   final String title;
   final String subtitle;
   final String countBadge;
@@ -993,135 +1007,161 @@ class _WideCategoryCard extends StatelessWidget {
   });
 
   @override
+  State<_WideCategoryCard> createState() => _WideCategoryCardState();
+}
+
+class _WideCategoryCardState extends State<_WideCategoryCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     const gold = Color(0xFFD4AF37);
     final textPrimary =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+        widget.isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final textSecondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+        widget.isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: isDark
-              ? [const Color(0xFF15202B), const Color(0xFF0F1720)]
-              : [const Color(0xFFFFFFFF), const Color(0xFFF7F9FA)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-        border: Border.all(
-          color: gold.withValues(alpha: isDark ? 0.25 : 0.35),
-          width: 1.0,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        transform: _isHovered
+            ? Matrix4.translationValues(0, -2, 0)
+            : Matrix4.identity(),
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          onTap: onTap,
-          splashColor: gold.withValues(alpha: 0.12),
-          highlightColor: gold.withValues(alpha: 0.06),
-          child: ClipRRect(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: widget.isDark
+                ? [
+                    _isHovered ? const Color(0xFF1A2634) : const Color(0xFF15202B),
+                    const Color(0xFF0F1720)
+                  ]
+                : [
+                    const Color(0xFFFFFFFF),
+                    _isHovered ? const Color(0xFFEFF3F6) : const Color(0xFFF7F9FA)
+                  ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _isHovered
+                  ? gold.withValues(alpha: widget.isDark ? 0.22 : 0.12)
+                  : Colors.black.withValues(alpha: widget.isDark ? 0.3 : 0.05),
+              blurRadius: _isHovered ? 14 : 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+          border: Border.all(
+            color: _isHovered
+                ? gold.withValues(alpha: widget.isDark ? 0.65 : 0.75)
+                : gold.withValues(alpha: widget.isDark ? 0.25 : 0.35),
+            width: _isHovered ? 1.5 : 1.0,
+          ),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(10),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 0,
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 3.5,
-                    decoration: BoxDecoration(
-                      color: gold.withValues(alpha: isDark ? 0.85 : 0.95),
-                      borderRadius: const BorderRadius.horizontal(
-                        right: Radius.circular(10),
+            onTap: widget.onTap,
+            splashColor: gold.withValues(alpha: 0.12),
+            highlightColor: gold.withValues(alpha: 0.06),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 3.5,
+                      decoration: BoxDecoration(
+                        color: gold.withValues(alpha: widget.isDark ? 0.85 : 0.95),
+                        borderRadius: const BorderRadius.horizontal(
+                          right: Radius.circular(10),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 18, 14),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 18, 14),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.title,
+                                style: GoogleFonts.amiri(
+                                  fontSize: 18.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: textPrimary,
+                                  height: 1.25,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                widget.subtitle,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w500,
+                                  color: textSecondary,
+                                  height: 1.3,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              title,
-                              style: GoogleFonts.amiri(
-                                fontSize: 18.5,
-                                fontWeight: FontWeight.w700,
-                                color: textPrimary,
-                                height: 1.25,
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 9,
+                                vertical: 4,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              decoration: BoxDecoration(
+                                color:
+                                    gold.withValues(alpha: widget.isDark ? 0.12 : 0.08),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color:
+                                      gold.withValues(alpha: widget.isDark ? 0.35 : 0.4),
+                                  width: 0.9,
+                                ),
+                              ),
+                              child: Text(
+                                widget.countBadge,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: gold,
+                                ),
+                              ),
                             ),
-                            const SizedBox(height: 3),
-                            Text(
-                              subtitle,
-                              style: GoogleFonts.cairo(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w500,
-                                color: textSecondary,
-                                height: 1.3,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 13,
+                              color: gold.withValues(alpha: 0.75),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 9,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color:
-                                  gold.withValues(alpha: isDark ? 0.12 : 0.08),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color:
-                                    gold.withValues(alpha: isDark ? 0.35 : 0.4),
-                                width: 0.9,
-                              ),
-                            ),
-                            child: Text(
-                              countBadge,
-                              style: GoogleFonts.cairo(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: gold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.arrow_back_ios_new_rounded,
-                            size: 13,
-                            color: gold.withValues(alpha: 0.75),
-                          ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
