@@ -23,12 +23,10 @@ class DesktopAppShell extends StatelessWidget {
         builder: (context, constraints) {
           final width = constraints.maxWidth;
 
-          // 1. Mobile (< 600px): Clean mobile view without sidebar or bottom bar
           if (width < Responsive.mobileBreakpoint) {
             return child;
           }
 
-          // 2. Tablet (600px - 900px): Compact NavigationRail + Content + Bottom Player Bar
           if (width <= Responsive.tabletBreakpoint) {
             return Scaffold(
               body: Column(
@@ -47,7 +45,6 @@ class DesktopAppShell extends StatelessWidget {
             );
           }
 
-          // 3. Desktop (> 900px): Full Sidebar + Main Content + Full-width Persistent Player Bar
           return Scaffold(
             body: Column(
               children: [

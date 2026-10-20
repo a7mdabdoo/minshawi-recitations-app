@@ -103,7 +103,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
           ),
           child: Row(
             children: [
-              // 1. Right Section: Track info & Favorite
               Expanded(
                 flex: 3,
                 child: _buildTrackInfo(
@@ -116,17 +115,14 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                 ),
               ),
 
-              // 2. Center Section: Playback controls & Seek Bar
               Expanded(
                 flex: 5,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Controls Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Shuffle
                         IconButton(
                           tooltip: isShuffle
                               ? 'إلغاء التشغيل العشوائي'
@@ -140,7 +136,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                               ? () => cubit.toggleShuffle()
                               : null,
                         ),
-                        // Previous
                         IconButton(
                           tooltip: 'التلاوة السابقة',
                           icon: Icon(
@@ -154,7 +149,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                               ? () => cubit.playPrevious()
                               : null,
                         ),
-                        // Rewind 10s
                         IconButton(
                           tooltip: 'تأخير ١٠ ثوانٍ',
                           icon: Icon(
@@ -169,7 +163,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                               : null,
                         ),
                         const SizedBox(width: 4),
-                        // Play / Pause Circle
                         GestureDetector(
                           onTap: recitation != null
                               ? () => cubit.togglePlayPause()
@@ -222,7 +215,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        // Forward 10s
                         IconButton(
                           tooltip: 'تقديم ١٠ ثوانٍ',
                           icon: Icon(
@@ -236,7 +228,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                               ? () => cubit.skipForward()
                               : null,
                         ),
-                        // Next
                         IconButton(
                           tooltip: 'التلاوة التالية',
                           icon: Icon(
@@ -250,7 +241,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                               ? () => cubit.playNext()
                               : null,
                         ),
-                        // Loop Mode
                         IconButton(
                           tooltip: loopMode == LoopMode.one
                               ? 'تكرار التلاوة الحالية'
@@ -270,7 +260,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                               ? () => cubit.toggleLoopMode()
                               : null,
                         ),
-                        // A-B Repeat
                         IconButton(
                           tooltip: isAbActive
                               ? 'إلغاء تكرار A-B'
@@ -287,7 +276,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                       ],
                     ),
 
-                    // Progress Bar Row (Isolated for high-performance position updates)
                     _DesktopPlayerProgressBar(
                       cubit: cubit,
                       recitation: recitation,
@@ -299,13 +287,11 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                 ),
               ),
 
-              // 3. Left Section: Volume, Speed, Sleep, Expand
               Expanded(
                 flex: 3,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // Playback Speed
                     PopupMenuButton<double>(
                       tooltip: 'سرعة التلاوة',
                       initialValue: speed,
@@ -367,7 +353,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                     ),
                     const SizedBox(width: 6),
 
-                    // Sleep Timer
                     IconButton(
                       tooltip: 'مؤقت النوم',
                       icon: Icon(
@@ -378,7 +363,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                       onPressed: () => showSleepTimerBottomSheet(context),
                     ),
 
-                    // Download Button
                     if (recitation != null)
                       BlocBuilder<DownloadCubit, DownloadState>(
                         builder: (context, downloadState) {
@@ -426,7 +410,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                         },
                       ),
 
-                    // Volume Control
                     IconButton(
                       tooltip: cubit.volume == 0 ? 'إلغاء الكتم' : 'كتم الصوت',
                       icon: Icon(
@@ -477,7 +460,6 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
 
                     const SizedBox(width: 8),
 
-                    // Expand to Full Player
                     IconButton(
                       tooltip: 'مشغل التلاوات الكامل',
                       icon: Icon(
