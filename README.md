@@ -19,9 +19,6 @@
   <a href="https://apps.microsoft.com/detail/9npbg9mjslhp">
     <img src="https://img.shields.io/badge/Microsoft%20Store-Available%20Now-0078d4?style=for-the-badge&logo=windows11&logoColor=white" alt="Microsoft Store">
   </a>
-  <a href="https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/AlMinshawi-Recitations-Portable-v1.2.1.zip">
-    <img src="https://img.shields.io/badge/Download-Windows%20Portable-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows Portable">
-  </a>
   <a href="https://apkpure.com/p/com.minshawi.recitations">
     <img src="https://img.shields.io/badge/Download%20on-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white" alt="Download on APKPure">
   </a>
@@ -43,9 +40,8 @@
 
 | المصدر | نوع التثبيت | رابط الاستخدام / التحميل | الحالة |
 | :--- | :--- | :---: | :---: |
-| **متجر مايكروسوفت (Microsoft Store)** | التثبيت الرسمي المباشر لنظام ويندوز 10/11 | [![Get from Microsoft](https://img.shields.io/badge/Get%20it%20from-Microsoft%20Store-0078d4?style=for-the-badge&logo=windows11&logoColor=white)](https://apps.microsoft.com/detail/9npbg9mjslhp) | متاح رسمياً على المتجر |
+| **متجر مايكروسوفت (Microsoft Store)** | التثبيت الرسمي المباشر لنظام ويندوز 10/11 مع تحديثات تلقائية | [![Get from Microsoft](https://img.shields.io/badge/Get%20it%20from-Microsoft%20Store-0078d4?style=for-the-badge&logo=windows11&logoColor=white)](https://apps.microsoft.com/detail/9npbg9mjslhp) | متاح رسمياً على المتجر |
 | **مثبت المتجر السريع (Store Installer)** | ملف تنفيذي خفيف ينقر عليه لتثبيت التطبيق فوراً من المتجر | [![Download Installer](https://img.shields.io/badge/Download-Store%20Installer%20.exe-0078d4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/AlMinshawi-Store-Installer.exe) | تثبيت مباشر بنقرة واحدة |
-| **نسخة الويندوز المحمولة (Windows Portable)** | نسخة كمبيوتر محمولة تعمل مباشرة بدون تثبيت (ZIP) | [![Download Windows](https://img.shields.io/badge/Download-Portable%20ZIP%20v1.2.1-0078d4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/AlMinshawi-Recitations-Portable-v1.2.1.zip) | متاح ومباشر |
 | **نسخة الويب (Web App)** | تصفح واستماع فوري بدون تحميل | [![Live Web App](https://img.shields.io/badge/Open-Web%20App-0ea5e9?style=for-the-badge&logo=google-chrome&logoColor=white)](https://a7mdabdoo.github.io/minshawi-recitations-app/) | متاح ويعمل |
 | **متجر APKPure (Android)** | المتجر الرسمي المعتمد للتطبيق على أندرويد | [![Download on APKPure](https://img.shields.io/badge/Download-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white)](https://apkpure.com/p/com.minshawi.recitations) | متاح على المتجر |
 | **مستودع GitHub (Android APK)** | تحميل ملف الـ APK المباشر للأندرويد (v1.2.0) | [![Download APK](https://img.shields.io/badge/Download-AlMinshawi--v1.2.0.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/AlMinshawi-v1.2.0.apk) | متاح ومباشر |
