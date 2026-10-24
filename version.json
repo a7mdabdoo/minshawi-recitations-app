@@ -15,7 +15,7 @@
     "latest_version": "1.2.1",
     "build_number": 5,
     "release_notes": "- تحديث وإصلاح شامل لتطبيق ويندوز ومتجر مايكروسوفت.\n- تحسين استقرار مشغل الصوت ومنع تعارض الملفات أثناء التنزيل.\n- إصلاح التنقل والرجوع للشاشة الرئيسية وضمان استقرار العرض التام.",
-    "download_url": "https://github.com/a7mdabdoo/minshawi-recitations-app/releases/tag/v1.2.1",
+    "download_url": "https://apps.microsoft.com/detail/9npbg9mjslhp",
     "force_update": false
   }
 }
