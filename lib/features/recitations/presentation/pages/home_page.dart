@@ -8,7 +8,6 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/settings/settings_cubit.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dart';
@@ -1323,8 +1322,8 @@ class _RecitationCardState extends State<_RecitationCard> {
                       Row(
                         children: [
                           Flexible(
-                            child: MarqueeText(
-                              text: r.surahNameAr,
+                            child: Text(
+                              r.cleanSurahTitleWithVerses,
                               style: GoogleFonts.amiri(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -1334,6 +1333,8 @@ class _RecitationCardState extends State<_RecitationCard> {
                                         ? AppColors.darkTextPrimary
                                         : AppColors.lightTextPrimary),
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (r.isDownloaded) ...[
@@ -1348,9 +1349,7 @@ class _RecitationCardState extends State<_RecitationCard> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        nahawand != null
-                            ? '${r.sourceLabel} • ${nahawand.durationFormatted} • ${r.trailingVerseOrLocation}'
-                            : '${r.sourceLabel} • ${r.surahNameEn} • ${r.trailingVerseOrLocation}',
+                        '${r.cleanLocationOrDetail} • ${r.sourceLabel}',
                         style: GoogleFonts.cairo(
                           fontSize: 11.5,
                           color: widget.isDark

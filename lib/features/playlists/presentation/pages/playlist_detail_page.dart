@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/marquee_text.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
@@ -639,15 +638,15 @@ class _PlaylistRecitationCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          MarqueeText(
-                            text: recitation.surahNameAr.startsWith('سورة')
-                                ? recitation.surahNameAr
-                                : 'سورة ${recitation.surahNameAr.isNotEmpty ? recitation.surahNameAr : recitation.surahNameEn}',
+                          Text(
+                            recitation.cleanSurahTitleWithVerses,
                             style: GoogleFonts.amiri(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: textPrimary,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
                           Row(
@@ -677,9 +676,7 @@ class _PlaylistRecitationCard extends StatelessWidget {
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  recitation.trailingVerseOrLocation.isNotEmpty
-                                      ? '• ${Formatters.formatDuration(recitation.durationSeconds)} • ${recitation.trailingVerseOrLocation}'
-                                      : '• ${Formatters.formatDuration(recitation.durationSeconds)}',
+                                  '• ${Formatters.formatDuration(recitation.durationSeconds)} • ${recitation.cleanLocationOrDetail}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.cairo(

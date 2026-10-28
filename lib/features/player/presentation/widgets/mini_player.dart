@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../cubit/audio_player_cubit.dart';
@@ -154,25 +153,45 @@ class _MiniPlayerContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Flexible(
-                                  child: MarqueeText(
-                                    text: recitation?.surahNameAr ?? '',
-                                    style: GoogleFonts.amiri(
-                                      color: textPrimary,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        recitation?.cleanSurahTitleWithVerses ?? '',
+                                        style: GoogleFonts.amiri(
+                                          color: textPrimary,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          height: 1.2,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.keyboard_arrow_up_rounded,
+                                      size: 18,
+                                      color: gold,
+                                    ),
+                                  ],
+                                ),
+                                if (recitation != null)
+                                  Text(
+                                    recitation.cleanLocationOrDetail,
+                                    style: GoogleFonts.cairo(
+                                      color: textSecondary,
+                                      fontSize: 11,
+                                      height: 1.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.keyboard_arrow_up_rounded,
-                                  size: 20,
-                                  color: gold,
-                                ),
                               ],
                             ),
                           ),

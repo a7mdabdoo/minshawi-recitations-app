@@ -7,7 +7,6 @@ import 'package:just_audio/just_audio.dart';
 import '../../router/app_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/formatters.dart';
-import '../../widgets/marquee_text.dart';
 import '../../../features/favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../features/favorites/presentation/cubit/favorites_state.dart';
 import '../../../features/player/presentation/cubit/audio_player_cubit.dart';
@@ -609,17 +608,19 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MarqueeText(
-                text: 'سورة ${recitation.surahNameAr}',
+              Text(
+                recitation.cleanSurahTitleWithVerses,
                 style: GoogleFonts.cairo(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
                   color: textPrimary,
                   height: 1.2,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               Text(
-                _getCollectionName(recitation.collectionId),
+                '${recitation.cleanLocationOrDetail} • ${_getCollectionName(recitation.collectionId)}',
                 style: GoogleFonts.cairo(
                   fontSize: 11,
                   color: textSecondary,

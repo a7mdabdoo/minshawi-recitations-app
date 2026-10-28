@@ -10,7 +10,6 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/battery_optimization_service.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dart';
@@ -473,14 +472,14 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     Color textSecondary,
   ) {
     final surahTitle = recitation != null
-        ? (recitation.surahNameAr.startsWith('سورة')
-            ? recitation.surahNameAr
-            : 'سورة ${recitation.surahNameAr}')
+        ? recitation.cleanSurahTitleWithVerses
         : 'سورة الفاتحة';
 
-    final collectionSub = recitation?.collectionId != null
-        ? ' • ${_getCollectionSubtitle(recitation?.collectionId)}'
-        : '';
+    final locationDetail = recitation != null
+        ? (recitation.cleanLocationOrDetail != recitation.sourceLabel
+            ? recitation.cleanLocationOrDetail
+            : _getCollectionSubtitle(recitation.collectionId))
+        : 'المصحف المرتل';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -493,18 +492,20 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                MarqueeText(
-                  text: surahTitle,
+                Text(
+                  surahTitle,
                   style: GoogleFonts.amiri(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: textPrimary,
                     height: 1.25,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'فضيلة الشيخ محمد صديق المنشاوي$collectionSub',
+                  'فضيلة الشيخ محمد صديق المنشاوي • $locationDetail',
                   style: GoogleFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -2028,8 +2029,8 @@ class _DesktopPlaylistPanelState extends State<_DesktopPlaylistPanel> {
                                     ),
                             ),
                           ),
-                          title: MarqueeText(
-                            text: 'سورة ${item.surahNameAr}',
+                          title: Text(
+                            item.cleanSurahTitleWithVerses,
                             style: GoogleFonts.cairo(
                               fontSize: 13,
                               fontWeight: isCurrent
@@ -2039,6 +2040,17 @@ class _DesktopPlaylistPanelState extends State<_DesktopPlaylistPanel> {
                                   ? widget.gold
                                   : widget.textPrimary,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            item.cleanLocationOrDetail,
+                            style: GoogleFonts.cairo(
+                              fontSize: 11,
+                              color: widget.textSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           trailing: Text(
                             Formatters.formatDuration(item.durationSeconds),

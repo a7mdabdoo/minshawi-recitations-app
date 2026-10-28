@@ -8,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/marquee_text.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
@@ -681,15 +680,15 @@ class _DownloadedRecitationCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MarqueeText(
-                        text: recitation.surahNameAr.startsWith('سورة')
-                            ? recitation.surahNameAr
-                            : 'سورة ${recitation.surahNameAr}',
+                      Text(
+                        recitation.cleanSurahTitleWithVerses,
                         style: GoogleFonts.amiri(
                           fontSize: 16.5,
                           fontWeight: FontWeight.w700,
                           color: textPrimary,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -719,7 +718,7 @@ class _DownloadedRecitationCard extends StatelessWidget {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              '• ${Formatters.formatDuration(recitation.durationSeconds)}${recitation.trailingVerseOrLocation.isNotEmpty ? ' • ${recitation.trailingVerseOrLocation}' : ''} • ${sizeMb > 0 ? sizeMb.toStringAsFixed(1) : (recitation.fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} م.ب',
+                              '• ${Formatters.formatDuration(recitation.durationSeconds)} • ${recitation.cleanLocationOrDetail} • ${sizeMb > 0 ? sizeMb.toStringAsFixed(1) : (recitation.fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} م.ب',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.cairo(

@@ -135,6 +135,42 @@ class Recitation extends Equatable {
     return '$sourceLabel • $formattedDuration • $trailing';
   }
 
+  /// Returns the pure Surah name (and verse range if present),
+  /// cleanly stripped of location/occasion noise.
+  String get cleanSurahTitleWithVerses {
+    var pure = surahNameAr.trim();
+    if (pure.contains(' - ')) {
+      pure = pure.split(' - ').first.trim();
+    }
+
+    final hasPrefix = pure.startsWith('سورة ') || pure.startsWith('المصحف');
+    final formattedName = hasPrefix ? pure : 'سورة $pure';
+
+    if (hasNumericVerseRange && !formattedName.contains(verseRange.trim())) {
+      return '$formattedName (الآيات: ${verseRange.trim()})';
+    }
+
+    return formattedName;
+  }
+
+  /// Returns the recording location, concert venue, or collection detail for the second line.
+  String get cleanLocationOrDetail {
+    if (surahNameAr.contains(' - ')) {
+      final parts = surahNameAr.split(' - ');
+      final locPart = parts.sublist(1).join(' - ').trim();
+      if (locPart.isNotEmpty) {
+        return locPart;
+      }
+    }
+
+    final loc = cleanLocationLabel.trim();
+    if (loc.isNotEmpty && loc != 'محفل خارجي' && loc != 'تسجيل تراثي نادر') {
+      return loc;
+    }
+
+    return sourceLabel;
+  }
+
   Recitation copyWith({
     String? id,
     int? surahNumber,
