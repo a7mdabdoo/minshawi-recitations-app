@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../cubit/audio_player_cubit.dart';
@@ -157,15 +158,13 @@ class _MiniPlayerContent extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Flexible(
-                                  child: Text(
-                                    recitation?.surahNameAr ?? '',
+                                  child: MarqueeText(
+                                    text: recitation?.surahNameAr ?? '',
                                     style: GoogleFonts.amiri(
                                       color: textPrimary,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 const SizedBox(width: 4),

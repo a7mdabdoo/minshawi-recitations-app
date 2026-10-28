@@ -8,6 +8,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/settings/settings_cubit.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dart';
@@ -1322,8 +1323,8 @@ class _RecitationCardState extends State<_RecitationCard> {
                       Row(
                         children: [
                           Flexible(
-                            child: Text(
-                              r.surahNameAr,
+                            child: MarqueeText(
+                              text: r.surahNameAr,
                               style: GoogleFonts.amiri(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -1333,8 +1334,6 @@ class _RecitationCardState extends State<_RecitationCard> {
                                         ? AppColors.darkTextPrimary
                                         : AppColors.lightTextPrimary),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (r.isDownloaded) ...[

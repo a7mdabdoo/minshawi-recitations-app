@@ -10,6 +10,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/battery_optimization_service.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dart';
@@ -492,16 +493,14 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  surahTitle,
+                MarqueeText(
+                  text: surahTitle,
                   style: GoogleFonts.amiri(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: textPrimary,
                     height: 1.25,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 3),
                 Text(
@@ -2029,8 +2028,8 @@ class _DesktopPlaylistPanelState extends State<_DesktopPlaylistPanel> {
                                     ),
                             ),
                           ),
-                          title: Text(
-                            'سورة ${item.surahNameAr}',
+                          title: MarqueeText(
+                            text: 'سورة ${item.surahNameAr}',
                             style: GoogleFonts.cairo(
                               fontSize: 13,
                               fontWeight: isCurrent
