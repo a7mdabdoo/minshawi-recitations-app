@@ -1,5 +1,26 @@
+import '../../features/recitations/domain/entities/recitation.dart';
+
 abstract class AppConstants {
   AppConstants._();
+
+  static const String minshawiRadioUrl =
+      'https://backup.qurango.net/radio/mohammed_siddiq_alminshawi';
+
+  static const Recitation minshawiRadio = Recitation(
+    id: 'radio_minshawi',
+    surahNumber: 0,
+    surahNameAr: 'إذاعة الشيخ المنشاوي',
+    surahNameEn: 'Al-Minshawi Live Radio',
+    verseRange: '',
+    durationSeconds: 0,
+    fileSizeBytes: 0,
+    audioUrl: minshawiRadioUrl,
+    recordingYear: 'بث مباشر',
+    recordingLocation: 'إذاعة القرآن الكريم (24/7)',
+    collectionId: 'radio',
+    isRare: false,
+    quality: 'بث حي',
+  );
 
   static const String appName = 'التلاوات الجديدة';
   static const String appSubtitle = 'الشيخ محمد صديق المنشاوي';

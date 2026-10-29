@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../cubit/audio_player_cubit.dart';
@@ -79,10 +80,11 @@ class _MiniPlayerContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.darkCardSurface : Colors.white;
-    final gold = isDark ? const Color(0xFFE5B248) : const Color(0xFFD4A017);
+    final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
     final borderColor =
-        isDark ? const Color(0xFF2D333B) : const Color(0xFFE2E8F0);
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+        isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0);
+    final textPrimary =
+        isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A);
     final textSecondary =
         isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B);
 
@@ -133,7 +135,7 @@ class _MiniPlayerContent extends StatelessWidget {
                 width: 36,
                 height: 3.5,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF30363D) : Colors.black12,
+                  color: isDark ? AppColors.darkBorder : Colors.black12,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -182,15 +184,13 @@ class _MiniPlayerContent extends StatelessWidget {
                                   ],
                                 ),
                                 if (recitation != null)
-                                  Text(
-                                    recitation.cleanLocationOrDetail,
+                                  MarqueeText(
+                                    text: recitation.cleanLocationOrDetail,
                                     style: GoogleFonts.cairo(
                                       color: textSecondary,
                                       fontSize: 11,
                                       height: 1.2,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                               ],
                             ),
@@ -396,10 +396,13 @@ class _SeekBarRowState extends State<_SeekBarRow> {
         final duration =
             state is AudioPlayerReady ? state.duration : Duration.zero;
 
-        final sliderValue = _dragging ? _dragValue : progress.clamp(0.0, 1.0);
-        final canInteract = !widget.isLoading && !widget.isError;
+        final isLive = state is AudioPlayerReady &&
+            state.recitation.collectionId == 'radio';
+        final sliderValue =
+            isLive ? 1.0 : (_dragging ? _dragValue : progress.clamp(0.0, 1.0));
+        final canInteract = !widget.isLoading && !widget.isError && !isLive;
         final inactiveTrack =
-            widget.isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
+            widget.isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -509,7 +512,7 @@ class _PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const iconColor = Color(0xFF12151A);
+    const iconColor = AppColors.darkBackground;
     final showSpinner = (isLoading || isBuffering) && !isPlaying;
 
     return Material(

@@ -8,6 +8,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/settings/settings_cubit.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dart';
@@ -136,7 +137,7 @@ class _HomeViewState extends State<_HomeView> with WidgetsBindingObserver {
                       ),
                     ],
                   ),
-                  backgroundColor: const Color(0xFF1E293B),
+                  backgroundColor: AppColors.darkCardSurface,
                   behavior: SnackBarBehavior.floating,
                   margin: EdgeInsets.fromLTRB(
                     16,
@@ -187,7 +188,7 @@ class _HomeViewState extends State<_HomeView> with WidgetsBindingObserver {
                       ),
                     ],
                   ),
-                  backgroundColor: const Color(0xFF1E293B),
+                  backgroundColor: AppColors.darkCardSurface,
                   behavior: SnackBarBehavior.floating,
                   margin: EdgeInsets.fromLTRB(
                     16,
@@ -743,7 +744,7 @@ class _ResumePlaybackBannerState extends State<_ResumePlaybackBanner> {
                 final gold =
                     isDark ? AppColors.goldPrimary : AppColors.goldDark;
                 final bg =
-                    isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
+                    isDark ? AppColors.darkCardSurface : const Color(0xFFF1F5F9);
                 final textPrimary = isDark
                     ? AppColors.darkTextPrimary
                     : AppColors.lightTextPrimary;
@@ -1263,7 +1264,7 @@ class _RecitationCardState extends State<_RecitationCard> {
                   ? AppColors.goldPrimary.withAlpha(22)
                   : AppColors.goldDark.withAlpha(14))
               : (_isHovered
-                  ? (widget.isDark ? const Color(0xFF222834) : const Color(0xFFF1F5F9))
+                  ? (widget.isDark ? const Color(0xFF1E2836) : const Color(0xFFF1F5F9))
                   : (widget.isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface)),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -1347,18 +1348,18 @@ class _RecitationCardState extends State<_RecitationCard> {
                           ],
                         ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${r.cleanLocationOrDetail} • ${r.sourceLabel}',
-                        style: GoogleFonts.cairo(
-                          fontSize: 11.5,
-                          color: widget.isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
+                      if (r.cleanLocationOrDetail.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        MarqueeText(
+                          text: r.cleanLocationOrDetail,
+                          style: GoogleFonts.cairo(
+                            fontSize: 11.5,
+                            color: widget.isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      ],
                       const SizedBox(height: 5),
                       Row(
                         mainAxisSize: MainAxisSize.min,

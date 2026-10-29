@@ -447,15 +447,20 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
         'mojawad' => 'المصحف المجود',
         'complete_murattal' => 'المصحف المرتل',
         'nahawand' => 'روائع النهاوند',
+        'radio' => 'إذاعة القرآن الكريم',
         _ => 'التلاوات النادرة - تسجيلات ١٣٨٧ هـ',
       };
 
       final artUri = _cachedArtworkUri ?? await _resolveArtworkUri();
 
+      final mediaTitle = recitation.collectionId == 'radio'
+          ? recitation.surahNameAr
+          : 'سورة ${recitation.surahNameAr}';
+
       final mediaItem = MediaItem(
         id: recitation.id,
         album: albumName,
-        title: 'سورة ${recitation.surahNameAr}',
+        title: mediaTitle,
         artist: AppConstants.sheikhNameAr,
         artUri: artUri,
         duration: recitation.durationSeconds > 0

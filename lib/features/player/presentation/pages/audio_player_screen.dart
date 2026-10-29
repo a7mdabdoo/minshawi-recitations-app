@@ -9,7 +9,9 @@ import 'package:just_audio/just_audio.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/battery_optimization_service.dart';
+import '../../../../core/utils/arabic_normalizer.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dart';
@@ -99,20 +101,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     }
   }
 
-  String _getCollectionSubtitle(String? collectionId) {
-    switch (collectionId) {
-      case 'nahawand':
-        return 'روائع مقام النهاوند - المحافل التاريخية';
-      case 'rare_1387':
-        return 'التلاوات النادرة الخارجية - لعام ١٣٨٧ هـ';
-      case 'mojawad':
-        return 'المصحف المجود - رواية حفص عن عاصم';
-      case 'complete_murattal':
-      default:
-        return 'المصحف المرتل - رواية حفص عن عاصم';
-    }
-  }
-
   void _showFeedback(
     BuildContext context,
     String message, {
@@ -157,22 +145,19 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final gold = isDark ? const Color(0xFFE5B248) : const Color(0xFFD4A017);
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
+    final textPrimary =
+        isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A);
     final textSecondary =
         isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B);
     final cardSurface = isDark ? AppColors.darkCardSurface : Colors.white;
     final cardBorder =
-        isDark ? const Color(0xFF2D333B) : const Color(0xFFE2E8F0);
+        isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0);
     final inactiveTrackColor =
-        isDark ? const Color(0xFF30363D) : const Color(0xFFCBD5E1);
+        isDark ? AppColors.darkBorder : const Color(0xFFCBD5E1);
 
     final bgGradient = isDark
-        ? const [
-            AppColors.darkCardSurface,
-            AppColors.darkSurface,
-            Color(0xFF12151A),
-          ]
+        ? AppColors.playerGradientDark
         : const [
             Color(0xFFF8FAFC),
             Color(0xFFF1F5F9),
@@ -191,7 +176,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         },
         child: Scaffold(
           backgroundColor:
-              isDark ? const Color(0xFF12151A) : const Color(0xFFF8FAFC),
+              isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC),
           body: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -209,6 +194,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                         prev.isPlaying != curr.isPlaying ||
                         prev.isBuffering != curr.isBuffering ||
                         prev.loopMode != curr.loopMode ||
+                        prev.isShuffleEnabled != curr.isShuffleEnabled ||
                         prev.speed != curr.speed ||
                         prev.abPointA != curr.abPointA ||
                         prev.abPointB != curr.abPointB ||
@@ -261,10 +247,9 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                         physics: const BouncingScrollPhysics(),
                         child: ConstrainedBox(
                           constraints: BoxConstraints(minHeight: maxHeight),
-                          child: IntrinsicHeight(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
                                 _buildTopBar(
                                   context,
                                   recitation,
@@ -339,9 +324,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                               ],
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
                   );
                 },
               ),
@@ -475,11 +459,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         ? recitation.cleanSurahTitleWithVerses
         : 'سورة الفاتحة';
 
-    final locationDetail = recitation != null
-        ? (recitation.cleanLocationOrDetail != recitation.sourceLabel
-            ? recitation.cleanLocationOrDetail
-            : _getCollectionSubtitle(recitation.collectionId))
-        : 'المصحف المرتل';
+    final locationDetail =
+        recitation != null ? recitation.cleanLocationOrDetail : '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -504,15 +485,15 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 3),
-                Text(
-                  'فضيلة الشيخ محمد صديق المنشاوي • $locationDetail',
+                MarqueeText(
+                  text: locationDetail.isNotEmpty
+                      ? 'فضيلة الشيخ محمد صديق المنشاوي • $locationDetail'
+                      : 'فضيلة الشيخ محمد صديق المنشاوي',
                   style: GoogleFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: textSecondary,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -631,7 +612,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     required bool isDark,
   }) {
     final showSpinner = (isInitialLoading || isBuffering) && !isPlaying;
-    const iconColor = Color(0xFF12151A);
+    const iconColor = AppColors.darkBackground;
 
     return Material(
       color: Colors.transparent,
@@ -1108,7 +1089,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
               side: BorderSide(
-                color: isDark ? const Color(0xFF2D333B) : Colors.black12,
+                color: isDark ? AppColors.darkBorder : Colors.black12,
                 width: 0.8,
               ),
             ),
@@ -1140,10 +1121,11 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     Color cardBorder,
     bool isDark,
   ) {
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textPrimary =
+        isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A);
     final textSecondary =
         isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B);
-    final itemBg = isDark ? const Color(0xFF161B22) : const Color(0xFFF1F5F9);
+    final itemBg = isDark ? AppColors.darkSurface : const Color(0xFFF1F5F9);
 
     showModalBottomSheet<void>(
       context: context,
@@ -1482,7 +1464,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                 color: isSet
                     ? gold
                     : (isDark
-                        ? const Color(0xFF2D333B)
+                        ? AppColors.darkBorder
                         : const Color(0xFFE2E8F0)),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -1492,7 +1474,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   Icon(
                     icon,
                     size: 16,
-                    color: isSet ? const Color(0xFF12151A) : textPrimary,
+                    color: isSet ? AppColors.darkBackground : textPrimary,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -1500,7 +1482,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                     style: GoogleFonts.cairo(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: isSet ? const Color(0xFF12151A) : textPrimary,
+                      color: isSet ? AppColors.darkBackground : textPrimary,
                     ),
                   ),
                 ],
@@ -1571,7 +1553,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               style: GoogleFonts.cairo(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                color: isSelected ? const Color(0xFF12151A) : textPrimary,
+                color: isSelected ? AppColors.darkBackground : textPrimary,
               ),
             ),
           ),
@@ -1590,10 +1572,11 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     bool isDark,
   ) {
     final speeds = [0.75, 1.0, 1.25, 1.5];
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textPrimary =
+        isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A);
     final textSecondary =
         isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B);
-    final itemBg = isDark ? const Color(0xFF161B22) : const Color(0xFFF1F5F9);
+    final itemBg = isDark ? AppColors.darkSurface : const Color(0xFFF1F5F9);
 
     showModalBottomSheet<void>(
       context: context,
@@ -1661,7 +1644,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                                       ? FontWeight.w700
                                       : FontWeight.w600,
                                   color: isSelected
-                                      ? const Color(0xFF12151A)
+                                      ? AppColors.darkBackground
                                       : textPrimary,
                                 ),
                               ),
@@ -1687,6 +1670,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     Color textPrimary,
     Color textSecondary,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -1709,7 +1693,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: gold,
-              foregroundColor: const Color(0xFF12151A),
+              foregroundColor:
+                  isDark ? AppColors.darkBackground : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -1884,8 +1869,18 @@ class _DesktopPlaylistPanelState extends State<_DesktopPlaylistPanel> {
   Widget build(BuildContext context) {
     final filtered = widget.playlist.where((r) {
       if (_query.isEmpty) return true;
-      return r.surahNameAr.contains(_query) ||
-          r.surahNumber.toString().contains(_query);
+      return ArabicNormalizer.matchesMultiToken(
+        query: _query,
+        sources: [
+          r.surahNameAr,
+          r.cleanSurahTitleWithVerses,
+          r.recordingLocation,
+          r.cleanLocationOrDetail,
+          r.recordingYear,
+          r.sourceLabel,
+          r.surahNumber.toString(),
+        ],
+      );
     }).toList();
 
     return Container(
@@ -2043,14 +2038,12 @@ class _DesktopPlaylistPanelState extends State<_DesktopPlaylistPanel> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          subtitle: Text(
-                            item.cleanLocationOrDetail,
+                          subtitle: MarqueeText(
+                            text: item.cleanLocationOrDetail,
                             style: GoogleFonts.cairo(
                               fontSize: 11,
                               color: widget.textSecondary,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                           trailing: Text(
                             Formatters.formatDuration(item.durationSeconds),
@@ -2113,12 +2106,15 @@ class _PlayerSeekBarSectionState extends State<_PlayerSeekBarSection> {
           final duration = isReady ? state.duration : Duration.zero;
           final position = isReady ? state.position : Duration.zero;
 
+          final isLive = state is AudioPlayerReady &&
+              (state.recitation.collectionId == 'radio' ||
+                  duration.inMilliseconds == 0);
           final double rawProgress = duration.inMilliseconds > 0
               ? (position.inMilliseconds / duration.inMilliseconds)
                   .clamp(0.0, 1.0)
-              : 0.0;
+              : 1.0;
           final double currentSliderValue =
-              _isDraggingSlider ? _dragSliderValue : rawProgress;
+              isLive ? 1.0 : (_isDraggingSlider ? _dragSliderValue : rawProgress);
 
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -2142,7 +2138,7 @@ class _PlayerSeekBarSectionState extends State<_PlayerSeekBarSection> {
                   value: currentSliderValue,
                   min: 0.0,
                   max: 1.0,
-                  onChanged: (isLoading || isError)
+                  onChanged: (isLoading || isError || isLive)
                       ? null
                       : (val) {
                           setState(() {
@@ -2150,13 +2146,16 @@ class _PlayerSeekBarSectionState extends State<_PlayerSeekBarSection> {
                             _dragSliderValue = val;
                           });
                         },
-                  onChangeEnd: (val) {
-                    setState(() {
-                      _isDraggingSlider = false;
-                    });
-                    final targetMs = (val * duration.inMilliseconds).round();
-                    widget.cubit.seekTo(Duration(milliseconds: targetMs));
-                  },
+                  onChangeEnd: isLive
+                      ? null
+                      : (val) {
+                          setState(() {
+                            _isDraggingSlider = false;
+                          });
+                          final targetMs =
+                              (val * duration.inMilliseconds).round();
+                          widget.cubit.seekTo(Duration(milliseconds: targetMs));
+                        },
                 ),
               ),
               Padding(
@@ -2173,11 +2172,13 @@ class _PlayerSeekBarSectionState extends State<_PlayerSeekBarSection> {
                       ).copyWith(fontFamilyFallback: const ['Arial', 'Cairo']),
                     ),
                     Text(
-                      Formatters.formatDurationObj(duration),
+                      isLive
+                          ? 'بث مباشر'
+                          : Formatters.formatDurationObj(duration),
                       style: GoogleFonts.cairo(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: widget.textSecondary,
+                        color: isLive ? widget.gold : widget.textSecondary,
                       ).copyWith(fontFamilyFallback: const ['Arial', 'Cairo']),
                     ),
                   ],
@@ -2217,7 +2218,7 @@ class _NudgeButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
         decoration: BoxDecoration(
           color: enabled
-              ? (isDark ? const Color(0xFF21262D) : const Color(0xFFE2E8F0))
+              ? (isDark ? AppColors.darkDivider : const Color(0xFFE2E8F0))
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(

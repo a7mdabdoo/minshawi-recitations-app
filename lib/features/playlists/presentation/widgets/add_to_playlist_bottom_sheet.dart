@@ -131,7 +131,7 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
                             'تم إنشاء قائمة $name وإضافة سورة ${recitation.surahNameAr}',
                             style: GoogleFonts.cairo(color: Colors.white),
                           ),
-                          backgroundColor: const Color(0xFF1E293B),
+                          backgroundColor: AppColors.darkCardSurface,
                           behavior: SnackBarBehavior.floating,
                           duration: const Duration(seconds: 2),
                         ),
@@ -157,7 +157,7 @@ class AddToPlaylistBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
-    final bg = isDark ? const Color(0xFF161B26) : Colors.white;
+    final bg = isDark ? AppColors.darkSurface : Colors.white;
     final cardBg =
         isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
     final textPrimary =

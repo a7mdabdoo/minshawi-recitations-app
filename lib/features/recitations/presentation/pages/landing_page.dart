@@ -2,8 +2,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -49,7 +51,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
-    final bg = isDark ? const Color(0xFF0F141C) : AppColors.lightBackground;
+    final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
 
     return BlocListener<AudioPlayerCubit, AudioPlayerState>(
       listenWhen: (prev, curr) => curr is AudioPlayerError,
@@ -79,7 +81,7 @@ class _LandingPageState extends State<LandingPage> {
                   ),
                 ],
               ),
-              backgroundColor: const Color(0xFF1E293B),
+              backgroundColor: AppColors.darkCardSurface,
               behavior: SnackBarBehavior.floating,
               margin: EdgeInsets.fromLTRB(
                 16,
@@ -103,44 +105,66 @@ class _LandingPageState extends State<LandingPage> {
         backgroundColor: bg,
         body: Stack(
           children: [
-            SingleChildScrollView(
+            CustomScrollView(
               physics: const BouncingScrollPhysics(),
-              child: SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    16,
-                    10,
-                    16,
-                    96.0 + MediaQuery.of(context).padding.bottom,
-                  ),
-                  child: Column(
-                    children: [
-                      _UnifiedHeroBanner(
-                        isDark: isDark,
-                        gold: gold,
-                        portraitUiImage: widget.portraitUiImage,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _UnifiedHeroBanner(
+                            isDark: isDark,
+                            gold: gold,
+                            portraitUiImage: widget.portraitUiImage,
+                          ),
+                          const SizedBox(height: 14),
+                          _LandingSegmentedTabs(
+                            selectedTab: _selectedTab,
+                            isDark: isDark,
+                            onTabSelected: (tab) =>
+                                setState(() => _selectedTab = tab),
+                          ),
+                          if (_selectedTab == _LandingTab.collections) ...[
+                            _VerticalCategoryCards(isDark: isDark),
+                          ] else ...[
+                            _LandingPlaylistsSection(
+                              isDark: isDark,
+                              gold: gold,
+                            ),
+                          ],
+                        ],
                       ),
-                      const SizedBox(height: 14),
-                      _LandingSegmentedTabs(
-                        selectedTab: _selectedTab,
-                        isDark: isDark,
-                        onTabSelected: (tab) =>
-                            setState(() => _selectedTab = tab),
-                      ),
-                      if (_selectedTab == _LandingTab.collections) ...[
-                        _VerticalCategoryCards(isDark: isDark),
-                      ] else ...[
-                        _LandingPlaylistsSection(
-                          isDark: isDark,
-                          gold: gold,
-                        ),
-                      ],
-
-                    ],
+                    ),
                   ),
                 ),
-              ),
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        16,
+                        32,
+                        16,
+                        96.0 + MediaQuery.of(context).padding.bottom,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Spacer(),
+                          _FramelessDeveloperFooter(isDark: isDark),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const Positioned(
               left: 0,
@@ -609,8 +633,8 @@ class _UnifiedHeroBanner extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: isDark
-              ? [const Color(0xFF141D29), const Color(0xFF0D131C)]
-              : [const Color(0xFFFFFFFF), const Color(0xFFF1F5F9)],
+              ? [AppColors.darkCardSurface, AppColors.darkSurface]
+              : [AppColors.lightSurface, AppColors.lightBackground],
         ),
         boxShadow: [
           BoxShadow(
@@ -620,7 +644,7 @@ class _UnifiedHeroBanner extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: const Color(0xFFD4AF37).withValues(alpha: isDark ? 0.25 : 0.4),
+          color: gold.withValues(alpha: isDark ? 0.25 : 0.4),
           width: 1.2,
         ),
       ),
@@ -630,36 +654,126 @@ class _UnifiedHeroBanner extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: (isDark ? Colors.white : Colors.black)
-                      .withValues(alpha: 0.06),
-                  border: Border.all(
-                    color: (isDark ? Colors.white : Colors.black)
-                        .withValues(alpha: 0.1),
-                    width: 1,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: (isDark ? Colors.white : Colors.black)
+                          .withValues(alpha: 0.06),
+                      border: Border.all(
+                        color: (isDark ? Colors.white : Colors.black)
+                            .withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        isDark
+                            ? Icons.light_mode_rounded
+                            : Icons.dark_mode_rounded,
+                        color: gold,
+                        size: 19,
+                      ),
+                      onPressed: () => context.read<ThemeCubit>().toggle(),
+                      tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.all(5),
+                      constraints: const BoxConstraints(),
+                    ),
                   ),
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                    color: gold,
-                    size: 19,
+                  const SizedBox(width: 8),
+                  BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
+                    builder: (context, playerState) {
+                      final isRadioPlaying = playerState is AudioPlayerReady &&
+                          playerState.recitation.id == 'radio_minshawi' &&
+                          playerState.isPlaying;
+                      final isRadioBuffering =
+                          (playerState is AudioPlayerLoading &&
+                                  playerState.recitation.id ==
+                                      'radio_minshawi') ||
+                              (playerState is AudioPlayerReady &&
+                                  playerState.recitation.id ==
+                                      'radio_minshawi' &&
+                                  playerState.isBuffering);
+
+                      return Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isRadioPlaying
+                              ? gold.withValues(alpha: isDark ? 0.25 : 0.2)
+                              : (isDark ? Colors.white : Colors.black)
+                                  .withValues(alpha: 0.06),
+                          border: Border.all(
+                            color: isRadioPlaying
+                                ? gold
+                                : (isDark ? Colors.white : Colors.black)
+                                    .withValues(alpha: 0.1),
+                            width: isRadioPlaying ? 1.4 : 1,
+                          ),
+                          boxShadow: isRadioPlaying
+                              ? [
+                                  BoxShadow(
+                                    color: gold.withValues(alpha: 0.35),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: IconButton(
+                          icon: isRadioBuffering
+                              ? SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(gold),
+                                  ),
+                                )
+                              : Icon(
+                                  isRadioPlaying
+                                      ? Icons.radio_rounded
+                                      : Icons.radio_outlined,
+                                  color: gold,
+                                  size: 19,
+                                ),
+                          onPressed: () {
+                            final cubit = context.read<AudioPlayerCubit>();
+                            if (isRadioPlaying) {
+                              cubit.pause();
+                            } else {
+                              cubit.play(AppConstants.minshawiRadio);
+                            }
+                          },
+                          tooltip: isRadioPlaying
+                              ? 'إيقاف إذاعة المنشاوي'
+                              : 'إذاعة الشيخ المنشاوي (بث مباشر)',
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.all(5),
+                          constraints: const BoxConstraints(),
+                        ),
+                      );
+                    },
                   ),
-                  onPressed: () => context.read<ThemeCubit>().toggle(),
-                  tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.all(5),
-                  constraints: const BoxConstraints(),
-                ),
+                ],
               ),
-              Text(
-                'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-                style: GoogleFonts.amiri(
-                  fontSize: 17.5,
-                  color: gold.withValues(alpha: isDark ? 0.85 : 0.75),
-                  fontWeight: FontWeight.w600,
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                      style: GoogleFonts.amiri(
+                        fontSize: 17.5,
+                        color: gold.withValues(alpha: isDark ? 0.85 : 0.75),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Container(
@@ -963,17 +1077,24 @@ class _VerticalCategoryCards extends StatelessWidget {
     ];
 
     if (isLarge) {
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: width > 900 ? 460 : 520,
-          mainAxisExtent: 84,
-          crossAxisSpacing: 14,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: cards.length,
-        itemBuilder: (context, index) => RepaintBoundary(child: cards[index]),
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(child: RepaintBoundary(child: cards[0])),
+              const SizedBox(width: 14),
+              Expanded(child: RepaintBoundary(child: cards[1])),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: RepaintBoundary(child: cards[2])),
+              const SizedBox(width: 14),
+              Expanded(child: RepaintBoundary(child: cards[3])),
+            ],
+          ),
+        ],
       );
     }
 
@@ -1012,7 +1133,8 @@ class _WideCategoryCardState extends State<_WideCategoryCard> {
 
   @override
   Widget build(BuildContext context) {
-    const gold = Color(0xFFD4AF37);
+    final gold =
+        widget.isDark ? AppColors.goldPrimary : AppColors.goldDark;
     final textPrimary =
         widget.isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final textSecondary =
@@ -1034,12 +1156,12 @@ class _WideCategoryCardState extends State<_WideCategoryCard> {
             end: Alignment.bottomLeft,
             colors: widget.isDark
                 ? [
-                    _isHovered ? const Color(0xFF1A2634) : const Color(0xFF15202B),
-                    const Color(0xFF0F1720)
+                    _isHovered ? const Color(0xFF1E2836) : AppColors.darkCardSurface,
+                    AppColors.darkSurface,
                   ]
                 : [
-                    const Color(0xFFFFFFFF),
-                    _isHovered ? const Color(0xFFEFF3F6) : const Color(0xFFF7F9FA)
+                    AppColors.lightSurface,
+                    _isHovered ? const Color(0xFFEFF3F6) : AppColors.lightCardSurface,
                   ],
           ),
           boxShadow: [
@@ -1165,4 +1287,163 @@ class _WideCategoryCardState extends State<_WideCategoryCard> {
       ),
     );
   }
+}
+
+class _FramelessDeveloperFooter extends StatelessWidget {
+  final bool isDark;
+  const _FramelessDeveloperFooter({required this.isDark});
+
+  Future<void> _launch(BuildContext context, String urlString) async {
+    try {
+      final uri = Uri.parse(urlString);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+        webOnlyWindowName: '_blank',
+      );
+      if (!launched && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'تعذّر فتح الرابط',
+              style: GoogleFonts.cairo(color: Colors.white),
+            ),
+            backgroundColor: AppColors.darkError,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'تعذّر فتح الرابط الخارجي',
+              style: GoogleFonts.cairo(color: Colors.white),
+            ),
+            backgroundColor: AppColors.darkError,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textMuted =
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final iconColorHex = isDark ? '#94A3B8' : '#7A5C30';
+
+    return Opacity(
+      opacity: 0.55,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'تطوير: ${AppConstants.devNameAr}',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.cairo(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+              color: textMuted,
+              letterSpacing: 0.1,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _FramelessSocialSvgIcon(
+                svgString: _BrandVectors.facebook(iconColorHex),
+                tooltip: 'فيسبوك',
+                onTap: () => _launch(context, AppConstants.devFacebookUrl),
+              ),
+              const SizedBox(width: 10),
+              _FramelessSocialSvgIcon(
+                svgString: _BrandVectors.linkedin(iconColorHex),
+                tooltip: 'لينكد إن',
+                onTap: () => _launch(context, AppConstants.devLinkedinUrl),
+              ),
+              const SizedBox(width: 10),
+              _FramelessSocialSvgIcon(
+                svgString: _BrandVectors.github(iconColorHex),
+                tooltip: 'جيت هب',
+                onTap: () => _launch(context, AppConstants.devGithubUrl),
+              ),
+              const SizedBox(width: 10),
+              _FramelessSocialSvgIcon(
+                svgString: _BrandVectors.email(iconColorHex),
+                tooltip: 'البريد الإلكتروني',
+                onTap: () => _launch(context, AppConstants.devEmail),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FramelessSocialSvgIcon extends StatelessWidget {
+  final String svgString;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _FramelessSocialSvgIcon({
+    required this.svgString,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Tooltip(
+            message: tooltip,
+            child: SizedBox(
+              width: 17,
+              height: 17,
+              child: SvgPicture.string(
+                svgString,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+abstract class _BrandVectors {
+  static String facebook(String color) => '''
+<svg viewBox="0 0 24 24">
+  <path fill="$color" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+</svg>
+''';
+
+  static String linkedin(String color) => '''
+<svg viewBox="0 0 24 24">
+  <path fill="$color" d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v7.6h2.8v-7.6h-2.8M7.86 6.3a1.63 1.63 0 0 0-1.63 1.63c0 .9.73 1.63 1.63 1.63.9 0 1.63-.73 1.63-1.63 0-.9-.73-1.63-1.63-1.63Z"/>
+</svg>
+''';
+
+  static String github(String color) => '''
+<svg viewBox="0 0 24 24">
+  <path fill="$color" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+</svg>
+''';
+
+  static String email(String color) => '''
+<svg viewBox="0 0 24 24">
+  <path fill="$color" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+</svg>
+''';
 }

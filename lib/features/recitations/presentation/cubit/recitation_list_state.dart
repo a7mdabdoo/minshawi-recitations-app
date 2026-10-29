@@ -31,15 +31,21 @@ class RecitationListLoaded extends RecitationListState {
     final q = searchQuery.trim();
     if (q.isEmpty) return recitations;
 
-    final normQuery = ArabicNormalizer.normalize(q);
-
     return recitations.where((r) {
-      return ArabicNormalizer.matches(r.surahNameAr, q) ||
-          ArabicNormalizer.matches(r.verseRange, q) ||
-          ArabicNormalizer.matches(r.recordingLocation, q) ||
-          r.surahNameEn.toLowerCase().contains(normQuery) ||
-          r.surahNumber.toString() == normQuery ||
-          r.surahNumber.toString().contains(normQuery);
+      return ArabicNormalizer.matchesMultiToken(
+        query: q,
+        sources: [
+          r.surahNameAr,
+          r.cleanSurahTitleWithVerses,
+          r.recordingLocation,
+          r.cleanLocationOrDetail,
+          r.recordingYear,
+          r.verseRange,
+          r.sourceLabel,
+          r.surahNameEn,
+          r.surahNumber.toString(),
+        ],
+      );
     }).toList();
   }
 

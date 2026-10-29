@@ -1,14 +1,16 @@
 {
-  "latest_version": "1.2.0",
-  "build_number": 4,
-  "release_notes": "إصلاحات عامة وتحسينات في الأداء ومكتبة التلاوات.",
-  "apk_url": "https://apkpure.com/p/com.minshawi.recitations",
+  "latest_version": "1.2.1",
+  "build_number": 5,
+  "release_notes": "- إضافة إذاعة الشيخ محمد صديق المنشاوي المباشرة (24/7).\n- التحديث المباشر للـ APK من داخل التطبيق بنقرة واحدة بدون متصفح.\n- توحيد وتطوير الوضع الليلي الملكي الفاخر (Royal Obsidian & Gold).\n- فصل أسماء السور عن أماكن التسجيلات مع تأثير التحريك الذكي (Marquee).\n- إصلاح زر التشغيل العشوائي والتحكم الصوتي.\n- تحسين حساب أحجام التنزيلات بالميجابايت بدقة.\n- إصلاح استقرار التمرير وتكبير الشاشة في جميع المقاسات.",
+  "apk_url": "https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/al-minshawi-recitations-v1.2.1.apk",
+  "download_url": "https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/al-minshawi-recitations-v1.2.1.apk",
   "force_update": false,
   "android": {
-    "latest_version": "1.2.0",
-    "build_number": 4,
-    "release_notes": "إصلاحات عامة وتحسينات في الأداء ومكتبة التلاوات.",
-    "apk_url": "https://apkpure.com/p/com.minshawi.recitations",
+    "latest_version": "1.2.1",
+    "build_number": 5,
+    "release_notes": "- إضافة إذاعة الشيخ محمد صديق المنشاوي المباشرة (24/7).\n- التحديث المباشر للـ APK من داخل التطبيق بنقرة واحدة بدون متصفح.\n- توحيد وتطوير الوضع الليلي الملكي الفاخر (Royal Obsidian & Gold).\n- فصل أسماء السور عن أماكن التسجيلات مع تأثير التحريك الذكي (Marquee).\n- إصلاح زر التشغيل العشوائي والتحكم الصوتي.\n- تحسين حساب أحجام التنزيلات بالميجابايت بدقة.\n- إصلاح استقرار التمرير وتكبير الشاشة في جميع المقاسات.",
+    "apk_url": "https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/al-minshawi-recitations-v1.2.1.apk",
+    "download_url": "https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/al-minshawi-recitations-v1.2.1.apk",
     "force_update": false
   },
   "windows": {

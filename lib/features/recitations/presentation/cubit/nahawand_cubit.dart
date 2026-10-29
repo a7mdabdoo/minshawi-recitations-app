@@ -194,12 +194,19 @@ class NahawandCubit extends Cubit<NahawandState> {
     final trimmedQuery = query.trim();
     if (trimmedQuery.isNotEmpty) {
       result = result.where(
-        (r) =>
-            ArabicNormalizer.matches(r.title, trimmedQuery) ||
-            ArabicNormalizer.matches(r.surah, trimmedQuery) ||
-            ArabicNormalizer.matches(r.placeOrYear, trimmedQuery) ||
-            ArabicNormalizer.matches(r.category, trimmedQuery) ||
-            r.nahawandId.toString() == trimmedQuery,
+        (r) => ArabicNormalizer.matchesMultiToken(
+          query: trimmedQuery,
+          sources: [
+            r.title,
+            r.surah,
+            r.placeOrYear,
+            r.category,
+            r.tag,
+            r.cleanSurahTitleWithVerses,
+            r.cleanLocationOrDetail,
+            r.nahawandId.toString(),
+          ],
+        ),
       );
     }
 

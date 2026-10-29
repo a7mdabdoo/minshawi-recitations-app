@@ -168,7 +168,11 @@ class Recitation extends Equatable {
       return loc;
     }
 
-    return sourceLabel;
+    if (surahNameEn.trim().isNotEmpty) {
+      return surahNameEn.trim();
+    }
+
+    return '';
   }
 
   Recitation copyWith({

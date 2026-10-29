@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/marquee_text.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
@@ -480,7 +481,7 @@ class _DownloadsHeader extends StatelessWidget {
                     Icon(Icons.sd_storage_rounded, size: 14, color: gold),
                     const SizedBox(width: 6),
                     Text(
-                      'المساحة المستهلكة: ${totalSizeMb.toStringAsFixed(1)} م.ب',
+                      'المساحة المستهلكة: ${totalSizeMb.toStringAsFixed(1)} ميجابايت',
                       style: GoogleFonts.cairo(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
@@ -717,10 +718,9 @@ class _DownloadedRecitationCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Expanded(
-                            child: Text(
-                              '• ${Formatters.formatDuration(recitation.durationSeconds)} • ${recitation.cleanLocationOrDetail} • ${sizeMb > 0 ? sizeMb.toStringAsFixed(1) : (recitation.fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} م.ب',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            child: MarqueeText(
+                              text:
+                                  '• ${Formatters.formatDuration(recitation.durationSeconds)} • ${recitation.cleanLocationOrDetail} • ${sizeMb > 0 ? sizeMb.toStringAsFixed(1) : (recitation.fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} ميجابايت',
                               style: GoogleFonts.cairo(
                                 fontSize: 11,
                                 color: textSecondary,

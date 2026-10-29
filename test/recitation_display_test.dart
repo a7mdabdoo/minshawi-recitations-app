@@ -41,7 +41,7 @@ void main() {
       );
 
       expect(recitation.cleanSurahTitleWithVerses, 'سورة الفاتحة (الآيات: 1-7)');
-      expect(recitation.cleanLocationOrDetail, 'المصحف المرتل');
+      expect(recitation.cleanLocationOrDetail, 'Al-Fatihah');
     });
 
     test('Handles combined Surahs title correctly', () {

@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_filex/open_filex.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/app_colors.dart';
@@ -141,7 +144,7 @@ class UpdateService {
   }
 }
 
-class UpdateDialog extends StatelessWidget {
+class UpdateDialog extends StatefulWidget {
   final String latestVersion;
   final String releaseNotes;
   final String apkUrl;
@@ -155,14 +158,104 @@ class UpdateDialog extends StatelessWidget {
     this.forceUpdate = false,
   });
 
-  Future<void> _openDownloadUrl(BuildContext context) async {
+  @override
+  State<UpdateDialog> createState() => _UpdateDialogState();
+}
+
+class _UpdateDialogState extends State<UpdateDialog> {
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
+  String _statusText = '';
+  CancelToken? _cancelToken;
+
+  @override
+  void dispose() {
+    _cancelToken?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _startUpdate() async {
+    final isApk = widget.apkUrl.toLowerCase().contains('.apk');
+
+    if (Platform.isAndroid && isApk) {
+      setState(() {
+        _isDownloading = true;
+        _downloadProgress = 0.0;
+        _statusText = 'جاري بدء التحميل...';
+      });
+
+      _cancelToken = CancelToken();
+
+      try {
+        final tempDir = await getTemporaryDirectory();
+        final savePath =
+            '${tempDir.path}/minshawi_update_${widget.latestVersion}.apk';
+
+        final dio = Dio();
+        await dio.download(
+          widget.apkUrl,
+          savePath,
+          cancelToken: _cancelToken,
+          onReceiveProgress: (received, total) {
+            if (total > 0 && mounted) {
+              setState(() {
+                _downloadProgress = (received / total).clamp(0.0, 1.0);
+                final pct = (_downloadProgress * 100).toInt();
+                final mbReceived =
+                    (received / (1024 * 1024)).toStringAsFixed(1);
+                final mbTotal = (total / (1024 * 1024)).toStringAsFixed(1);
+                _statusText =
+                    'جاري التنزيل: $mbReceived / $mbTotal ميجابايت ($pct%)';
+              });
+            }
+          },
+        );
+
+        if (mounted) {
+          setState(() {
+            _statusText = 'اكتمل التنزيل، جاري فتح مثبت الحزم...';
+          });
+        }
+
+        final result = await OpenFilex.open(
+          savePath,
+          type: 'application/vnd.android.package-archive',
+        );
+
+        if (result.type != ResultType.done && mounted) {
+          await _fallbackExternalOpen();
+        }
+      } catch (e) {
+        if (mounted && _cancelToken?.isCancelled != true) {
+          setState(() {
+            _isDownloading = false;
+            _statusText = 'تعذّر التنزيل المباشر، جاري الفتح في المتصفح...';
+          });
+          await _fallbackExternalOpen();
+        }
+      }
+    } else {
+      await _fallbackExternalOpen();
+    }
+  }
+
+  Future<void> _fallbackExternalOpen() async {
     try {
-      final uri = Uri.parse(apkUrl);
+      final uri = Uri.parse(widget.apkUrl);
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {}
-    if (!forceUpdate && context.mounted) {
+    if (!widget.forceUpdate && mounted) {
       Navigator.of(context).pop();
     }
+  }
+
+  void _cancelDownload() {
+    _cancelToken?.cancel();
+    setState(() {
+      _isDownloading = false;
+      _downloadProgress = 0.0;
+      _statusText = '';
+    });
   }
 
   @override
@@ -170,14 +263,14 @@ class UpdateDialog extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
     final cardBg =
-        isDark ? const Color(0xFF161B26) : AppColors.lightCardSurface;
+        isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
     final textPrimary =
         isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final textSecondary =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return PopScope(
-      canPop: !forceUpdate,
+      canPop: !widget.forceUpdate && !_isDownloading,
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
@@ -248,7 +341,7 @@ class UpdateDialog extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              'الإصدار $latestVersion',
+                              'الإصدار ${widget.latestVersion}',
                               style: GoogleFonts.cairo(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -261,7 +354,7 @@ class UpdateDialog extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (releaseNotes.isNotEmpty) ...[
+                if (widget.releaseNotes.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(14),
@@ -287,7 +380,7 @@ class UpdateDialog extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          releaseNotes,
+                          widget.releaseNotes,
                           style: GoogleFonts.cairo(
                             fontSize: 12.5,
                             height: 1.55,
@@ -299,60 +392,110 @@ class UpdateDialog extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    if (!forceUpdate) ...[
-                      Expanded(
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(
-                                color: textSecondary.withAlpha(60),
-                                width: 0.8,
+                if (_isDownloading) ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: LinearProgressIndicator(
+                          value:
+                              _downloadProgress > 0 ? _downloadProgress : null,
+                          minHeight: 8,
+                          backgroundColor:
+                              (isDark ? Colors.white12 : Colors.black12),
+                          valueColor: AlwaysStoppedAnimation<Color>(gold),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _statusText,
+                              style: GoogleFonts.cairo(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: textSecondary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (!widget.forceUpdate)
+                            GestureDetector(
+                              onTap: _cancelDownload,
+                              child: Text(
+                                'إلغاء',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.darkError,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  Row(
+                    children: [
+                      if (!widget.forceUpdate) ...[
+                        Expanded(
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                  color: textSecondary.withAlpha(60),
+                                  width: 0.8,
+                                ),
+                              ),
+                            ),
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(
+                              'لاحقاً',
+                              style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: textSecondary,
                               ),
                             ),
                           ),
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: Text(
-                            'لاحقاً',
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: gold,
+                            foregroundColor: isDark
+                                ? AppColors.darkBackground
+                                : Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          onPressed: _startUpdate,
+                          icon: const Icon(Icons.download_rounded, size: 19),
+                          label: Text(
+                            'تحديث الآن',
                             style: GoogleFonts.cairo(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: textSecondary,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
                     ],
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: gold,
-                          foregroundColor:
-                              isDark ? AppColors.darkBackground : Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        onPressed: () => _openDownloadUrl(context),
-                        icon: const Icon(Icons.download_rounded, size: 19),
-                        label: Text(
-                          'تحديث الآن',
-                          style: GoogleFonts.cairo(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ],
             ),
           ),

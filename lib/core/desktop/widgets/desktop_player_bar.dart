@@ -7,6 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import '../../router/app_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/formatters.dart';
+import '../../widgets/marquee_text.dart';
 import '../../../features/favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../features/favorites/presentation/cubit/favorites_state.dart';
 import '../../../features/player/presentation/cubit/audio_player_cubit.dart';
@@ -36,25 +37,11 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
     return true;
   }
 
-  String _getCollectionName(String? collectionId) {
-    switch (collectionId) {
-      case 'mojawad':
-        return 'المصحف المجود';
-      case 'complete_murattal':
-        return 'المصحف المرتل';
-      case 'nahawand':
-        return 'روائع النهاوند';
-      case 'rare_1387':
-      default:
-        return 'التلاوات النادرة ١٣٨٧ هـ';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
-    final bg = isDark ? const Color(0xFF161B22) : Colors.white;
+    final bg = isDark ? AppColors.darkSurface : Colors.white;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final textPrimary =
         isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
@@ -195,7 +182,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                                     ? [
                                         gold,
                                         isDark
-                                            ? const Color(0xFFC49826)
+                                            ? AppColors.goldDark
                                             : const Color(0xFFB3861B),
                                       ]
                                     : [
@@ -318,7 +305,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                       tooltip: 'سرعة التلاوة',
                       initialValue: speed,
                       offset: const Offset(0, -140),
-                      color: isDark ? const Color(0xFF1E2530) : Colors.white,
+                      color: isDark ? AppColors.darkCardSurface : Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
@@ -460,7 +447,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                           trackHeight: 3.0,
                           activeTrackColor: gold,
                           inactiveTrackColor: isDark
-                              ? const Color(0xFF30363D)
+                              ? AppColors.darkBorder
                               : const Color(0xFFE2E8F0),
                           thumbColor: gold,
                           thumbShape: const RoundSliderThumbShape(
@@ -543,7 +530,7 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF21262D) : const Color(0xFFF1F5F9),
+              color: isDark ? AppColors.darkCardSurface : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(10),
               image: const DecorationImage(
                 image: ResizeImage(
@@ -619,16 +606,15 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              Text(
-                '${recitation.cleanLocationOrDetail} • ${_getCollectionName(recitation.collectionId)}',
-                style: GoogleFonts.cairo(
-                  fontSize: 11,
-                  color: textSecondary,
-                  height: 1.2,
+              if (recitation.cleanLocationOrDetail.isNotEmpty)
+                MarqueeText(
+                  text: recitation.cleanLocationOrDetail,
+                  style: GoogleFonts.cairo(
+                    fontSize: 11,
+                    color: textSecondary,
+                    height: 1.2,
+                  ),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
             ],
           ),
         ),
@@ -720,7 +706,7 @@ class _DesktopPlayerProgressBarState extends State<_DesktopPlayerProgressBar> {
                   trackHeight: 3.5,
                   activeTrackColor: widget.gold,
                   inactiveTrackColor: widget.isDark
-                      ? const Color(0xFF30363D)
+                      ? AppColors.darkBorder
                       : const Color(0xFFE2E8F0),
                   thumbColor: widget.gold,
                   overlayColor: widget.gold.withAlpha(40),

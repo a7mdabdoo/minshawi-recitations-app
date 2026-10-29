@@ -3,32 +3,32 @@ import 'package:flutter/material.dart';
 abstract class AppColors {
   AppColors._();
 
-  static const Color darkBackground = Color(0xFF0D1117);
-  static const Color darkSurface = Color(0xFF161B22);
-  static const Color darkCardSurface = Color(0xFF1C2128);
-  static const Color darkBorder = Color(0xFF30363D);
-  static const Color darkDivider = Color(0xFF21262D);
+  static const Color darkBackground = Color(0xFF0A0E14);
+  static const Color darkSurface = Color(0xFF10151C);
+  static const Color darkCardSurface = Color(0xFF151C26);
+  static const Color darkBorder = Color(0xFF222B38);
+  static const Color darkDivider = Color(0xFF18202B);
 
-  static const Color goldPrimary = Color(0xFFD4A832);
-  static const Color goldLight = Color(0xFFE8C56A);
-  static const Color goldDark = Color(0xFF9A7520);
-  static const Color goldGlow = Color(0x33D4A832);
+  static const Color goldPrimary = Color(0xFFD4AF37);
+  static const Color goldLight = Color(0xFFE8C766);
+  static const Color goldDark = Color(0xFF9E7B24);
+  static const Color goldGlow = Color(0x33D4AF37);
 
   static const Color emeraldPrimary = Color(0xFF2EA043);
   static const Color emeraldLight = Color(0xFF3FB950);
   static const Color emeraldGlow = Color(0x332EA043);
 
-  static const Color darkTextPrimary = Color(0xFFE6EDF3);
-  static const Color darkTextSecondary = Color(0xFF8B949E);
-  static const Color darkTextTertiary = Color(0xFF484F58);
-  static const Color darkIconColor = Color(0xFF8B949E);
+  static const Color darkTextPrimary = Color(0xFFF1F5F9);
+  static const Color darkTextSecondary = Color(0xFF94A3B8);
+  static const Color darkTextTertiary = Color(0xFF64748B);
+  static const Color darkIconColor = Color(0xFF94A3B8);
   static const Color darkError = Color(0xFFF85149);
-  static const Color darkWarning = Color(0xFFD29922);
+  static const Color darkWarning = Color(0xFFD4AF37);
   static const Color darkSuccess = Color(0xFF3FB950);
 
   static const Color downloadedColor = Color(0xFF3FB950);
   static const Color downloadingColor = Color(0xFF58A6FF);
-  static const Color availableColor = Color(0xFFD4A832);
+  static const Color availableColor = Color(0xFFD4AF37);
 
   static const Color lightBackground = Color(0xFFF8F4EE);
   static const Color lightSurface = Color(0xFFFFFFFF);
@@ -45,9 +45,9 @@ abstract class AppColors {
   static const Color lightSuccess = Color(0xFF166534);
 
   static const List<Color> playerGradientDark = [
-    Color(0xFF0D1117),
-    Color(0xFF1A1208),
-    Color(0xFF0D1117),
+    Color(0xFF0A0E14),
+    Color(0xFF141C26),
+    Color(0xFF0A0E14),
   ];
 
   static const List<Color> playerGradientLight = [
@@ -56,8 +56,8 @@ abstract class AppColors {
     Color(0xFFF8F4EE),
   ];
 
-  static const Color shimmerBaseDark = Color(0xFF1C2128);
-  static const Color shimmerHighlightDark = Color(0xFF30363D);
+  static const Color shimmerBaseDark = Color(0xFF151C26);
+  static const Color shimmerHighlightDark = Color(0xFF222B38);
   static const Color shimmerBaseLight = Color(0xFFE8D5B7);
   static const Color shimmerHighlightLight = Color(0xFFF8F4EE);
 }

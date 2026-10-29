@@ -19,16 +19,11 @@ abstract class Formatters {
   }
 
   static String formatFileSize(int bytes) {
-    if (bytes <= 0) return '0 KB';
+    if (bytes <= 0) return '0 MB';
 
     const kb = 1024;
     const mb = kb * 1024;
-    const gb = mb * 1024;
 
-    if (bytes >= gb) {
-      final val = bytes / gb;
-      return '${val.toStringAsFixed(val.truncateToDouble() == val ? 0 : 1)} GB';
-    }
     if (bytes >= mb) {
       final val = bytes / mb;
       return '${val.toStringAsFixed(val.truncateToDouble() == val ? 0 : 1)} MB';
@@ -45,12 +40,7 @@ abstract class Formatters {
 
     const kb = 1024;
     const mb = kb * 1024;
-    const gb = mb * 1024;
 
-    if (bytes >= gb) {
-      final val = bytes / gb;
-      return '${val.toStringAsFixed(val.truncateToDouble() == val ? 0 : 1)} جيجابايت';
-    }
     if (bytes >= mb) {
       final val = bytes / mb;
       return '${val.toStringAsFixed(val.truncateToDouble() == val ? 0 : 1)} ميجابايت';

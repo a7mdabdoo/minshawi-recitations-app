@@ -571,7 +571,8 @@ class _SocialIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final color = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final color =
+        isDark ? AppColors.darkTextSecondary : AppColors.darkTextTertiary;
 
     return Material(
       color: Colors.transparent,

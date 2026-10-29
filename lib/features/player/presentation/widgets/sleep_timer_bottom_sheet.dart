@@ -23,7 +23,7 @@ class _SleepTimerBottomSheetContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final gold = isDark ? AppColors.goldPrimary : AppColors.goldDark;
-    final bgColor = isDark ? const Color(0xFF141C26) : Colors.white;
+    final bgColor = isDark ? AppColors.darkSurface : Colors.white;
     final textSecondary =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
@@ -271,7 +271,7 @@ class _SleepTimerBottomSheetContent extends StatelessWidget {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: AppColors.darkCardSurface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 96),
@@ -300,17 +300,18 @@ class _CompactTimerChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final chipBg = isSelected
         ? gold.withValues(alpha: isDark ? 0.18 : 0.12)
-        : (isDark ? const Color(0xFF1C2633) : const Color(0xFFF1F5F9));
+        : (isDark ? AppColors.darkCardSurface : const Color(0xFFF1F5F9));
 
     final chipBorder = isSelected
         ? Border.all(color: gold, width: 1.2)
         : Border.all(
-            color: (isDark ? Colors.white10 : Colors.black12),
+            color: (isDark ? AppColors.darkBorder : Colors.black12),
             width: 0.8,
           );
 
-    final chipTextColor =
-        isSelected ? gold : (isDark ? Colors.white70 : const Color(0xFF334155));
+    final chipTextColor = isSelected
+        ? gold
+        : (isDark ? AppColors.darkTextSecondary : const Color(0xFF334155));
 
     return Material(
       color: Colors.transparent,

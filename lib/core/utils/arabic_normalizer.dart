@@ -67,4 +67,58 @@ class ArabicNormalizer {
 
     return false;
   }
+
+  /// Checks if all keywords in [query] match across the provided [sources].
+  /// Every significant word/token in the query must be found in the normalized searchable text.
+  static bool matchesMultiToken({
+    required String query,
+    required Iterable<String> sources,
+  }) {
+    final trimmedQuery = query.trim();
+    if (trimmedQuery.isEmpty) return true;
+
+    final combinedNormSource =
+        sources.map((s) => normalize(s)).where((s) => s.isNotEmpty).join(' ');
+    if (combinedNormSource.isEmpty) return false;
+
+    final rawTokens = trimmedQuery.split(RegExp(r'\s+'));
+    final tokens = rawTokens
+        .map((w) => normalize(w))
+        .where((w) => w.isNotEmpty)
+        .toList();
+
+    if (tokens.isEmpty) return true;
+
+    var nonSurahTokenCount = 0;
+    for (final token in tokens) {
+      if (token == 'سوره' || token == 'سورة') {
+        continue;
+      }
+      nonSurahTokenCount++;
+
+      var matched = combinedNormSource.contains(token);
+
+      // Check stripping "ال"
+      if (!matched && token.startsWith('ال') && token.length > 2) {
+        matched = combinedNormSource.contains(token.substring(2));
+      }
+
+      // Check adding "ال"
+      if (!matched && !token.startsWith('ال')) {
+        matched = combinedNormSource.contains('ال$token');
+      }
+
+      if (!matched) {
+        return false;
+      }
+    }
+
+    // If query only consisted of "سورة", match if the combined text has "سورة" or surah references
+    if (nonSurahTokenCount == 0) {
+      return combinedNormSource.contains('سوره') ||
+          combinedNormSource.contains('سورة');
+    }
+
+    return true;
+  }
 }

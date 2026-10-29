@@ -229,19 +229,20 @@ class DownloadedRecitationsCubit extends Cubit<DownloadedRecitationsState> {
 
     final trimmedQuery = query.trim();
     if (trimmedQuery.isNotEmpty) {
-      final normalizedQuery = ArabicNormalizer.normalize(trimmedQuery);
       result = result.where((r) {
-        final normSurah = ArabicNormalizer.normalize(r.surahNameAr);
-        final normSource = ArabicNormalizer.normalize(r.sourceLabel);
-        final normLoc = ArabicNormalizer.normalize(r.recordingLocation);
-        final normYear = ArabicNormalizer.normalize(r.recordingYear);
-        final surahNum = r.surahNumber.toString();
-
-        return normSurah.contains(normalizedQuery) ||
-            normSource.contains(normalizedQuery) ||
-            normLoc.contains(normalizedQuery) ||
-            normYear.contains(normalizedQuery) ||
-            surahNum.contains(normalizedQuery);
+        return ArabicNormalizer.matchesMultiToken(
+          query: trimmedQuery,
+          sources: [
+            r.surahNameAr,
+            r.cleanSurahTitleWithVerses,
+            r.recordingLocation,
+            r.cleanLocationOrDetail,
+            r.recordingYear,
+            r.sourceLabel,
+            r.verseRange,
+            r.surahNumber.toString(),
+          ],
+        );
       }).toList();
     }
 

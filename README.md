@@ -1,7 +1,7 @@
 <div align="center">
 
 # جامع تلاوات المنشاوي
-### Al-Minshawi Quran Recitations App (v1.2.0)
+### Al-Minshawi Quran Recitations App (v1.2.1)
 
 تطبيق قرآني شامل للتراث الصوتي لفضيلة الشيخ محمد صديق المنشاوي (رحمه الله)  
 مبني بـ Flutter وفق معمارية Clean Architecture، مجاني 100% وبدون أي إعلانات.
@@ -22,8 +22,8 @@
   <a href="https://apkpure.com/p/com.minshawi.recitations">
     <img src="https://img.shields.io/badge/Download%20on-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white" alt="Download on APKPure">
   </a>
-  <a href="https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/AlMinshawi-v1.2.0.apk">
-    <img src="https://img.shields.io/badge/Download-Release%20APK%20v1.2.0-2563eb?style=for-the-badge&logo=github&logoColor=white" alt="Download APK">
+  <a href="https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/al-minshawi-recitations-v1.2.1.apk">
+    <img src="https://img.shields.io/badge/Download-Release%20APK%20v1.2.1-2563eb?style=for-the-badge&logo=github&logoColor=white" alt="Download APK">
   </a>
   <a href="PRIVACY_POLICY.md">
     <img src="https://img.shields.io/badge/Privacy%20Policy-100%25%20Free%20&%20No%20Ads-D4AF37?style=for-the-badge" alt="Privacy Policy">
@@ -44,7 +44,7 @@
 | **مثبت المتجر السريع (Store Installer)** | ملف تنفيذي خفيف ينقر عليه لتثبيت التطبيق فوراً من المتجر | [![Download Installer](https://img.shields.io/badge/Download-Store%20Installer%20.exe-0078d4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/AlMinshawi-Store-Installer.exe) | تثبيت مباشر بنقرة واحدة |
 | **نسخة الويب (Web App)** | تصفح واستماع فوري بدون تحميل | [![Live Web App](https://img.shields.io/badge/Open-Web%20App-0ea5e9?style=for-the-badge&logo=google-chrome&logoColor=white)](https://a7mdabdoo.github.io/minshawi-recitations-app/) | متاح ويعمل |
 | **متجر APKPure (Android)** | المتجر الرسمي المعتمد للتطبيق على أندرويد | [![Download on APKPure](https://img.shields.io/badge/Download-APKPure-00c853?style=for-the-badge&logo=android&logoColor=white)](https://apkpure.com/p/com.minshawi.recitations) | متاح على المتجر |
-| **مستودع GitHub (Android APK)** | تحميل ملف الـ APK المباشر للأندرويد (v1.2.0) | [![Download APK](https://img.shields.io/badge/Download-AlMinshawi--v1.2.0.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/AlMinshawi-v1.2.0.apk) | متاح ومباشر |
+| **مستودع GitHub (Android APK)** | تحميل ملف الـ APK المباشر للأندرويد (v1.2.1) | [![Download APK](https://img.shields.io/badge/Download-al--minshawi--recitations--v1.2.1.apk-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/al-minshawi-recitations-v1.2.1.apk) | متاح ومباشر |
 
 ---
 
@@ -72,7 +72,7 @@
 
 ### About The Project (English)
 
-**Al-Minshawi Quran Recitations (v1.2.0)** is a modern, open-source audio streaming and offline playback platform engineered to present the timeless recordings of Sheikh Muhammad Siddiq Al-Minshawi.
+**Al-Minshawi Quran Recitations (v1.2.1)** is a modern, open-source audio streaming and offline playback platform engineered to present the timeless recordings of Sheikh Muhammad Siddiq Al-Minshawi.
 
 The app bundles four comprehensive collections: his complete Murattal recitation (114 Surahs), complete Mujawwad recitation (114 Surahs), rare historic external concert recordings from 1387 AH (26 Surahs), and the Nahawand Masterpieces collection (303 historic recordings alongside a curated 21-track Golden Selection). It provides an elegant audio experience with Quranic memorization tools, offline caching, automatic in-app update checking, and strict zero-advertising and privacy commitments.
 
