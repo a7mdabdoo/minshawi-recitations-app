@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/marquee_text.dart';
 import '../../../player/presentation/cubit/audio_player_cubit.dart';
 import '../../../player/presentation/cubit/audio_player_state.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
@@ -676,13 +675,14 @@ class _PlaylistRecitationCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 6),
                               Expanded(
-                                child: MarqueeText(
-                                  text:
-                                      '• ${Formatters.formatDuration(recitation.durationSeconds)} • ${recitation.cleanLocationOrDetail}',
+                                child: Text(
+                                  '• ${Formatters.formatDuration(recitation.durationSeconds)} • ${recitation.cleanLocationOrDetail}',
                                   style: GoogleFonts.cairo(
                                     fontSize: 11,
                                     color: textSecondary,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],

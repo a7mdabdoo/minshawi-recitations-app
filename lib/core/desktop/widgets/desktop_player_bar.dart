@@ -7,7 +7,6 @@ import 'package:just_audio/just_audio.dart';
 import '../../router/app_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/formatters.dart';
-import '../../widgets/marquee_text.dart';
 import '../../../features/favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../features/favorites/presentation/cubit/favorites_state.dart';
 import '../../../features/player/presentation/cubit/audio_player_cubit.dart';
@@ -607,13 +606,15 @@ class _DesktopPlayerBarState extends State<DesktopPlayerBar> {
                 overflow: TextOverflow.ellipsis,
               ),
               if (recitation.cleanLocationOrDetail.isNotEmpty)
-                MarqueeText(
-                  text: recitation.cleanLocationOrDetail,
+                Text(
+                  recitation.cleanLocationOrDetail,
                   style: GoogleFonts.cairo(
                     fontSize: 11,
                     color: textSecondary,
                     height: 1.2,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
             ],
           ),

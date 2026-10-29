@@ -20,7 +20,7 @@ class UpdateService {
       'https://raw.githubusercontent.com/a7mdabdoo/minshawi-recitations-app/main/version.json';
 
   static const String _defaultApkUrl =
-      'https://apkpure.com/p/com.minshawi.recitations';
+      'https://github.com/a7mdabdoo/minshawi-recitations-app/releases/download/v1.2.1/al-minshawi-recitations-v1.2.1.apk';
 
   static const String _defaultWindowsUrl =
       'https://github.com/a7mdabdoo/minshawi-recitations-app/releases/latest';
@@ -191,10 +191,18 @@ class _UpdateDialogState extends State<UpdateDialog> {
         final savePath =
             '${tempDir.path}/minshawi_update_${widget.latestVersion}.apk';
 
-        final dio = Dio();
+        final dio = Dio(
+          BaseOptions(
+            followRedirects: true,
+            maxRedirects: 5,
+            connectTimeout: const Duration(seconds: 20),
+            receiveTimeout: const Duration(minutes: 10),
+          ),
+        );
         await dio.download(
           widget.apkUrl,
           savePath,
+          deleteOnError: true,
           cancelToken: _cancelToken,
           onReceiveProgress: (received, total) {
             if (total > 0 && mounted) {

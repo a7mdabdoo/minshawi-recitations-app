@@ -5,4 +5,3 @@ export 'network/dio_client.dart';
 export 'router/app_router.dart';
 export 'theme/theme_cubit.dart';
 export 'utils/formatters.dart';
-export 'widgets/marquee_text.dart';

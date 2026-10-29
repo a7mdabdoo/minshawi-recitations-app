@@ -11,7 +11,6 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/battery_optimization_service.dart';
 import '../../../../core/utils/arabic_normalizer.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../core/widgets/marquee_text.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_bottom_sheet.dart';
@@ -485,8 +484,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 3),
-                MarqueeText(
-                  text: locationDetail.isNotEmpty
+                Text(
+                  locationDetail.isNotEmpty
                       ? 'فضيلة الشيخ محمد صديق المنشاوي • $locationDetail'
                       : 'فضيلة الشيخ محمد صديق المنشاوي',
                   style: GoogleFonts.cairo(
@@ -494,6 +493,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                     fontWeight: FontWeight.w500,
                     color: textSecondary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -2038,12 +2039,14 @@ class _DesktopPlaylistPanelState extends State<_DesktopPlaylistPanel> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          subtitle: MarqueeText(
-                            text: item.cleanLocationOrDetail,
+                          subtitle: Text(
+                            item.cleanLocationOrDetail,
                             style: GoogleFonts.cairo(
                               fontSize: 11,
                               color: widget.textSecondary,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           trailing: Text(
                             Formatters.formatDuration(item.durationSeconds),
