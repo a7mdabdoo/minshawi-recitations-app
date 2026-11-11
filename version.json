@@ -2,13 +2,13 @@
   "latest_version": "1.2.2",
   "build_number": 6,
   "release_notes": "- اعتماد تسمية «المصحف المرتل - 1387 هـ» و«المحافل والتلاوات النادرة».\n- تنقية وتحديث قسم المحافل ليضم ١٠١٩ تلاوة تاريخية بدون أي تكرار مع زر تصفية أنيق بالمكان والسور والمختارات الذهبية.\n- إصلاح جذري لمشكلة الإغلاق المفاجئ عند التكبير أو ملء الشاشة على ويندوز.\n- تنظيف الكود وتسريع البحث وتحسين سلاسة التطبيق على جميع الأجهزة.",
-  "apk_url": "https://github.com/a7mdabdoo/minshawi-recitations-releases/releases/download/v1.2.2/al-minshawi-recitations-v1.2.2.apk",
-  "download_url": "https://github.com/a7mdabdoo/minshawi-recitations-releases/releases/download/v1.2.2/al-minshawi-recitations-v1.2.2.apk",
+  "apk_url": "https://github.com/a7mdabdoo/minshawi-recitations-releases/releases/latest",
+  "download_url": "https://github.com/a7mdabdoo/minshawi-recitations-releases/releases/latest",
   "force_update": false,
   "android": {
     "latest_version": "1.2.2",
     "build_number": 6,
-    "release_notes": "- اعتماد تسمية «المصحف المرتل - 1387 هـ» و«المحافل والتلاوات النادرة».\n- تنقية وتحديث قسم المحافل ليضم ١٠١٩ تلاوة تاريخية بدون تكرار مع زر تصفية أنيق بالمكان والسور والمختارات الذهبية.\n- إصلاح البحث السريع دون تقطيع وتحسين تجربة التحميل والتشغيل.",
+    "release_notes": "- اعتماد تسمية «المصحف المرتل - 1387 هـ» و«المحافل والتلاوات النادرة».\n- تنقية وتحديث قسم المحافل ليضم ١٠١٩ تلاوة تاريخية بدون أي تكرار مع زر تصفية أنيق بالمكان والسور والمختارات الذهبية.\n- إصلاح البحث السريع دون تقطيع وتحسين تجربة التحميل والتشغيل.",
     "apk_url": "https://github.com/a7mdabdoo/minshawi-recitations-releases/releases/download/v1.2.2/al-minshawi-recitations-v1.2.2.apk",
     "download_url": "https://github.com/a7mdabdoo/minshawi-recitations-releases/releases/download/v1.2.2/al-minshawi-recitations-v1.2.2.apk",
     "force_update": false
